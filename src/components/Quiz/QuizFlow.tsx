@@ -1,5 +1,6 @@
 import { useReducer } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   quizReducer, INITIAL_STATE, currentStepId,
   isMultiSelectStep, multiSelectMax, progressFraction,
@@ -20,6 +21,7 @@ interface Props {
 
 export function QuizFlow({ onComplete }: Props) {
   const [state, dispatch] = useReducer(quizReducer, INITIAL_STATE)
+  const { t } = useTranslation()
   const stepId = currentStepId(state)
 
   // Emit profile when we reach result
@@ -42,7 +44,7 @@ export function QuizFlow({ onComplete }: Props) {
           className="self-start ml-6 mt-2 text-gray-500 hover:text-gray-300 text-sm
                      flex items-center gap-1 transition-colors"
         >
-          ← Back
+          {t('back')}
         </button>
       )}
 
@@ -59,7 +61,7 @@ export function QuizFlow({ onComplete }: Props) {
             <ChoiceStep
               key="play-count"
               emoji="🎮"
-              question="How many escape rooms have you done?"
+              question={t('q_play_count')}
               options={PLAY_COUNT_OPTIONS}
               onAnswer={v => dispatch({ type: 'ANSWER', value: v })}
             />
@@ -69,7 +71,7 @@ export function QuizFlow({ onComplete }: Props) {
             <ChoiceStep
               key="fear-q1"
               emoji="🌑"
-              question="You hear a sudden noise behind you in a dark room."
+              question={t('q_fear_q1')}
               options={FEAR_Q1_OPTIONS}
               onAnswer={v => dispatch({ type: 'ANSWER', value: v })}
             />
@@ -79,7 +81,7 @@ export function QuizFlow({ onComplete }: Props) {
             <ChoiceStep
               key="fear-q2"
               emoji="🚪"
-              question="You have to walk alone through a dark hallway."
+              question={t('q_fear_q2')}
               options={FEAR_Q2_OPTIONS}
               onAnswer={v => dispatch({ type: 'ANSWER', value: v })}
             />
@@ -89,7 +91,7 @@ export function QuizFlow({ onComplete }: Props) {
             <MultiSelectStep
               key="genre"
               emoji="🎭"
-              question="Which genres do you love?"
+              question={t('q_genre')}
               options={GENRE_OPTIONS}
               selected={state.answers.genres}
               max={multiSelectMax('genre')}
@@ -102,7 +104,7 @@ export function QuizFlow({ onComplete }: Props) {
             <ChoiceStep
               key="puzzle-q1"
               emoji="🔒"
-              question="When something doesn't open, you..."
+              question={t('q_puzzle_q1')}
               options={PUZZLE_Q1_OPTIONS}
               onAnswer={v => dispatch({ type: 'ANSWER', value: v })}
             />
@@ -112,7 +114,7 @@ export function QuizFlow({ onComplete }: Props) {
             <ChoiceStep
               key="puzzle-q2"
               emoji="🏆"
-              question="What feels more satisfying?"
+              question={t('q_puzzle_q2')}
               options={PUZZLE_Q2_OPTIONS}
               onAnswer={v => dispatch({ type: 'ANSWER', value: v })}
             />
@@ -122,7 +124,7 @@ export function QuizFlow({ onComplete }: Props) {
             <MultiSelectStep
               key="play-style"
               emoji="🎯"
-              question="How do you play?"
+              question={t('q_play_style')}
               options={PLAY_STYLE_OPTIONS}
               selected={state.answers.playStyle}
               max={multiSelectMax('play-style')}

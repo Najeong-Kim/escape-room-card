@@ -1,5 +1,6 @@
 // Multi-select step: tapping toggles selection, Continue button advances.
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 interface Option {
   value: string
@@ -20,6 +21,7 @@ interface Props {
 export function MultiSelectStep({
   emoji, question, options, selected, max, onToggle, onContinue,
 }: Props) {
+  const { t } = useTranslation()
   const atMax = selected.length >= max
 
   return (
@@ -33,7 +35,9 @@ export function MultiSelectStep({
         <div className="text-4xl mb-3">{emoji}</div>
         <h2 className="text-xl font-bold text-white leading-snug">{question}</h2>
         <p className="text-gray-500 text-xs mt-1">
-          {atMax ? `Max ${max} selected` : `Pick up to ${max}`}
+          {atMax
+            ? t('max_selected', { max })
+            : t('pick_up_to', { max })}
         </p>
       </div>
 
@@ -58,7 +62,7 @@ export function MultiSelectStep({
               ].join(' ')}
             >
               {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
-              <span className="font-medium flex-1">{opt.label}</span>
+              <span className="font-medium flex-1">{t(`opt_${opt.value}`, opt.label)}</span>
               {isSelected && (
                 <span className="text-violet-400 text-sm">✓</span>
               )}
@@ -78,7 +82,7 @@ export function MultiSelectStep({
           className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold
                      py-3 rounded-2xl transition-all active:scale-95"
         >
-          Continue →
+          {t('continue_arrow')}
         </motion.button>
       )}
     </motion.div>

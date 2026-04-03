@@ -1,5 +1,6 @@
 // Single-select step: tapping an option auto-advances.
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 interface Option {
   value: string
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function ChoiceStep({ emoji, question, options, onAnswer }: Props) {
+  const { t } = useTranslation()
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -39,7 +41,7 @@ export function ChoiceStep({ emoji, question, options, onAnswer }: Props) {
                        transition-all duration-150 flex items-center gap-3"
           >
             {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
-            <span className="font-medium">{opt.label}</span>
+            <span className="font-medium">{t(`opt_${opt.value}`, opt.label)}</span>
           </motion.button>
         ))}
       </div>

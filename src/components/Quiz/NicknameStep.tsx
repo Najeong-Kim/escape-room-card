@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   onAnswer: (value: string) => void
@@ -7,6 +8,7 @@ interface Props {
 
 export function NicknameStep({ onAnswer }: Props) {
   const [value, setValue] = useState('')
+  const { t } = useTranslation()
 
   function handleSubmit() {
     const trimmed = value.trim()
@@ -22,8 +24,8 @@ export function NicknameStep({ onAnswer }: Props) {
     >
       <div className="text-center">
         <div className="text-4xl mb-3">🎭</div>
-        <h2 className="text-2xl font-bold text-white mb-2">What's your nickname?</h2>
-        <p className="text-gray-400 text-sm">This will appear on your escape room card</p>
+        <h2 className="text-2xl font-bold text-white mb-2">{t('nickname_title')}</h2>
+        <p className="text-gray-400 text-sm">{t('nickname_subtitle')}</p>
       </div>
 
       <input
@@ -31,7 +33,7 @@ export function NicknameStep({ onAnswer }: Props) {
         value={value}
         onChange={e => setValue(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-        placeholder="Enter your nickname"
+        placeholder={t('nickname_placeholder')}
         maxLength={24}
         autoFocus
         className="w-full max-w-xs bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3
@@ -46,7 +48,7 @@ export function NicknameStep({ onAnswer }: Props) {
                    disabled:text-gray-600 text-white font-semibold py-3 rounded-2xl
                    transition-all active:scale-95"
       >
-        Continue
+        {t('continue')}
       </button>
     </motion.div>
   )

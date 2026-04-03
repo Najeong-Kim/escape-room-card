@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
 import {
   DISPLAY_IMAGES, ANIMAL_EMOJIS,
@@ -15,13 +16,19 @@ export function ResultCard({ profile, onReset }: Props) {
   const [flipped, setFlipped] = useState(false)
   const [shareBlob, setShareBlob] = useState<Blob | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { t, i18n } = useTranslation()
 
-  // Pre-compose share image when card mounts
+  const tagline = t(`tagline_${profile.characterId}`)
+  const fearLabel = t(`fear_${profile.fearLevel}`)
+  const styleLabel = t(`style_${profile.puzzleStyle}`)
+  const tierLabel = t(`tier_${profile.playCountTier.label}`)
+
+  // Re-compose share image when card mounts or language changes
   useEffect(() => {
-    composeShareCanvas(profile).then(blob => {
+    composeShareCanvas(profile, tagline, tierLabel).then(blob => {
       if (blob) setShareBlob(blob)
     })
-  }, [profile])
+  }, [profile, i18n.language, tagline, tierLabel])
 
   const displayImg = DISPLAY_IMAGES[profile.characterId]
   const fearIcon = FEAR_ICONS[profile.fearLevel]
@@ -36,8 +43,8 @@ export function ResultCard({ profile, onReset }: Props) {
       className="flex flex-col items-center min-h-dvh max-w-md mx-auto px-6 py-8 gap-6"
     >
       <div className="text-center">
-        <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Your escape room card</p>
-        <h1 className="text-3xl font-black text-white">{profile.tagline}</h1>
+        <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">{t('result_subtitle')}</p>
+        <h1 className="text-3xl font-black text-white">{tagline}</h1>
       </div>
 
       {/* Card with flip */}
@@ -55,29 +62,40 @@ export function ResultCard({ profile, onReset }: Props) {
               fearIcon={fearIcon}
               puzzleIcon={puzzleIcon}
               stars={stars}
+              tagline={tagline}
+              tierLabel={tierLabel}
+              fearLabel={fearLabel}
+              styleLabel={styleLabel}
             />
           </div>
 
           {/* Back */}
           <div className="card-face card-face-back rounded-3xl overflow-hidden bg-gray-950 border border-gray-800 shadow-2xl">
-            <CardBack profile={profile} fearIcon={fearIcon} puzzleIcon={puzzleIcon} />
+            <CardBack
+              profile={profile}
+              fearIcon={fearIcon}
+              puzzleIcon={puzzleIcon}
+              fearLabel={fearLabel}
+              styleLabel={styleLabel}
+              tierLabel={tierLabel}
+            />
           </div>
         </div>
       </div>
 
       {/* Flip hint */}
-      <p className="text-gray-600 text-xs">Tap card to flip</p>
+      <p className="text-gray-600 text-xs">{t('tap_to_flip')}</p>
 
       {/* Actions */}
       <div className="w-full flex flex-col gap-3">
-        <ShareButton shareBlob={shareBlob} nickname={profile.nickname} />
+        <ShareButton shareBlob={shareBlob} nickname={profile.nickname} t={t} />
 
         <button
           onClick={onReset}
           className="w-full border border-gray-800 hover:border-gray-600 text-gray-400
                      hover:text-white py-3 rounded-2xl transition-all text-sm font-medium"
         >
-          Try again
+          {t('try_again')}
         </button>
       </div>
 
@@ -90,13 +108,17 @@ export function ResultCard({ profile, onReset }: Props) {
 // ─── Card faces ───────────────────────────────────────────────────
 
 function CardFront({
-  profile, displayImg, fearIcon, puzzleIcon, stars,
+  profile, displayImg, fearIcon, puzzleIcon, stars, tagline, tierLabel, fearLabel, styleLabel,
 }: {
   profile: QuizProfile
   displayImg: string
   fearIcon: string
   puzzleIcon: string
   stars: string
+  tagline: string
+  tierLabel: string
+  fearLabel: string
+  styleLabel: string
 }) {
   return (
     <div className="h-full flex flex-col">
@@ -113,13 +135,13 @@ function CardFront({
       {/* Name + tagline */}
       <div className="px-6 pb-4 text-center">
         <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">{profile.nickname}</p>
-        <h2 className="text-white text-xl font-black">{profile.tagline}</h2>
+        <h2 className="text-white text-xl font-black">{tagline}</h2>
       </div>
 
       {/* Trait icons row */}
       <div className="px-6 pb-4 flex justify-center gap-6">
-        <TraitBadge icon={fearIcon} label={profile.fearLevel} />
-        <TraitBadge icon={puzzleIcon} label={profile.puzzleStyle} />
+        <TraitBadge icon={fearIcon} label={fearLabel} />
+        <TraitBadge icon={puzzleIcon} label={styleLabel} />
         {profile.playStyle[0] && (
           <TraitBadge icon="🎯" label={profile.playStyle[0]} />
         )}
@@ -129,7 +151,7 @@ function CardFront({
       <div className="mx-6 mb-5 bg-violet-900/30 border border-violet-700/40 rounded-xl px-4 py-2
                       flex items-center justify-between">
         <span className="text-violet-300 text-xs font-semibold uppercase tracking-wider">
-          {profile.playCountTier.label}
+          {tierLabel}
         </span>
         <span className="text-yellow-400 text-sm tracking-tight">{stars}</span>
       </div>
@@ -138,38 +160,42 @@ function CardFront({
 }
 
 function CardBack({
-  profile, fearIcon, puzzleIcon,
+  profile, fearIcon, puzzleIcon, fearLabel, styleLabel, tierLabel,
 }: {
   profile: QuizProfile
   fearIcon: string
   puzzleIcon: string
+  fearLabel: string
+  styleLabel: string
+  tierLabel: string
 }) {
+  const { t } = useTranslation()
   return (
     <div className="h-full flex flex-col p-6 gap-4">
       <div className="text-center mb-2">
-        <p className="text-gray-500 text-xs uppercase tracking-widest">Card Details</p>
+        <p className="text-gray-500 text-xs uppercase tracking-widest">{t('card_details')}</p>
         <h3 className="text-white font-black text-lg mt-1">{profile.nickname}</h3>
       </div>
 
       <div className="flex flex-col gap-3 flex-1">
-        <BackRow label="Fear level" value={`${fearIcon} ${capitalize(profile.fearLevel)}`} />
-        <BackRow label="Style" value={`${puzzleIcon} ${capitalize(profile.puzzleStyle)}`} />
+        <BackRow label={t('label_fear')} value={`${fearIcon} ${fearLabel}`} />
+        <BackRow label={t('label_style')} value={`${puzzleIcon} ${styleLabel}`} />
         <BackRow
-          label="Genres"
+          label={t('label_genres')}
           value={profile.genres.length > 0 ? profile.genres.join(', ') : '—'}
         />
         <BackRow
-          label="Play style"
+          label={t('label_play_style')}
           value={profile.playStyle.length > 0 ? profile.playStyle.join(', ') : '—'}
         />
         <BackRow
-          label="Experience"
-          value={`${profile.playCountTier.label} (${profile.playCount} rooms)`}
+          label={t('label_experience')}
+          value={`${tierLabel} (${t('rooms_count', { count: profile.playCount })})`}
         />
       </div>
 
       <p className="text-center text-gray-700 text-xs mt-auto">
-        🔒 Escape Room Profile Card
+        {t('watermark')}
       </p>
     </div>
   )
@@ -179,7 +205,7 @@ function TraitBadge({ icon, label }: { icon: string; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <span className="text-2xl">{icon}</span>
-      <span className="text-gray-500 text-xs capitalize">{label}</span>
+      <span className="text-gray-500 text-xs">{label}</span>
     </div>
   )
 }
@@ -193,13 +219,15 @@ function BackRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
 // ─── Share button ─────────────────────────────────────────────────
 
-function ShareButton({ shareBlob, nickname }: { shareBlob: Blob | null; nickname: string }) {
+function ShareButton({
+  shareBlob, nickname, t,
+}: {
+  shareBlob: Blob | null
+  nickname: string
+  t: (key: string) => string
+}) {
   async function handleShare() {
     if (!shareBlob) return
     const file = new File([shareBlob], `${nickname}-escape-room-card.png`, { type: 'image/png' })
@@ -231,16 +259,18 @@ function ShareButton({ shareBlob, nickname }: { shareBlob: Blob | null; nickname
                  disabled:text-gray-600 text-white font-semibold py-3 rounded-2xl
                  transition-all active:scale-95 flex items-center justify-center gap-2"
     >
-      <span>{shareBlob ? '💾 Save Card' : '⏳ Preparing...'}</span>
+      <span>{shareBlob ? t('save_card') : t('preparing')}</span>
     </button>
   )
 }
 
 // ─── Canvas composition ───────────────────────────────────────────
-// Runs in background when card mounts. No dependency on fabric.js needed
-// for a simple composition — pure canvas API is sufficient here.
 
-async function composeShareCanvas(profile: QuizProfile): Promise<Blob | null> {
+async function composeShareCanvas(
+  profile: QuizProfile,
+  tagline: string,
+  tierLabel: string,
+): Promise<Blob | null> {
   const SIZE = 1080
   const canvas = document.createElement('canvas')
   canvas.width = SIZE
@@ -274,10 +304,10 @@ async function composeShareCanvas(profile: QuizProfile): Promise<Blob | null> {
   ctx.textAlign = 'center'
   ctx.fillText(profile.nickname.toUpperCase(), SIZE / 2, 660)
 
-  // Tagline
+  // Tagline (translated)
   ctx.fillStyle = '#ffffff'
   ctx.font = 'bold 64px system-ui, sans-serif'
-  ctx.fillText(profile.tagline, SIZE / 2, 740)
+  ctx.fillText(tagline, SIZE / 2, 740)
 
   // Trait icons row
   const icons = [
@@ -293,14 +323,14 @@ async function composeShareCanvas(profile: QuizProfile): Promise<Blob | null> {
     ctx.fillText(icon, iconStart + i * iconSpacing, 830)
   })
 
-  // Play count tier badge
+  // Play count tier badge (translated)
   ctx.fillStyle = 'rgba(139, 92, 246, 0.2)'
   roundRect(ctx, SIZE / 2 - 200, 870, 400, 70, 20)
   ctx.fill()
   ctx.fillStyle = '#c4b5fd'
   ctx.font = '500 32px system-ui, sans-serif'
   ctx.fillText(
-    `${profile.playCountTier.label}  ${PLAY_COUNT_STARS[profile.playCount]}`,
+    `${tierLabel}  ${PLAY_COUNT_STARS[profile.playCount]}`,
     SIZE / 2, 915
   )
 
