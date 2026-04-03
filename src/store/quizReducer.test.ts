@@ -60,12 +60,12 @@ describe('MULTI_TOGGLE — genre step', () => {
   it('caps at 3 genres — 4th toggle ignored', () => {
     const s = dispatch(atGenre(),
       { type: 'MULTI_TOGGLE', value: 'Horror' },
-      { type: 'MULTI_TOGGLE', value: 'Mystery' },
-      { type: 'MULTI_TOGGLE', value: 'Fantasy' },
-      { type: 'MULTI_TOGGLE', value: 'Thriller' }, // should be ignored
+      { type: 'MULTI_TOGGLE', value: 'MysteryThriller' },
+      { type: 'MULTI_TOGGLE', value: 'FantasyAdventure' },
+      { type: 'MULTI_TOGGLE', value: 'Comic' }, // should be ignored
     )
     expect(s.answers.genres).toHaveLength(3)
-    expect(s.answers.genres).not.toContain('Thriller')
+    expect(s.answers.genres).not.toContain('Comic')
   })
 })
 
@@ -150,7 +150,7 @@ describe('Full flow → profile generation', () => {
       { type: 'ANSWER', value: 'react' },     // fear-q1
       { type: 'ANSWER', value: 'alone' },     // fear-q2
       { type: 'MULTI_TOGGLE', value: 'Horror' },
-      { type: 'MULTI_TOGGLE', value: 'Mystery' },
+      { type: 'MULTI_TOGGLE', value: 'MysteryThriller' },
       { type: 'CONTINUE' },                   // genre → puzzle-q1
       { type: 'ANSWER', value: 'puzzles' },   // puzzle-q1
       { type: 'ANSWER', value: 'solving' },   // puzzle-q2
@@ -160,6 +160,6 @@ describe('Full flow → profile generation', () => {
     expect(s.profile).not.toBeNull()
     expect(s.profile?.tagline).toBe('Brave Puzzle Solver')
     expect(s.profile?.nickname).toBe('najeong')
-    expect(s.profile?.genres).toEqual(['Horror', 'Mystery'])
+    expect(s.profile?.genres).toEqual(['Horror', 'MysteryThriller'])
   })
 })

@@ -42,10 +42,10 @@ const en = {
 
   // Options — genre
   opt_Horror: 'Horror',
-  opt_Mystery: 'Mystery',
-  opt_Fantasy: 'Fantasy',
+  opt_MysteryThriller: 'Mystery / Thriller',
+  opt_FantasyAdventure: 'Fantasy / Adventure',
   opt_Emotional: 'Emotional',
-  opt_Thriller: 'Thriller',
+  opt_Comic: 'Comic',
 
   // Options — puzzle
   opt_surroundings: 'Search surroundings for a trigger',

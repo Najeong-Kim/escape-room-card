@@ -78,7 +78,7 @@ describe('buildProfile', () => {
       playCount: '30-100',
       q3a: 'react',
       q3b: 'alone',
-      genres: ['Horror', 'Mystery', 'Fantasy'],
+      genres: ['Horror', 'MysteryThriller', 'FantasyAdventure'],
       q5a: 'puzzles',
       q5b: 'solving',
       playStyle: ['Speed runner', 'No-hint player'],
@@ -87,7 +87,7 @@ describe('buildProfile', () => {
     expect(profile.puzzleStyle).toBe('puzzle')
     expect(profile.tagline).toBe('Brave Puzzle Solver')
     expect(profile.characterId).toBe('brave_puzzle')
-    expect(profile.genres).toEqual(['Horror', 'Mystery', 'Fantasy'])
+    expect(profile.genres).toEqual(['Horror', 'MysteryThriller', 'FantasyAdventure'])
     expect(profile.playStyle).toEqual(['Speed runner', 'No-hint player'])
     expect(profile.playCountTier.label).toBe('Veteran')
     expect(profile.nickname).toBe('najeong')
@@ -97,7 +97,7 @@ describe('buildProfile', () => {
     const profile = buildProfile({
       nickname: 'x', playCount: '0-10',
       q3a: 'freeze', q3b: 'cannot',
-      genres: ['Horror', 'Mystery', 'Fantasy', 'Thriller'],
+      genres: ['Horror', 'MysteryThriller', 'FantasyAdventure', 'Comic'],
       q5a: 'surroundings', q5b: 'triggering',
       playStyle: [],
     })

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
@@ -22,6 +22,8 @@ export function ResultCard({ profile, onReset }: Props) {
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
   const tierLabel = t(`tier_${profile.playCountTier.label}`)
+  const genreBackground = getGenreBackground(profile.genres)
+  const genreBorder = getGenreBorder(profile.genres)
 
   // Re-compose share image when card mounts or language changes
   useEffect(() => {
@@ -55,7 +57,10 @@ export function ResultCard({ profile, onReset }: Props) {
       >
         <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
           {/* Front */}
-          <div className="card-face rounded-3xl overflow-hidden bg-gradient-to-b from-gray-900 to-gray-950 border border-gray-800 shadow-2xl">
+          <div
+            className="card-face rounded-3xl overflow-hidden border shadow-2xl"
+            style={{ background: genreBackground, borderColor: genreBorder }}
+          >
             <CardFront
               profile={profile}
               displayImg={displayImg}
@@ -70,7 +75,10 @@ export function ResultCard({ profile, onReset }: Props) {
           </div>
 
           {/* Back */}
-          <div className="card-face card-face-back rounded-3xl overflow-hidden bg-gray-950 border border-gray-800 shadow-2xl">
+          <div
+            className="card-face card-face-back rounded-3xl overflow-hidden border shadow-2xl"
+            style={{ background: genreBackground, borderColor: genreBorder }}
+          >
             <CardBack
               profile={profile}
               fearIcon={fearIcon}
@@ -170,6 +178,13 @@ function CardBack({
   tierLabel: string
 }) {
   const { t } = useTranslation()
+  const genresLabel = profile.genres.length > 0
+    ? profile.genres.map(genre => t(`opt_${genre}`)).join(', ')
+    : '—'
+  const playStyleLabel = profile.playStyle.length > 0
+    ? profile.playStyle.map(style => t(`opt_${style}`)).join(', ')
+    : '—'
+
   return (
     <div className="h-full flex flex-col p-6 gap-4">
       <div className="text-center mb-2">
@@ -182,11 +197,11 @@ function CardBack({
         <BackRow label={t('label_style')} value={`${puzzleIcon} ${styleLabel}`} />
         <BackRow
           label={t('label_genres')}
-          value={profile.genres.length > 0 ? profile.genres.join(', ') : '—'}
+          value={genresLabel}
         />
         <BackRow
           label={t('label_play_style')}
-          value={profile.playStyle.length > 0 ? profile.playStyle.join(', ') : '—'}
+          value={playStyleLabel}
         />
         <BackRow
           label={t('label_experience')}
@@ -278,15 +293,24 @@ async function composeShareCanvas(
   const ctx = canvas.getContext('2d')
   if (!ctx) return null
 
+  const genreStops = getGenreStops(profile.genres)
   // Background gradient
   const grad = ctx.createLinearGradient(0, 0, 0, SIZE)
-  grad.addColorStop(0, '#0d0d18')
-  grad.addColorStop(1, '#0a0a0f')
+  genreStops.forEach((color, index) => {
+    const stop = genreStops.length === 1 ? index : index / (genreStops.length - 1)
+    grad.addColorStop(stop, color)
+  })
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, SIZE, SIZE)
 
+  const overlay = ctx.createLinearGradient(0, 0, SIZE, SIZE)
+  overlay.addColorStop(0, 'rgba(8, 10, 18, 0.18)')
+  overlay.addColorStop(1, 'rgba(4, 6, 14, 0.48)')
+  ctx.fillStyle = overlay
+  ctx.fillRect(0, 0, SIZE, SIZE)
+
   // Subtle border
-  ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'
+  ctx.strokeStyle = `${hexToRgba(getGenreBorder(profile.genres), 0.7)}`
   ctx.lineWidth = 4
   roundRect(ctx, 20, 20, SIZE - 40, SIZE - 40, 48)
   ctx.stroke()
@@ -364,4 +388,66 @@ function loadCanvasImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error(`Failed to load image: ${src}`))
     img.src = src
   })
+}
+
+const GENRE_COLORS: Record<string, string> = {
+  Horror: '#3b1021',
+  MysteryThriller: '#173467',
+  FantasyAdventure: '#23644e',
+  Emotional: '#d94f8a',
+  Comic: '#c24b16',
+}
+
+function getGenreStops(genres: string[]): string[] {
+  const stops = genres
+    .map(genre => GENRE_COLORS[genre])
+    .filter((color): color is string => Boolean(color))
+
+  if (stops.length === 0) return ['#171725', '#09090f']
+  if (stops.length === 1) return [lightenColor(stops[0], 0.16), darkenColor(stops[0], 0.22)]
+  return stops.map(color => darkenColor(color, 0.08))
+}
+
+function getGenreBackground(genres: string[]): CSSProperties['background'] {
+  const stops = getGenreStops(genres)
+  return `linear-gradient(135deg, ${stops.join(', ')})`
+}
+
+function getGenreBorder(genres: string[]): string {
+  const first = genres.find(genre => GENRE_COLORS[genre])
+  return first ? lightenColor(GENRE_COLORS[first], 0.32) : '#3f3f46'
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const normalized = hex.replace('#', '')
+  const value = normalized.length === 3
+    ? normalized.split('').map(char => char + char).join('')
+    : normalized
+  const num = Number.parseInt(value, 16)
+  const r = (num >> 16) & 255
+  const g = (num >> 8) & 255
+  const b = num & 255
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+function lightenColor(hex: string, amount: number): string {
+  return adjustColor(hex, amount)
+}
+
+function darkenColor(hex: string, amount: number): string {
+  return adjustColor(hex, -amount)
+}
+
+function adjustColor(hex: string, amount: number): string {
+  const normalized = hex.replace('#', '')
+  const value = normalized.length === 3
+    ? normalized.split('').map(char => char + char).join('')
+    : normalized
+  const num = Number.parseInt(value, 16)
+  const clamp = (channel: number) => Math.max(0, Math.min(255, channel))
+  const offset = Math.round(255 * amount)
+  const r = clamp(((num >> 16) & 255) + offset)
+  const g = clamp(((num >> 8) & 255) + offset)
+  const b = clamp((num & 255) + offset)
+  return `#${[r, g, b].map(channel => channel.toString(16).padStart(2, '0')).join('')}`
 }
