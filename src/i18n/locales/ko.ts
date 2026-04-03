@@ -54,10 +54,10 @@ const ko = {
   opt_triggering: '장치 작동시키기',
 
   // Options — play style
-  'opt_No-hint player': '힌트 없이 플레이',
+  'opt_No-hint player': '노힌트',
   'opt_Speed runner': '스피드런',
   opt_Cooperative: '협동형',
-  opt_Observer: '관찰자',
+  opt_Observer: '옵저버',
 
   // Result card UI
   result_subtitle: '나의 방탈출 카드',
@@ -81,7 +81,7 @@ const ko = {
   tagline_neutral_puzzle: '침착한 퍼즐 마스터',
   tagline_neutral_device: '침착한 장치 전문가',
   tagline_neutral_balanced: '침착한 전략가',
-  tagline_scared_any: '신중한 관찰자',
+  tagline_scared_any: '신중한 옵저버',
 
   // Fear / style display
   fear_brave: '용감함',
