@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
 import {
-  DISPLAY_IMAGES, ANIMAL_EMOJIS,
+  DISPLAY_IMAGES, SHARE_IMAGES,
   FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
 
@@ -291,12 +291,8 @@ async function composeShareCanvas(
   roundRect(ctx, 20, 20, SIZE - 40, SIZE - 40, 48)
   ctx.stroke()
 
-  // Character animal emoji
-  ctx.font = '220px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(ANIMAL_EMOJIS[profile.characterId], SIZE / 2, 380)
-  ctx.textBaseline = 'alphabetic'
+  const animalImage = await loadCanvasImage(SHARE_IMAGES[profile.characterId])
+  ctx.drawImage(animalImage, SIZE / 2 - 280, 120, 560, 560)
 
   // Nickname
   ctx.fillStyle = 'rgba(167, 139, 250, 0.8)'
@@ -359,4 +355,13 @@ function roundRect(
   ctx.lineTo(x, y + r)
   ctx.arcTo(x, y, x + r, y, r)
   ctx.closePath()
+}
+
+function loadCanvasImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`))
+    img.src = src
+  })
 }

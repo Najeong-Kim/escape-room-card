@@ -1,30 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <!-- Cat -->
-  <!-- Background -->
-  <circle cx="100" cy="100" r="100" fill="#8B5CF6"/>
-  <!-- Face -->
-  <circle cx="100" cy="108" r="72" fill="#C4B5FD"/>
-  <!-- Ears (triangular) -->
-  <path d="M46,76 L40,26 L82,66 Z" fill="#8B5CF6"/>
-  <path d="M56,74 L52,34 L78,65 Z" fill="#DDD6FE"/>
-  <path d="M154,76 L160,26 L118,66 Z" fill="#8B5CF6"/>
-  <path d="M144,74 L148,34 L122,65 Z" fill="#DDD6FE"/>
-  <!-- Forehead highlight -->
-  <ellipse cx="100" cy="84" rx="48" ry="36" fill="#EDE9FE"/>
-  <!-- Eyes (almond) -->
-  <ellipse cx="78" cy="97" rx="13" ry="10" fill="white"/>
-  <ellipse cx="122" cy="97" rx="13" ry="10" fill="white"/>
-  <ellipse cx="78" cy="97" rx="6" ry="9" fill="#4C1D95"/>
-  <ellipse cx="122" cy="97" rx="6" ry="9" fill="#4C1D95"/>
-  <circle cx="80" cy="94" r="2" fill="white"/>
-  <circle cx="124" cy="94" r="2" fill="white"/>
-  <!-- Nose -->
-  <path d="M97,114 Q100,111 103,114 Q100,118 97,114 Z" fill="#7C3AED"/>
-  <!-- Mouth -->
-  <path d="M93,117 Q100,124 107,117" stroke="#7C3AED" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <!-- Whiskers -->
-  <line x1="26" y1="111" x2="66" y2="113" stroke="#7C3AED" stroke-width="1.5"/>
-  <line x1="26" y1="118" x2="66" y2="117" stroke="#7C3AED" stroke-width="1.5"/>
-  <line x1="134" y1="113" x2="174" y2="111" stroke="#7C3AED" stroke-width="1.5"/>
-  <line x1="134" y1="117" x2="174" y2="118" stroke="#7C3AED" stroke-width="1.5"/>
-</svg>
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1080" height="1080" rx="220" fill="#fff0f6"/>
+    <circle cx="540" cy="540" r="370" fill="#ffbdd8" opacity="0.28"/>
+    <circle cx="540" cy="540" r="330" fill="#ffffff" opacity="0.55"/>
+    <ellipse cx="540" cy="902" rx="220" ry="54" fill="#31233b" opacity="0.10"/>
+    
+        <path d="M385 490 L420 350 L500 470 Z" fill="#8f7cf7" />
+        <path d="M695 490 L660 350 L580 470 Z" fill="#8f7cf7" />
+        <path d="M420 448 L440 382 L484 450 Z" fill="#fce7f3" />
+        <path d="M660 448 L640 382 L596 450 Z" fill="#fce7f3" />
+        
+    <ellipse cx="540" cy="575" rx="190" ry="170" fill="#8f7cf7" />
+    <ellipse cx="540" cy="700" rx="130" ry="110" fill="#6756c7" opacity="0.95"/>
+    <ellipse cx="540" cy="610" rx="92" ry="72" fill="#fce7f3" />
+    <circle cx="485" cy="555" r="20" fill="#1f2430" />
+    <circle cx="595" cy="555" r="20" fill="#1f2430" />
+    <circle cx="478" cy="548" r="6" fill="#ffffff" opacity="0.92"/>
+    <circle cx="588" cy="548" r="6" fill="#ffffff" opacity="0.92"/>
+    <ellipse cx="540" cy="600" rx="26" ry="18" fill="#473228" />
+    <path d="M520 625 Q540 645 560 625" stroke="#473228" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <circle cx="455" cy="612" r="18" fill="#ffb3c7" opacity="0.8"/>
+    <circle cx="625" cy="612" r="18" fill="#ffb3c7" opacity="0.8"/>
+  
+        <path d="M440 600 L355 582" stroke="#473228" stroke-width="8" stroke-linecap="round"/>
+        <path d="M440 626 L348 626" stroke="#473228" stroke-width="8" stroke-linecap="round"/>
+        <path d="M640 600 L725 582" stroke="#473228" stroke-width="8" stroke-linecap="round"/>
+        <path d="M640 626 L732 626" stroke="#473228" stroke-width="8" stroke-linecap="round"/>
+        <path d="M430 708 C474 668 512 668 540 712 C500 739 462 742 430 708" fill="#ff8db8" />
+      
+    <path d="M360 858 C428 816 508 800 540 802 C590 804 676 820 734 858 L710 920 C662 888 586 874 540 874 C492 874 416 888 372 920 Z" fill="#ff8db8" opacity="0.95"/>
+    <circle cx="446" cy="848" r="22" fill="#ffffff" opacity="0.18"/>
+    <circle cx="640" cy="834" r="16" fill="#ffffff" opacity="0.12"/>
+  </svg>

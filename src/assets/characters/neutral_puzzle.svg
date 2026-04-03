@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <!-- Fox -->
-  <!-- Background -->
-  <circle cx="100" cy="100" r="100" fill="#E05D20"/>
-  <!-- Face -->
-  <ellipse cx="100" cy="110" rx="72" ry="70" fill="#F07030"/>
-  <!-- Pointed ears -->
-  <path d="M38,80 L26,14 L82,62 Z" fill="#E05D20"/>
-  <path d="M50,77 L40,22 L78,60 Z" fill="#CC3300"/>
-  <path d="M162,80 L174,14 L118,62 Z" fill="#E05D20"/>
-  <path d="M150,77 L160,22 L122,60 Z" fill="#CC3300"/>
-  <!-- Forehead stripe -->
-  <path d="M100,44 Q106,60 100,72 Q94,60 100,44 Z" fill="#CC3300"/>
-  <!-- White muzzle -->
-  <ellipse cx="100" cy="118" rx="30" ry="24" fill="#FFF8F0"/>
-  <!-- Eyes -->
-  <circle cx="78" cy="90" r="11" fill="#FFFBEB"/>
-  <circle cx="122" cy="90" r="11" fill="#FFFBEB"/>
-  <ellipse cx="79" cy="91" rx="7" ry="8" fill="#1A0500"/>
-  <ellipse cx="123" cy="91" rx="7" ry="8" fill="#1A0500"/>
-  <circle cx="81" cy="88" r="2.5" fill="white"/>
-  <circle cx="125" cy="88" r="2.5" fill="white"/>
-  <!-- Nose -->
-  <ellipse cx="100" cy="112" rx="6" ry="4.5" fill="#1A0500"/>
-  <!-- Mouth -->
-  <path d="M90,120 Q100,128 110,120" stroke="#CC4400" stroke-width="2" fill="none" stroke-linecap="round"/>
-</svg>
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1080" height="1080" rx="220" fill="#f4edff"/>
+    <circle cx="540" cy="540" r="370" fill="#cdb7ff" opacity="0.28"/>
+    <circle cx="540" cy="540" r="330" fill="#ffffff" opacity="0.55"/>
+    <ellipse cx="540" cy="902" rx="220" ry="54" fill="#31233b" opacity="0.10"/>
+    
+        <path d="M355 465 C360 378 430 330 500 360 C460 402 434 428 416 480 Z" fill="#ff9051" />
+        <path d="M725 465 C720 378 650 330 580 360 C620 402 646 428 664 480 Z" fill="#ff9051" />
+        <path d="M400 446 C410 394 448 378 478 388 C455 412 438 430 428 462 Z" fill="#fff1dd" />
+        <path d="M680 446 C670 394 632 378 602 388 C625 412 642 430 652 462 Z" fill="#fff1dd" />
+        <ellipse cx="540" cy="575" rx="175" ry="160" fill="#ff9051" />
+        <ellipse cx="540" cy="700" rx="126" ry="104" fill="#eb6d2f" />
+        <path d="M455 565 L540 665 L625 565 Q610 705 540 752 Q470 705 455 565" fill="#fff1dd" />
+        <circle cx="485" cy="555" r="18" fill="#1f2430" />
+        <circle cx="595" cy="555" r="18" fill="#1f2430" />
+        <circle cx="478" cy="548" r="5" fill="#ffffff" opacity="0.92"/>
+        <circle cx="588" cy="548" r="5" fill="#ffffff" opacity="0.92"/>
+        <ellipse cx="540" cy="605" rx="24" ry="16" fill="#473228" />
+        <path d="M516 626 Q540 648 564 626" stroke="#473228" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <circle cx="460" cy="612" r="18" fill="#ffb3c7" opacity="0.8"/>
+        <circle cx="620" cy="612" r="18" fill="#ffb3c7" opacity="0.8"/>
+        <path d="M425 706 C470 668 510 668 540 712 C498 740 458 742 425 706" fill="#8d67ff" />
+      
+    <path d="M360 858 C428 816 508 800 540 802 C590 804 676 820 734 858 L710 920 C662 888 586 874 540 874 C492 874 416 888 372 920 Z" fill="#8d67ff" opacity="0.95"/>
+    <circle cx="446" cy="848" r="22" fill="#ffffff" opacity="0.18"/>
+    <circle cx="640" cy="834" r="16" fill="#ffffff" opacity="0.12"/>
+  </svg>
