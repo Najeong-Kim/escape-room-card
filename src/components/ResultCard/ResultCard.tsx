@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { QuizProfile } from '../../lib/traitMap'
 import {
-  DISPLAY_IMAGES, SHARE_IMAGES,
+  DISPLAY_IMAGES, ANIMAL_EMOJIS,
   FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
 
@@ -261,25 +261,12 @@ async function composeShareCanvas(profile: QuizProfile): Promise<Blob | null> {
   roundRect(ctx, 20, 20, SIZE - 40, SIZE - 40, 48)
   ctx.stroke()
 
-  // Character image
-  try {
-    const img = new Image()
-    img.src = SHARE_IMAGES[profile.characterId]
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve()
-      img.onerror = () => reject()
-    })
-    const imgSize = 400
-    const imgX = (SIZE - imgSize) / 2
-    ctx.save()
-    ctx.beginPath()
-    ctx.arc(SIZE / 2, 380, imgSize / 2, 0, Math.PI * 2)
-    ctx.clip()
-    ctx.drawImage(img, imgX, 380 - imgSize / 2, imgSize, imgSize)
-    ctx.restore()
-  } catch {
-    // Character failed to load — continue without it
-  }
+  // Character animal emoji
+  ctx.font = '220px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(ANIMAL_EMOJIS[profile.characterId], SIZE / 2, 380)
+  ctx.textBaseline = 'alphabetic'
 
   // Nickname
   ctx.fillStyle = 'rgba(167, 139, 250, 0.8)'

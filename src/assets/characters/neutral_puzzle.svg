@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Fox -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#E05D20"/>
+  <!-- Face -->
+  <ellipse cx="100" cy="110" rx="72" ry="70" fill="#F07030"/>
+  <!-- Pointed ears -->
+  <path d="M38,80 L26,14 L82,62 Z" fill="#E05D20"/>
+  <path d="M50,77 L40,22 L78,60 Z" fill="#CC3300"/>
+  <path d="M162,80 L174,14 L118,62 Z" fill="#E05D20"/>
+  <path d="M150,77 L160,22 L122,60 Z" fill="#CC3300"/>
+  <!-- Forehead stripe -->
+  <path d="M100,44 Q106,60 100,72 Q94,60 100,44 Z" fill="#CC3300"/>
+  <!-- White muzzle -->
+  <ellipse cx="100" cy="118" rx="30" ry="24" fill="#FFF8F0"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="90" r="11" fill="#FFFBEB"/>
+  <circle cx="122" cy="90" r="11" fill="#FFFBEB"/>
+  <ellipse cx="79" cy="91" rx="7" ry="8" fill="#1A0500"/>
+  <ellipse cx="123" cy="91" rx="7" ry="8" fill="#1A0500"/>
+  <circle cx="81" cy="88" r="2.5" fill="white"/>
+  <circle cx="125" cy="88" r="2.5" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="112" rx="6" ry="4.5" fill="#1A0500"/>
+  <!-- Mouth -->
+  <path d="M90,120 Q100,128 110,120" stroke="#CC4400" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

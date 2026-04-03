@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Lion -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#F5C842"/>
+  <!-- Mane -->
+  <circle cx="100" cy="112" r="80" fill="#D4850A"/>
+  <!-- Face -->
+  <circle cx="100" cy="100" r="62" fill="#F5C842"/>
+  <!-- Ears -->
+  <circle cx="52" cy="50" r="22" fill="#F5C842"/>
+  <circle cx="52" cy="50" r="14" fill="#D4850A"/>
+  <circle cx="148" cy="50" r="22" fill="#F5C842"/>
+  <circle cx="148" cy="50" r="14" fill="#D4850A"/>
+  <!-- Eyes -->
+  <circle cx="80" cy="90" r="11" fill="white"/>
+  <circle cx="120" cy="90" r="11" fill="white"/>
+  <circle cx="82" cy="92" r="7" fill="#2C1600"/>
+  <circle cx="122" cy="92" r="7" fill="#2C1600"/>
+  <circle cx="85" cy="89" r="2.5" fill="white"/>
+  <circle cx="125" cy="89" r="2.5" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="112" rx="9" ry="6" fill="#D4850A"/>
+  <circle cx="96" cy="114" r="2" fill="#7C3F00"/>
+  <circle cx="104" cy="114" r="2" fill="#7C3F00"/>
+  <!-- Mouth -->
+  <path d="M88,120 Q100,130 112,120" stroke="#D4850A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

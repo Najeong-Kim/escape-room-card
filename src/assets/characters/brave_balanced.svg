@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Wolf -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#6B7280"/>
+  <!-- Body -->
+  <circle cx="100" cy="112" r="76" fill="#9CA3AF"/>
+  <!-- Pointed ears -->
+  <path d="M46,84 L36,18 L86,68 Z" fill="#6B7280"/>
+  <path d="M56,81 L48,26 L82,66 Z" fill="#4B5563"/>
+  <path d="M154,84 L164,18 L114,68 Z" fill="#6B7280"/>
+  <path d="M144,81 L152,26 L118,66 Z" fill="#4B5563"/>
+  <!-- Forehead -->
+  <ellipse cx="100" cy="82" rx="55" ry="42" fill="#D1D5DB"/>
+  <!-- Muzzle -->
+  <ellipse cx="100" cy="120" rx="30" ry="22" fill="#E5E7EB"/>
+  <!-- Eyes -->
+  <circle cx="80" cy="90" r="11" fill="#F9FAFB"/>
+  <circle cx="120" cy="90" r="11" fill="#F9FAFB"/>
+  <circle cx="82" cy="91" r="7" fill="#1F2937"/>
+  <circle cx="122" cy="91" r="7" fill="#1F2937"/>
+  <circle cx="84" cy="88" r="2.5" fill="white"/>
+  <circle cx="124" cy="88" r="2.5" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="113" rx="8" ry="5.5" fill="#374151"/>
+  <!-- Mouth -->
+  <path d="M90,121 Q100,130 110,121" stroke="#6B7280" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

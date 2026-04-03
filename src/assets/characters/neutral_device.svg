@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Cat -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#8B5CF6"/>
+  <!-- Face -->
+  <circle cx="100" cy="108" r="72" fill="#C4B5FD"/>
+  <!-- Ears (triangular) -->
+  <path d="M46,76 L40,26 L82,66 Z" fill="#8B5CF6"/>
+  <path d="M56,74 L52,34 L78,65 Z" fill="#DDD6FE"/>
+  <path d="M154,76 L160,26 L118,66 Z" fill="#8B5CF6"/>
+  <path d="M144,74 L148,34 L122,65 Z" fill="#DDD6FE"/>
+  <!-- Forehead highlight -->
+  <ellipse cx="100" cy="84" rx="48" ry="36" fill="#EDE9FE"/>
+  <!-- Eyes (almond) -->
+  <ellipse cx="78" cy="97" rx="13" ry="10" fill="white"/>
+  <ellipse cx="122" cy="97" rx="13" ry="10" fill="white"/>
+  <ellipse cx="78" cy="97" rx="6" ry="9" fill="#4C1D95"/>
+  <ellipse cx="122" cy="97" rx="6" ry="9" fill="#4C1D95"/>
+  <circle cx="80" cy="94" r="2" fill="white"/>
+  <circle cx="124" cy="94" r="2" fill="white"/>
+  <!-- Nose -->
+  <path d="M97,114 Q100,111 103,114 Q100,118 97,114 Z" fill="#7C3AED"/>
+  <!-- Mouth -->
+  <path d="M93,117 Q100,124 107,117" stroke="#7C3AED" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Whiskers -->
+  <line x1="26" y1="111" x2="66" y2="113" stroke="#7C3AED" stroke-width="1.5"/>
+  <line x1="26" y1="118" x2="66" y2="117" stroke="#7C3AED" stroke-width="1.5"/>
+  <line x1="134" y1="113" x2="174" y2="111" stroke="#7C3AED" stroke-width="1.5"/>
+  <line x1="134" y1="117" x2="174" y2="118" stroke="#7C3AED" stroke-width="1.5"/>
+</svg>

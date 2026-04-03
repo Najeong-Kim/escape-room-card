@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Rabbit -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#FDA4AF"/>
+  <!-- Tall ears -->
+  <ellipse cx="72" cy="42" rx="18" ry="38" fill="#FFF1F2"/>
+  <ellipse cx="72" cy="42" rx="10" ry="29" fill="#FBCFE8"/>
+  <ellipse cx="128" cy="42" rx="18" ry="38" fill="#FFF1F2"/>
+  <ellipse cx="128" cy="42" rx="10" ry="29" fill="#FBCFE8"/>
+  <!-- Face -->
+  <circle cx="100" cy="112" r="68" fill="#FFF1F2"/>
+  <!-- Cheek blush -->
+  <ellipse cx="70" cy="120" rx="16" ry="10" fill="#FEC5CC" opacity="0.7"/>
+  <ellipse cx="130" cy="120" rx="16" ry="10" fill="#FEC5CC" opacity="0.7"/>
+  <!-- Eyes (big, round) -->
+  <circle cx="80" cy="104" r="13" fill="white"/>
+  <circle cx="120" cy="104" r="13" fill="white"/>
+  <circle cx="82" cy="106" r="9" fill="#DB2777"/>
+  <circle cx="122" cy="106" r="9" fill="#DB2777"/>
+  <circle cx="85" cy="103" r="3" fill="white"/>
+  <circle cx="125" cy="103" r="3" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="124" rx="6" ry="4" fill="#F472B6"/>
+  <!-- Mouth -->
+  <path d="M92,130 Q100,137 108,130" stroke="#F472B6" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

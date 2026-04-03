@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Eagle -->
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#92400E"/>
+  <!-- Brown body -->
+  <circle cx="100" cy="112" r="76" fill="#B45309"/>
+  <!-- White head -->
+  <ellipse cx="100" cy="82" rx="52" ry="50" fill="#F9FAFB"/>
+  <!-- Brow ridge (fierce) -->
+  <path d="M64,70 L88,76" stroke="#9CA3AF" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M136,70 L112,76" stroke="#9CA3AF" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="82" r="12" fill="#F59E0B"/>
+  <circle cx="122" cy="82" r="12" fill="#F59E0B"/>
+  <circle cx="80" cy="84" r="8" fill="#1F2937"/>
+  <circle cx="124" cy="84" r="8" fill="#1F2937"/>
+  <circle cx="82" cy="81" r="2.5" fill="white"/>
+  <circle cx="126" cy="81" r="2.5" fill="white"/>
+  <!-- Hooked beak -->
+  <path d="M90,98 L110,98 L106,110 Q100,116 94,110 Z" fill="#F59E0B"/>
+  <path d="M90,98 L110,98 L100,105 Z" fill="#D97706"/>
+</svg>

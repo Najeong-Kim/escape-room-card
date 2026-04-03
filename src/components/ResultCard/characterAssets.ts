@@ -1,41 +1,33 @@
 import type { CharacterId } from '../../lib/traitMap'
 
-// Display images (300px) — used in card UI
-import bravePuzzleDisplay from '../../assets/characters/brave_puzzle-display.png'
-import braveDeviceDisplay from '../../assets/characters/brave_device-display.png'
-import braveBalancedDisplay from '../../assets/characters/brave_balanced-display.png'
-import neutralPuzzleDisplay from '../../assets/characters/neutral_puzzle-display.png'
-import neutralDeviceDisplay from '../../assets/characters/neutral_device-display.png'
-import neutralBalancedDisplay from '../../assets/characters/neutral_balanced-display.png'
-import scaredAnyDisplay from '../../assets/characters/scared_any-display.png'
-
-// Share images (1080px) — used in canvas export
-import bravePuzzleShare from '../../assets/characters/brave_puzzle-share.png'
-import braveDeviceShare from '../../assets/characters/brave_device-share.png'
-import braveBalancedShare from '../../assets/characters/brave_balanced-share.png'
-import neutralPuzzleShare from '../../assets/characters/neutral_puzzle-share.png'
-import neutralDeviceShare from '../../assets/characters/neutral_device-share.png'
-import neutralBalancedShare from '../../assets/characters/neutral_balanced-share.png'
-import scaredAnyShare from '../../assets/characters/scared_any-share.png'
+// Animal SVGs — used in card UI
+import bravePuzzle from '../../assets/characters/brave_puzzle.svg'
+import braveDevice from '../../assets/characters/brave_device.svg'
+import braveBalanced from '../../assets/characters/brave_balanced.svg'
+import neutralPuzzle from '../../assets/characters/neutral_puzzle.svg'
+import neutralDevice from '../../assets/characters/neutral_device.svg'
+import neutralBalanced from '../../assets/characters/neutral_balanced.svg'
+import scaredAny from '../../assets/characters/scared_any.svg'
 
 export const DISPLAY_IMAGES: Record<CharacterId, string> = {
-  brave_puzzle:    bravePuzzleDisplay,
-  brave_device:    braveDeviceDisplay,
-  brave_balanced:  braveBalancedDisplay,
-  neutral_puzzle:  neutralPuzzleDisplay,
-  neutral_device:  neutralDeviceDisplay,
-  neutral_balanced: neutralBalancedDisplay,
-  scared_any:      scaredAnyDisplay,
+  brave_puzzle:     bravePuzzle,
+  brave_device:     braveDevice,
+  brave_balanced:   braveBalanced,
+  neutral_puzzle:   neutralPuzzle,
+  neutral_device:   neutralDevice,
+  neutral_balanced: neutralBalanced,
+  scared_any:       scaredAny,
 }
 
-export const SHARE_IMAGES: Record<CharacterId, string> = {
-  brave_puzzle:    bravePuzzleShare,
-  brave_device:    braveDeviceShare,
-  brave_balanced:  braveBalancedShare,
-  neutral_puzzle:  neutralPuzzleShare,
-  neutral_device:  neutralDeviceShare,
-  neutral_balanced: neutralBalancedShare,
-  scared_any:      scaredAnyShare,
+// Emoji used in the canvas share image (reliable cross-platform rendering)
+export const ANIMAL_EMOJIS: Record<CharacterId, string> = {
+  brave_puzzle:     '🦁',
+  brave_device:     '🐯',
+  brave_balanced:   '🐺',
+  neutral_puzzle:   '🦊',
+  neutral_device:   '🐱',
+  neutral_balanced: '🦅',
+  scared_any:       '🐰',
 }
 
 export const FEAR_ICONS: Record<string, string> = {
