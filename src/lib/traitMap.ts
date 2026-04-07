@@ -116,6 +116,7 @@ export function derivePlayCountTier(playCount: PlayCount): PlayCountTier {
     case '10-30':   return { label: 'Regular', stars: 2 }
     case '30-100':  return { label: 'Veteran', stars: 3 }
     case '100+':    return { label: 'Expert', stars: 4 }
+    default:        return { label: 'Beginner', stars: 1 }
   }
 }
 

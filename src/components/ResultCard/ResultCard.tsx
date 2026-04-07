@@ -21,7 +21,7 @@ export function ResultCard({ profile, onReset }: Props) {
   const tagline = t(`tagline_${profile.characterId}`)
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
-  const tierLabel = t(`tier_${profile.playCountTier.label}`)
+  const tierLabel = t(`tier_${profile.playCountTier?.label ?? 'Beginner'}`)
   const genreBackground = getGenreBackground(profile.genres)
   const genreBorder = getGenreBorder(profile.genres)
 
