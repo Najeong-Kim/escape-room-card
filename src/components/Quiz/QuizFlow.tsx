@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useReducer, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import {
@@ -24,11 +24,14 @@ export function QuizFlow({ onComplete }: Props) {
   const { t } = useTranslation()
   const stepId = currentStepId(state)
 
-  // Emit profile when we reach result
-  if (stepId === 'result' && state.profile) {
-    onComplete(state.profile)
-    return null
-  }
+  // Emit profile when we reach result (useEffect to avoid side-effect in render)
+  useEffect(() => {
+    if (stepId === 'result' && state.profile) {
+      onComplete(state.profile)
+    }
+  }, [stepId, state.profile, onComplete])
+
+  if (stepId === 'result') return null
 
   const stepIndex = state.stepIndex
   const fraction = progressFraction(state)

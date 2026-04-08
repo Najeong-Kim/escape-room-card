@@ -32,7 +32,7 @@ export function NicknameStep({ onAnswer }: Props) {
         type="text"
         value={value}
         onChange={e => setValue(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        onKeyDown={e => e.key === 'Enter' && !e.nativeEvent.isComposing && handleSubmit()}
         placeholder={t('nickname_placeholder')}
         maxLength={24}
         autoFocus
