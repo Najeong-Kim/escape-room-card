@@ -1,4 +1,5 @@
 import { List, Datagrid, TextField, NumberField, FunctionField } from 'react-admin'
+import { GENRE_LABEL } from './RoomForm'
 
 export const RoomList = () => (
   <List perPage={50}>
@@ -9,7 +10,7 @@ export const RoomList = () => (
       <FunctionField
         label="장르"
         render={(record: { genres?: string[] }) =>
-          record.genres?.join(', ') ?? ''
+          record.genres?.map(g => GENRE_LABEL[g] ?? g).join(', ') ?? ''
         }
       />
       <NumberField source="fear_level" label="공포도" />

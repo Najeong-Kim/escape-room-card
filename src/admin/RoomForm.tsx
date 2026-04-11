@@ -10,13 +10,15 @@ const LOCATION_CHOICES = [
   '홍대', '강남', '건대', '신촌', '성수', '잠실', '신림', '노원', '용산', '대학로',
 ].map(v => ({ id: v, name: v }))
 
-const GENRE_CHOICES = [
-  { id: 'Horror', name: 'Horror' },
-  { id: 'MysteryThriller', name: 'MysteryThriller' },
-  { id: 'Emotional', name: 'Emotional' },
-  { id: 'Comic', name: 'Comic' },
-  { id: 'FantasyAdventure', name: 'FantasyAdventure' },
-]
+export const GENRE_LABEL: Record<string, string> = {
+  Horror: '공포',
+  MysteryThriller: '미스터리/스릴러',
+  Emotional: '감성',
+  Comic: '코믹',
+  FantasyAdventure: '판타지/어드벤처',
+}
+
+const GENRE_CHOICES = Object.entries(GENRE_LABEL).map(([id, name]) => ({ id, name }))
 
 export const RoomFormFields = ({ isEdit = false }: { isEdit?: boolean }) => (
   <>
