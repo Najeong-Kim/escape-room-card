@@ -4,6 +4,7 @@ import { RoomList } from './RoomList'
 import { RoomEdit } from './RoomEdit'
 import { RoomCreate } from './RoomCreate'
 import { authProvider } from './authProvider'
+import { darkTheme, lightTheme } from './theme'
 
 if (!import.meta.env.VITE_ADMIN_PASSWORD) {
   console.warn('[admin] VITE_ADMIN_PASSWORD not set — anyone can log in')
@@ -17,7 +18,7 @@ const dataProvider = postgrestDataProvider({
 
 export default function AdminApp() {
   return (
-    <Admin dataProvider={dataProvider} authProvider={authProvider} basename="/admin">
+    <Admin dataProvider={dataProvider} authProvider={authProvider} basename="/admin" theme={lightTheme} darkTheme={darkTheme}>
       <Resource name="rooms" list={RoomList} edit={RoomEdit} create={RoomCreate} />
     </Admin>
   )
