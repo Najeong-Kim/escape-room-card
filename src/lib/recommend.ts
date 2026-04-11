@@ -1,5 +1,6 @@
 import type { QuizProfile } from './traitMap'
-import rooms from '../data/rooms.json'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 export interface Room {
   id: string
@@ -9,6 +10,12 @@ export interface Room {
   genres: string[]
   fear_level: number
   puzzle_weight: number
+  difficulty: number
+  activity_level: number
+  interior_score: number
+  hint_count: number
+  duration_minutes: number
+  price_per_person: number
   min_players: number
   max_players: number
   rating_avg: number
@@ -22,6 +29,7 @@ const FEAR_SCORE: Record<string, number> = {
   cautious: 1,
 }
 
+
 function matches(room: Room, profile: QuizProfile, fearTolerance: number): boolean {
   const profileFear = FEAR_SCORE[profile.fearLevel] ?? 3
   const fearOk = Math.abs(room.fear_level - profileFear) <= fearTolerance
@@ -29,8 +37,10 @@ function matches(room: Room, profile: QuizProfile, fearTolerance: number): boole
   return fearOk && genreOk
 }
 
-export function getRecommendations(profile: QuizProfile, count = 3): Room[] {
-  const allRooms = rooms as Room[]
+export async function getRecommendations(profile: QuizProfile, count = 3): Promise<Room[]> {
+  const res = await fetch(`${API_URL}/rooms`)
+  if (!res.ok) throw new Error('Failed to fetch rooms')
+  const allRooms: Room[] = await res.json()
 
   // Try strict match first (±1 fear)
   let candidates = allRooms.filter(r => matches(r, profile, 1))

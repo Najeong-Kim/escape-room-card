@@ -19,7 +19,11 @@ export function ResultCard({ profile, onReset }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { t, i18n } = useTranslation()
 
-  const recommendations = getRecommendations(profile)
+  const [recommendations, setRecommendations] = useState<Room[]>([])
+  useEffect(() => {
+    getRecommendations(profile).then(setRecommendations).catch(() => {})
+  }, [profile])
+
   const tagline = t(`tagline_${profile.characterId}`)
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
