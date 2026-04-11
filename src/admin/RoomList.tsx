@@ -1,4 +1,4 @@
-import { List, Datagrid, TextField, NumberField, ArrayField, SingleFieldList, ChipField } from 'react-admin'
+import { List, Datagrid, TextField, NumberField, FunctionField } from 'react-admin'
 
 export const RoomList = () => (
   <List perPage={50}>
@@ -6,11 +6,12 @@ export const RoomList = () => (
       <TextField source="name" label="방 이름" />
       <TextField source="brand" label="브랜드" />
       <TextField source="location" label="지역" />
-      <ArrayField source="genres">
-        <SingleFieldList>
-          <ChipField source="id" />
-        </SingleFieldList>
-      </ArrayField>
+      <FunctionField
+        label="장르"
+        render={(record: { genres?: string[] }) =>
+          record.genres?.join(', ') ?? ''
+        }
+      />
       <NumberField source="fear_level" label="공포도" />
       <NumberField source="rating_avg" label="평점" />
     </Datagrid>
