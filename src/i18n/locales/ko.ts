@@ -74,6 +74,11 @@ const ko = {
   rooms_count: '{{count}}번',
   watermark: '🔒 방탈출 카드',
 
+  // Recommendations
+  rec_title: '추천 방 3개',
+  rec_subtitle: '내 취향에 맞는 테마',
+  rec_location: '위치',
+
   // Taglines
   tagline_brave_puzzle: '용감한 퍼즐 마스터',
   tagline_brave_device: '용감한 장치 전문가',

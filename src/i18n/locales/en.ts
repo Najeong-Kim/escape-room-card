@@ -74,6 +74,11 @@ const en = {
   rooms_count: '{{count}} rooms',
   watermark: '🔒 Escape Room Card',
 
+  // Recommendations
+  rec_title: 'Top 3 Picks For You',
+  rec_subtitle: 'Matched to your taste',
+  rec_location: 'Location',
+
   // Taglines
   tagline_brave_puzzle: 'Brave Puzzle Solver',
   tagline_brave_device: 'Brave Device Tinkerer',

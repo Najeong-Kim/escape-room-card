@@ -6,6 +6,7 @@ import {
   DISPLAY_IMAGES, SHARE_IMAGES,
   FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
+import { getRecommendations, type Room } from '../../lib/recommend'
 
 interface Props {
   profile: QuizProfile
@@ -18,6 +19,7 @@ export function ResultCard({ profile, onReset }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { t, i18n } = useTranslation()
 
+  const recommendations = getRecommendations(profile)
   const tagline = t(`tagline_${profile.characterId}`)
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
@@ -106,6 +108,9 @@ export function ResultCard({ profile, onReset }: Props) {
           {t('try_again')}
         </button>
       </div>
+
+      {/* Recommended rooms */}
+      <RecommendedRooms rooms={recommendations} t={t} />
 
       {/* Hidden canvas for share */}
       <canvas ref={canvasRef} className="hidden" />
@@ -276,6 +281,75 @@ function ShareButton({
     >
       <span>{shareBlob ? t('save_card') : t('preparing')}</span>
     </button>
+  )
+}
+
+// ─── Recommended rooms ────────────────────────────────────────────
+
+const GENRE_LABELS: Record<string, string> = {
+  Horror: '공포',
+  MysteryThriller: '미스터리',
+  FantasyAdventure: '판타지',
+  Emotional: '감성',
+  Comic: '코믹',
+}
+
+function RecommendedRooms({
+  rooms, t,
+}: {
+  rooms: Room[]
+  t: (key: string) => string
+}) {
+  if (rooms.length === 0) return null
+
+  return (
+    <div className="w-full">
+      <div className="mb-3">
+        <p className="text-gray-500 text-xs uppercase tracking-widest">{t('rec_subtitle')}</p>
+        <h2 className="text-white font-bold text-lg">{t('rec_title')}</h2>
+      </div>
+      <div className="flex flex-col gap-3">
+        {rooms.map(room => (
+          <RoomCard key={room.id} room={room} t={t} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RoomCard({ room, t }: { room: Room; t: (key: string) => string }) {
+  return (
+    <div
+      className="bg-gray-900/60 border border-gray-800 rounded-2xl px-4 py-3 flex flex-col gap-1"
+      onClick={() => {
+        // click tracking placeholder — log to console for now
+        console.log('[rec_click]', { room_id: room.id, room_name: room.name })
+      }}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-semibold text-sm truncate">{room.name}</p>
+          <p className="text-gray-500 text-xs">{room.brand}</p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-yellow-400 text-xs">★</span>
+          <span className="text-gray-300 text-xs">{room.rating_avg.toFixed(1)}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-gray-500 text-xs">{t('rec_location')}: {room.location}</span>
+        <div className="flex gap-1 flex-wrap">
+          {room.genres.map(g => (
+            <span
+              key={g}
+              className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400"
+            >
+              {GENRE_LABELS[g] ?? g}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
