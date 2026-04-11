@@ -50,6 +50,20 @@
 
 ---
 
+## 어드민 페이지 (feat/admin-page)
+
+목표: `/admin` 라우트에서 방 데이터 CRUD 관리 (react-admin + ra-data-postgrest)
+
+- [ ] **P0** PostgREST write 권한 확인 — `\dp rooms`로 INSERT/UPDATE/DELETE 권한 점검, 없으면 `GRANT INSERT, UPDATE, DELETE ON rooms TO <role>` 실행 (블로커: 권한 없으면 수정/생성/삭제 전부 403)
+- [ ] **P0** `npm install react-admin ra-data-postgrest react-router-dom --legacy-peer-deps` 설치 후 빌드 확인
+- [ ] **P0** Vercel 환경변수 설정 — `VITE_API_URL`, `VITE_ADMIN_PASSWORD` (배포 전 필수)
+- [ ] `src/admin/` 컴포넌트 구현 (AdminApp, RoomList, RoomEdit, RoomCreate, authProvider)
+- [ ] `main.tsx` BrowserRouter + Routes/Route 추가 (lazy load AdminApp)
+- [ ] `vercel.json` SPA rewrites 추가 (`{ "source": "/(.*)", "destination": "/index.html" }`)
+- [ ] **P1** BrowserRouter URL 직접 로드 검증 — 배포 후 `/`, `/admin`, 임의 경로 새로고침 시 App/AdminApp 정상 렌더 확인
+
+---
+
 ## 배포 & 인프라
 
 - [ ] Vercel 배포 자동화 확인
