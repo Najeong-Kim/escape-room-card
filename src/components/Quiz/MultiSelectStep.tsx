@@ -74,17 +74,19 @@ export function MultiSelectStep({
         })}
       </div>
 
-      {selected.length > 0 && (
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={onContinue}
-          className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold
-                     py-3 rounded-2xl transition-all active:scale-95"
-        >
-          {t('continue_arrow')}
-        </motion.button>
-      )}
+      <motion.button
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={onContinue}
+        className={[
+          'w-full font-semibold py-3 rounded-2xl transition-all active:scale-95',
+          selected.length > 0
+            ? 'bg-violet-600 hover:bg-violet-500 text-white'
+            : 'bg-transparent border border-gray-700 hover:border-gray-500 text-gray-400',
+        ].join(' ')}
+      >
+        {selected.length > 0 ? t('continue_arrow') : t('skip')}
+      </motion.button>
     </motion.div>
   )
 }

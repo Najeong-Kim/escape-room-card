@@ -3,6 +3,7 @@ const en = {
   back: '← Back',
   continue: 'Continue',
   continue_arrow: 'Continue →',
+  skip: 'Skip',
   step: 'Step {{current}} / {{total}}',
   lang_toggle: '한국어',
 

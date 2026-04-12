@@ -3,6 +3,7 @@ const ko = {
   back: '← 뒤로',
   continue: '계속하기',
   continue_arrow: '계속하기 →',
+  skip: '건너뛰기',
   step: '{{current}} / {{total}} 단계',
   lang_toggle: 'English',
 
