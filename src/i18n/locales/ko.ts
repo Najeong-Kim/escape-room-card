@@ -98,6 +98,7 @@ const ko = {
   style_balanced: '균형',
 
   // Tiers
+  tier_Newbie: '완전 초보',
   tier_Beginner: '입문자',
   tier_Regular: '일반인',
   tier_Veteran: '베테랑',

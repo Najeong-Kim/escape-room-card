@@ -98,6 +98,7 @@ const en = {
   style_balanced: 'Balanced',
 
   // Tiers
+  tier_Newbie: 'Newbie',
   tier_Beginner: 'Beginner',
   tier_Regular: 'Regular',
   tier_Veteran: 'Veteran',
