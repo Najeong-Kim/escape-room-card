@@ -1,9 +1,10 @@
 import type { QuizProfile } from './traitMap'
 
-const API_URL = import.meta.env.VITE_API_URL
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 export interface Room {
-  id: string
+  id: number
   name: string
   brand: string
   location: string
@@ -20,6 +21,8 @@ export interface Room {
   max_players: number
   rating_avg: number
   tags: string[]
+  website_url?: string
+  image_url?: string
 }
 
 // Map profile fearLevel to numeric fear score (1-5 scale)
@@ -38,7 +41,12 @@ function matches(room: Room, profile: QuizProfile, fearTolerance: number): boole
 }
 
 export async function getRecommendations(profile: QuizProfile, count = 3): Promise<Room[]> {
-  const res = await fetch(`${API_URL}/rooms`)
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rooms`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  })
   if (!res.ok) throw new Error('Failed to fetch rooms')
   const allRooms: Room[] = await res.json()
 

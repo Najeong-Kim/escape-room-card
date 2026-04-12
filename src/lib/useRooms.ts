@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import type { Room } from './recommend'
 
-const API_URL = import.meta.env.VITE_API_URL
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 export interface Theme {
   id: string
@@ -11,20 +12,20 @@ export interface Theme {
 }
 
 export const THEMES: Theme[] = [
-  { id: 'solo',    label: '혼방 가능',   emoji: '🧍', filter: r => r.min_players <= 2 },
-  { id: 'large',   label: '6인+ 가능',   emoji: '👥', filter: r => r.max_players >= 6 },
-  { id: 'fear-in', label: '공포 입문',   emoji: '😨', filter: r => r.fear_level <= 2 },
-  { id: 'fear-ex', label: '공포 고수',   emoji: '💀', filter: r => r.fear_level >= 4 },
+  { id: 'solo',    label: '혼방 가능',    emoji: '🧍', filter: r => r.min_players <= 2 },
+  { id: 'large',   label: '6인+ 가능',    emoji: '👥', filter: r => r.max_players >= 6 },
+  { id: 'fear-in', label: '공포 입문',    emoji: '😨', filter: r => r.fear_level <= 2 },
+  { id: 'fear-ex', label: '공포 고수',    emoji: '💀', filter: r => r.fear_level >= 4 },
   { id: 'interior',label: '인테리어 맛집', emoji: '✨', filter: r => r.interior_score >= 4.5 },
-  { id: 'date',    label: '데이트 코스', emoji: '💑', filter: r => r.interior_score >= 4.0 && r.genres.includes('Emotional') },
-  { id: 'puzzle',  label: '추리 특화',   emoji: '🔍', filter: r => r.puzzle_weight >= 4 },
+  { id: 'date',    label: '데이트 코스',  emoji: '💑', filter: r => r.interior_score >= 4.0 && r.genres.includes('Emotional') },
+  { id: 'puzzle',  label: '추리 특화',    emoji: '🔍', filter: r => r.puzzle_weight >= 4 },
 ]
 
 export interface RoomFilters {
   themeId: string | null
   location: string | null
   genre: string | null
-  players: number | null   // group size — max_players must be >= this
+  players: number | null
   fearMax: number | null
 }
 
@@ -55,7 +56,12 @@ export function useRooms() {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    fetch(`${API_URL}/rooms?order=rating_avg.desc`)
+    fetch(`${SUPABASE_URL}/rest/v1/rooms?order=rating_avg.desc`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    })
       .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.json() })
       .then((data: Room[]) => { setRooms(data); setLoading(false) })
       .catch(e => { setError(e); setLoading(false) })

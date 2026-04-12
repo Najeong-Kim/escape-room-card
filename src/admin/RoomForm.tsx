@@ -20,9 +20,8 @@ export const GENRE_LABEL: Record<string, string> = {
 
 const GENRE_CHOICES = Object.entries(GENRE_LABEL).map(([id, name]) => ({ id, name }))
 
-export const RoomFormFields = ({ isEdit = false }: { isEdit?: boolean }) => (
+export const RoomFormFields = () => (
   <>
-    <TextInput source="id" label="ID (예: room-006)" fullWidth required disabled={isEdit} />
     <TextInput source="name" label="방 이름" fullWidth required />
     <TextInput source="brand" label="브랜드" fullWidth required />
     <SelectInput source="location" label="지역" choices={LOCATION_CHOICES} required />
@@ -45,6 +44,9 @@ export const RoomFormFields = ({ isEdit = false }: { isEdit?: boolean }) => (
     <NumberInput source="min_players" label="최소 인원" min={1} max={20} />
     <NumberInput source="max_players" label="최대 인원" min={1} max={20} />
     <NumberInput source="rating_avg" label="평점 (1-5)" min={1} max={5} step={0.1} />
+
+    <TextInput source="website_url" label="홈페이지 URL" fullWidth />
+    <TextInput source="image_url" label="이미지 URL" fullWidth />
 
     <ArrayInput source="tags" label="태그">
       <SimpleFormIterator>

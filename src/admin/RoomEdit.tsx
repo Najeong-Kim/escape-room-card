@@ -4,7 +4,7 @@ import { RoomFormFields } from './RoomForm'
 export const RoomEdit = () => (
   <Edit>
     <SimpleForm>
-      <RoomFormFields isEdit />
+      <RoomFormFields />
     </SimpleForm>
   </Edit>
 )
