@@ -1,39 +1,28 @@
 import type { CharacterId } from '../../lib/traitMap'
 
-import bravePuzzleDisplay from '../../assets/characters/brave_puzzle-display.png'
-import braveDeviceDisplay from '../../assets/characters/brave_device-display.png'
-import braveBalancedDisplay from '../../assets/characters/brave_balanced-display.png'
-import neutralPuzzleDisplay from '../../assets/characters/neutral_puzzle-display.png'
-import neutralDeviceDisplay from '../../assets/characters/neutral_device-display.png'
-import neutralBalancedDisplay from '../../assets/characters/neutral_balanced-display.png'
-import scaredAnyDisplay from '../../assets/characters/scared_any-display.png'
-
-import bravePuzzleShare from '../../assets/characters/brave_puzzle-share.png'
-import braveDeviceShare from '../../assets/characters/brave_device-share.png'
-import braveBalancedShare from '../../assets/characters/brave_balanced-share.png'
-import neutralPuzzleShare from '../../assets/characters/neutral_puzzle-share.png'
-import neutralDeviceShare from '../../assets/characters/neutral_device-share.png'
-import neutralBalancedShare from '../../assets/characters/neutral_balanced-share.png'
-import scaredAnyShare from '../../assets/characters/scared_any-share.png'
+// AI-generated character images served from public/characters/
+// brave_puzzle → lion, brave_device → tiger, brave_balanced → wolf
+// neutral_puzzle → fox, neutral_device → cat, neutral_balanced → eagle
+// scared_any → rabbit
 
 export const DISPLAY_IMAGES: Record<CharacterId, string> = {
-  brave_puzzle: bravePuzzleDisplay,
-  brave_device: braveDeviceDisplay,
-  brave_balanced: braveBalancedDisplay,
-  neutral_puzzle: neutralPuzzleDisplay,
-  neutral_device: neutralDeviceDisplay,
-  neutral_balanced: neutralBalancedDisplay,
-  scared_any: scaredAnyDisplay,
+  brave_puzzle:    '/characters/lion.png',
+  brave_device:    '/characters/tiger.png',
+  brave_balanced:  '/characters/wolf.png',
+  neutral_puzzle:  '/characters/fox.png',
+  neutral_device:  '/characters/cat.png',
+  neutral_balanced: '/characters/eagle.png',
+  scared_any:      '/characters/rabbit.png',
 }
 
 export const SHARE_IMAGES: Record<CharacterId, string> = {
-  brave_puzzle: bravePuzzleShare,
-  brave_device: braveDeviceShare,
-  brave_balanced: braveBalancedShare,
-  neutral_puzzle: neutralPuzzleShare,
-  neutral_device: neutralDeviceShare,
-  neutral_balanced: neutralBalancedShare,
-  scared_any: scaredAnyShare,
+  brave_puzzle:    '/characters/lion.png',
+  brave_device:    '/characters/tiger.png',
+  brave_balanced:  '/characters/wolf.png',
+  neutral_puzzle:  '/characters/fox.png',
+  neutral_device:  '/characters/cat.png',
+  neutral_balanced: '/characters/eagle.png',
+  scared_any:      '/characters/rabbit.png',
 }
 
 export const FEAR_ICONS: Record<string, string> = {
