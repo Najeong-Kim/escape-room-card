@@ -18,6 +18,7 @@ const CHARACTER_ANIMALS: Record<CharacterId, string> = {
 }
 
 const PLAY_COUNT_PREFIX: Record<PlayCount, string> = {
+  '0':       'baby-',
   '0-10':    'baby-',
   '10-30':   'small-',
   '30-100':  '',
@@ -56,6 +57,7 @@ export const PUZZLE_ICONS: Record<string, string> = {
 }
 
 export const PLAY_COUNT_STARS: Record<string, string> = {
+  '0':      '',
   '0-10':   '★',
   '10-30':  '★★',
   '30-100': '★★★',

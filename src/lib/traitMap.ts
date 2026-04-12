@@ -4,7 +4,7 @@
 
 export type FearLevel = 'brave' | 'calm' | 'cautious'
 export type PuzzleStyle = 'puzzle' | 'device' | 'balanced'
-export type PlayCount = '0-10' | '10-30' | '30-100' | '100+'
+export type PlayCount = '0' | '0-10' | '10-30' | '30-100' | '100+'
 
 export type CharacterId =
   | 'brave_puzzle'
@@ -112,11 +112,12 @@ export function deriveCharacterId(fear: FearLevel, puzzle: PuzzleStyle): Charact
 // ─── Play count tier ──────────────────────────────────────────────
 export function derivePlayCountTier(playCount: PlayCount): PlayCountTier {
   switch (playCount) {
+    case '0':       return { label: 'Newbie', stars: 0 }
     case '0-10':    return { label: 'Beginner', stars: 1 }
     case '10-30':   return { label: 'Regular', stars: 2 }
     case '30-100':  return { label: 'Veteran', stars: 3 }
     case '100+':    return { label: 'Expert', stars: 4 }
-    default:        return { label: 'Beginner', stars: 1 }
+    default:        return { label: 'Newbie', stars: 0 }
   }
 }
 

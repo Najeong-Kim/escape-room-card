@@ -1,7 +1,8 @@
 // All question copy in one place — easy to edit without touching logic
 
 export const PLAY_COUNT_OPTIONS = [
-  { value: '0-10',   label: '0 – 10 rooms',  emoji: '🌱' },
+  { value: '0',      label: '0 rooms',       emoji: '🐣' },
+  { value: '0-10',   label: '1 – 10 rooms',  emoji: '🌱' },
   { value: '10-30',  label: '10 – 30 rooms', emoji: '🔑' },
   { value: '30-100', label: '30 – 100 rooms',emoji: '⚔️' },
   { value: '100+',   label: '100+ rooms',    emoji: '👑' },
