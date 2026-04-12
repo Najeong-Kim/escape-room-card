@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
 import {
-  DISPLAY_IMAGES, SHARE_IMAGES,
+  getCharacterImage,
   FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
 import { getRecommendations, type Room } from '../../lib/recommend'
@@ -38,7 +38,7 @@ export function ResultCard({ profile, onReset }: Props) {
     })
   }, [profile, i18n.language, tagline, tierLabel])
 
-  const displayImg = DISPLAY_IMAGES[profile.characterId]
+  const displayImg = getCharacterImage(profile.characterId, profile.playCount)
   const fearIcon = FEAR_ICONS[profile.fearLevel]
   const puzzleIcon = PUZZLE_ICONS[profile.puzzleStyle]
   const stars = PLAY_COUNT_STARS[profile.playCount]
@@ -393,7 +393,7 @@ async function composeShareCanvas(
   roundRect(ctx, 20, 20, SIZE - 40, SIZE - 40, 48)
   ctx.stroke()
 
-  const animalImage = await loadCanvasImage(SHARE_IMAGES[profile.characterId])
+  const animalImage = await loadCanvasImage(getCharacterImage(profile.characterId, profile.playCount))
   ctx.drawImage(animalImage, SIZE / 2 - 280, 120, 560, 560)
 
   // Nickname
