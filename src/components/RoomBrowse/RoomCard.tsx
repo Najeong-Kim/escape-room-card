@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { Room } from '../../lib/recommend'
 import { hasLog } from '../../lib/roomLog'
 import { LogModal } from '../RoomLog/LogModal'
@@ -186,10 +187,15 @@ export function RoomCard({ room, communityRating, communityMetricStats, onRated 
           </div>
         )}
 
+        {/* Detail link */}
+        <div className="pt-1 border-t border-white/5">
+          <span className="text-xs text-violet-400">상세 보기 →</span>
+        </div>
+
         {/* Website link */}
         {room.website_url && (
           <div className="pt-1 border-t border-white/5">
-            <span className="text-xs text-violet-400">예약 페이지 →</span>
+            <span className="text-xs text-gray-500">예약 페이지 연결 가능</span>
           </div>
         )}
 
@@ -213,11 +219,9 @@ export function RoomCard({ room, communityRating, communityMetricStats, onRated 
 
   return (
     <>
-      {room.website_url ? (
-        <a href={room.website_url} target="_blank" rel="noopener noreferrer" className="block">
-          {inner}
-        </a>
-      ) : inner}
+      <Link to={`/rooms/${room.id}`} className="block">
+        {inner}
+      </Link>
       {showLog && (
         <LogModal
           room={room}
