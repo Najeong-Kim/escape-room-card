@@ -7,6 +7,7 @@ import type { PathRating } from '../../lib/ratings'
 import { hasLog } from '../../lib/roomLog'
 import { useRooms } from '../../lib/useRooms'
 import { ReportModal } from '../ReportModal'
+import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
 
 const GENRE_LABEL: Record<string, string> = {
@@ -238,6 +239,7 @@ export default function RoomDetail() {
           </button>
         </section>
       </main>
+      <Footer />
 
       {showLog && (
         <LogModal

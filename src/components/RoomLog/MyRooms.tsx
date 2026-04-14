@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getLogs, deleteLog } from '../../lib/roomLog'
 import type { RoomLog } from '../../lib/roomLog'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
+import { Footer } from '../Footer'
 
 function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
   if (rating === null || rating === undefined) {
@@ -145,6 +146,7 @@ export default function MyRooms() {
           ))}
         </AnimatePresence>
       </div>
+      <Footer />
     </div>
   )
 }

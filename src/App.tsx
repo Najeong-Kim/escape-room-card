@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import type { QuizProfile } from './lib/traitMap'
 import { QuizFlow } from './components/Quiz/QuizFlow'
 import { ResultCard } from './components/ResultCard/ResultCard'
+import { Footer } from './components/Footer'
 import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 
@@ -101,6 +102,7 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+      <Footer />
     </div>
   )
 }

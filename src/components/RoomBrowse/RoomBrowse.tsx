@@ -5,6 +5,7 @@ import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
+import { Footer } from '../Footer'
 
 export default function RoomBrowse() {
   const navigate = useNavigate()
@@ -167,6 +168,7 @@ export default function RoomBrowse() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }
