@@ -19,8 +19,14 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [rating, setRating] = useState<PathRating | null>(null)
   const [memo, setMemo] = useState('')
   const [saving, setSaving] = useState(false)
+  const [ratingTouched, setRatingTouched] = useState(false)
 
   async function save() {
+    if (rating === null) {
+      setRatingTouched(true)
+      return
+    }
+
     setSaving(true)
     addLog({
       room_id: room.id,
@@ -106,14 +112,17 @@ export function LogModal({ room, onClose, onSaved }: Props) {
 
           {/* Rating */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs text-gray-400">길 평가 (선택)</label>
+            <label className="text-xs text-gray-400">길 평가 (필수)</label>
             <div className="grid grid-cols-3 gap-2">
               {PATH_RATINGS.map(r => {
                 const isSelected = rating === r.value
                 return (
                   <button
                     key={r.value}
-                    onClick={() => setRating(rating === r.value ? null : r.value)}
+                    onClick={() => {
+                      setRating(rating === r.value ? null : r.value)
+                      setRatingTouched(true)
+                    }}
                     className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border transition-all"
                     style={isSelected
                       ? { backgroundColor: r.bg, borderColor: r.border, boxShadow: `0 0 8px ${r.border}40` }
@@ -131,6 +140,9 @@ export function LogModal({ room, onClose, onSaved }: Props) {
                 )
               })}
             </div>
+            {ratingTouched && rating === null && (
+              <p className="text-xs text-red-400">길 평가를 선택해 주세요.</p>
+            )}
           </div>
 
           {/* Memo */}

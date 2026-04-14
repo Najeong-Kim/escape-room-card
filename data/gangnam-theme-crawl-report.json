@@ -1,10 +1,10 @@
 {
   "source_url": "https://escape-cafe.too1s.com/theme/all",
-  "crawled_at": "2026-04-14T22:38:41.081Z",
+  "crawled_at": "2026-04-14T23:17:29.758Z",
   "target_count": 60,
   "matched_count": 28,
   "unmatched_count": 32,
-  "enriched_count": 22,
+  "enriched_count": 24,
   "official_verified_count": 10,
   "matched": [
     {
@@ -232,6 +232,12 @@
       "source_url": "https://web.zamfit.kr/escapes/5935"
     },
     {
+      "target": "둘이라면",
+      "crawled_name": "둘이라면",
+      "cafe": "도어이스케이프 강남 가든점",
+      "source_url": "https://web.zamfit.kr/escapes/4989"
+    },
+    {
       "target": "대호시장 살인사건",
       "crawled_name": "대호시장 살인사건",
       "cafe": "비트포비아 강남던전",
@@ -278,6 +284,12 @@
       "crawled_name": "NERD (네드)",
       "cafe": "키이스케이프 강남더오름점",
       "source_url": "https://web.zamfit.kr/escapes/5815/NERD-%EB%84%A4%EB%93%9C"
+    },
+    {
+      "target": "IMAGINE",
+      "crawled_name": "IMAGINE",
+      "cafe": "도어이스케이프 강남 가든점",
+      "source_url": "https://web.zamfit.kr/escapes/5934/IMAGINE"
     },
     {
       "target": "유전",

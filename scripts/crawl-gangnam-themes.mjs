@@ -41,6 +41,29 @@ function numberOrNull(value) {
   return match ? Number(match[0]) : null
 }
 
+function clampScore10(value) {
+  if (!Number.isFinite(value)) return null
+  return Math.max(0, Math.min(10, Math.round(value * 10) / 10))
+}
+
+function score10OrNull(value) {
+  const text = String(value ?? '')
+  const encodedScore = text.match(/score%22%3A([0-9.]+)/)?.[1]
+  if (encodedScore) return clampScore10(Number(encodedScore))
+
+  const fraction = text.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)/)
+  if (fraction) {
+    const score = Number(fraction[1])
+    const max = Number(fraction[2])
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      return clampScore10((score / max) * 10)
+    }
+  }
+
+  const number = text.match(/[0-9]+(?:\.[0-9]+)?/)?.[0]
+  return number ? clampScore10(Number(number)) : null
+}
+
 function compactText(value) {
   return decodeHtml(String(value ?? ''))
     .replace(/\r/g, '\n')
@@ -175,8 +198,11 @@ function parseZamfitDetail(html, sourceUrl, target) {
       booking_url: homepageUrl || sourceUrl,
       source_url: sourceUrl,
       difficulty_label: difficulty && difficulty !== '?' ? difficulty : null,
+      difficulty_score: score10OrNull(difficulty),
       fear_label: null,
+      fear_score: null,
       activity_label: activity && activity !== '?' ? activity : null,
+      activity_score: score10OrNull(activity),
     },
   }
 }
@@ -244,7 +270,9 @@ function parsePlayTheWorldTheme(theme, sourceUrl, target) {
     booking_url: theme.booking_url ?? sourceUrl,
     source_url: sourceUrl,
     difficulty_label: description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]?.trim() ?? null,
+    difficulty_score: score10OrNull(description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]),
     fear_label: null,
+    fear_score: null,
   }
 }
 
@@ -264,7 +292,9 @@ function parseKeyescapeTheme(theme, sourceUrl, target) {
     booking_url: sourceUrl,
     source_url: sourceUrl,
     difficulty_label: theme.level ? String(theme.level) : null,
+    difficulty_score: score10OrNull(theme.level),
     fear_label: null,
+    fear_score: null,
   }
 }
 
@@ -319,6 +349,16 @@ function addTheme(cafesByKey, cafeInput, themeInput, sourceName) {
     status: 'active',
     difficulty_label: themeInput.difficulty_label ?? null,
     fear_label: themeInput.fear_label ?? null,
+    difficulty_score: score10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label),
+    fear_score: score10OrNull(themeInput.fear_score ?? themeInput.fear_label),
+    activity_label: themeInput.activity_label ?? null,
+    activity_score: score10OrNull(themeInput.activity_score ?? themeInput.activity_label),
+    story_label: themeInput.story_label ?? null,
+    story_score: score10OrNull(themeInput.story_score ?? themeInput.story_label),
+    interior_label: themeInput.interior_label ?? null,
+    interior_score: score10OrNull(themeInput.interior_score ?? themeInput.interior_label),
+    aging_label: themeInput.aging_label ?? null,
+    aging_score: score10OrNull(themeInput.aging_score ?? themeInput.aging_label),
     needs_review: true,
     source_name: sourceName,
   })
@@ -366,6 +406,17 @@ function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName, opti
       writePresent(theme, 'image_url', themeInput.image_url),
       writePresent(theme, 'booking_url', themeInput.booking_url, { overwrite }),
       writePresent(theme, 'difficulty_label', themeInput.difficulty_label, { overwrite }),
+      writePresent(theme, 'difficulty_score', score10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label), { overwrite }),
+      writePresent(theme, 'fear_label', themeInput.fear_label, { overwrite }),
+      writePresent(theme, 'fear_score', score10OrNull(themeInput.fear_score ?? themeInput.fear_label), { overwrite }),
+      writePresent(theme, 'activity_label', themeInput.activity_label, { overwrite }),
+      writePresent(theme, 'activity_score', score10OrNull(themeInput.activity_score ?? themeInput.activity_label), { overwrite }),
+      writePresent(theme, 'story_label', themeInput.story_label, { overwrite }),
+      writePresent(theme, 'story_score', score10OrNull(themeInput.story_score ?? themeInput.story_label), { overwrite }),
+      writePresent(theme, 'interior_label', themeInput.interior_label, { overwrite }),
+      writePresent(theme, 'interior_score', score10OrNull(themeInput.interior_score ?? themeInput.interior_label), { overwrite }),
+      writePresent(theme, 'aging_label', themeInput.aging_label, { overwrite }),
+      writePresent(theme, 'aging_score', score10OrNull(themeInput.aging_score ?? themeInput.aging_label), { overwrite }),
       writePresent(cafe, 'address', cafeInput.address, { overwrite }),
       writePresent(cafe, 'phone', cafeInput.phone, { overwrite }),
       writePresent(cafe, 'website_url', cafeInput.website_url, { overwrite }),
@@ -538,6 +589,8 @@ async function main() {
       source_url: card.detail_url,
       difficulty_label: detail.difficulty_label,
       fear_label: detail.fear_label,
+      difficulty_score: score10OrNull(detail.difficulty_label),
+      fear_score: score10OrNull(detail.fear_label),
     }, 'ㅂㅌㅊ 전체 테마')
     matched.push({ target, crawled_name: card.name, cafe: card.cafe_name, source_url: card.detail_url })
   }

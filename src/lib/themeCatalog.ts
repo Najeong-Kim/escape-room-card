@@ -21,6 +21,12 @@ export interface ThemeCatalogRow {
   min_players: number | null
   max_players: number | null
   price_per_person: number | null
+  difficulty_score: number | null
+  fear_score: number | null
+  activity_score: number | null
+  interior_score: number | null
+  story_score: number | null
+  aging_score: number | null
   image_url: string | null
   booking_url: string | null
   theme_genres?: {
@@ -31,6 +37,11 @@ export interface ThemeCatalogRow {
     }[] | null
   }[]
   cafes: ThemeCafe | ThemeCafe[] | null
+}
+
+function score10To5(value: number | null, fallback: number) {
+  if (value === null || value === undefined) return fallback
+  return Math.max(0, Math.min(5, value / 2))
 }
 
 function firstCafe(cafes: ThemeCatalogRow['cafes']) {
@@ -61,11 +72,11 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     brand,
     location: area ?? cafe?.area_label ?? '기타',
     genres: genres ?? [],
-    fear_level: 1,
+    fear_level: score10To5(theme.fear_score, 1),
     puzzle_weight: 1,
-    difficulty: 1,
-    activity_level: 1,
-    interior_score: 0,
+    difficulty: score10To5(theme.difficulty_score, 1),
+    activity_level: score10To5(theme.activity_score, 1),
+    interior_score: score10To5(theme.interior_score, 0),
     hint_count: 0,
     duration_minutes: theme.duration_minutes ?? 60,
     price_per_person: theme.price_per_person ?? 0,

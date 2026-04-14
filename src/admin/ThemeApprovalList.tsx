@@ -31,6 +31,18 @@ interface ApprovalTheme {
   image_url: string | null
   booking_url: string | null
   source_url: string | null
+  difficulty_label: string | null
+  difficulty_score: number | null
+  fear_label: string | null
+  fear_score: number | null
+  activity_label: string | null
+  activity_score: number | null
+  story_label: string | null
+  story_score: number | null
+  interior_label: string | null
+  interior_score: number | null
+  aging_label: string | null
+  aging_score: number | null
   status: string
   needs_review: boolean
   theme_genres?: {
@@ -56,6 +68,18 @@ type ThemeForm = Pick<
   | 'image_url'
   | 'booking_url'
   | 'source_url'
+  | 'difficulty_label'
+  | 'difficulty_score'
+  | 'fear_label'
+  | 'fear_score'
+  | 'activity_label'
+  | 'activity_score'
+  | 'story_label'
+  | 'story_score'
+  | 'interior_label'
+  | 'interior_score'
+  | 'aging_label'
+  | 'aging_score'
 > & {
   genre_ids: number[]
 }
@@ -104,6 +128,21 @@ function formatPrice(theme: ApprovalTheme) {
   return `${theme.price_per_person.toLocaleString()}원/인`
 }
 
+function formatScore(label: string, score: number | null) {
+  return `${label} ${score === null ? '미확인' : `${score}/10`}`
+}
+
+function formatScores(theme: ApprovalTheme) {
+  return [
+    formatScore('난이도', theme.difficulty_score),
+    formatScore('공포도', theme.fear_score),
+    formatScore('활동성', theme.activity_score),
+    formatScore('스토리', theme.story_score),
+    formatScore('인테리어', theme.interior_score),
+    formatScore('노후화', theme.aging_score),
+  ].join(' · ')
+}
+
 function themeToForm(theme: ApprovalTheme): ThemeForm {
   return {
     name: theme.name,
@@ -117,6 +156,18 @@ function themeToForm(theme: ApprovalTheme): ThemeForm {
     image_url: theme.image_url,
     booking_url: theme.booking_url,
     source_url: theme.source_url,
+    difficulty_label: theme.difficulty_label,
+    difficulty_score: theme.difficulty_score,
+    fear_label: theme.fear_label,
+    fear_score: theme.fear_score,
+    activity_label: theme.activity_label,
+    activity_score: theme.activity_score,
+    story_label: theme.story_label,
+    story_score: theme.story_score,
+    interior_label: theme.interior_label,
+    interior_score: theme.interior_score,
+    aging_label: theme.aging_label,
+    aging_score: theme.aging_score,
   }
 }
 
@@ -158,6 +209,18 @@ export function ThemeApprovalList() {
         image_url,
         booking_url,
         source_url,
+        difficulty_label,
+        difficulty_score,
+        fear_label,
+        fear_score,
+        activity_label,
+        activity_score,
+        story_label,
+        story_score,
+        interior_label,
+        interior_score,
+        aging_label,
+        aging_score,
         status,
         needs_review,
         theme_genres (
@@ -236,6 +299,18 @@ export function ThemeApprovalList() {
       image_url: emptyToNull(form.image_url),
       booking_url: emptyToNull(form.booking_url),
       source_url: emptyToNull(form.source_url),
+      difficulty_label: emptyToNull(form.difficulty_label),
+      difficulty_score: form.difficulty_score,
+      fear_label: emptyToNull(form.fear_label),
+      fear_score: form.fear_score,
+      activity_label: emptyToNull(form.activity_label),
+      activity_score: form.activity_score,
+      story_label: emptyToNull(form.story_label),
+      story_score: form.story_score,
+      interior_label: emptyToNull(form.interior_label),
+      interior_score: form.interior_score,
+      aging_label: emptyToNull(form.aging_label),
+      aging_score: form.aging_score,
     }
 
     const { error } = await supabase.from('themes').update(payload).eq('id', themeId)
@@ -378,6 +453,18 @@ export function ThemeApprovalList() {
                     <label>최대 인원<input style={inputStyle} value={form.max_players ?? ''} onChange={e => updateForm('max_players', numberOrNull(e.target.value))} /></label>
                     <label>인당 가격<input style={inputStyle} value={form.price_per_person ?? ''} onChange={e => updateForm('price_per_person', numberOrNull(e.target.value))} /></label>
                     <label>가격 원문<input style={inputStyle} value={form.price_text ?? ''} onChange={e => updateForm('price_text', e.target.value)} /></label>
+                    <label>난이도 원문<input style={inputStyle} value={form.difficulty_label ?? ''} onChange={e => updateForm('difficulty_label', e.target.value)} /></label>
+                    <label>난이도 (0-10)<input style={inputStyle} value={form.difficulty_score ?? ''} onChange={e => updateForm('difficulty_score', numberOrNull(e.target.value))} /></label>
+                    <label>공포도 원문<input style={inputStyle} value={form.fear_label ?? ''} onChange={e => updateForm('fear_label', e.target.value)} /></label>
+                    <label>공포도 (0-10)<input style={inputStyle} value={form.fear_score ?? ''} onChange={e => updateForm('fear_score', numberOrNull(e.target.value))} /></label>
+                    <label>활동성 원문<input style={inputStyle} value={form.activity_label ?? ''} onChange={e => updateForm('activity_label', e.target.value)} /></label>
+                    <label>활동성 (0-10)<input style={inputStyle} value={form.activity_score ?? ''} onChange={e => updateForm('activity_score', numberOrNull(e.target.value))} /></label>
+                    <label>스토리 원문<input style={inputStyle} value={form.story_label ?? ''} onChange={e => updateForm('story_label', e.target.value)} /></label>
+                    <label>스토리 (0-10)<input style={inputStyle} value={form.story_score ?? ''} onChange={e => updateForm('story_score', numberOrNull(e.target.value))} /></label>
+                    <label>인테리어 원문<input style={inputStyle} value={form.interior_label ?? ''} onChange={e => updateForm('interior_label', e.target.value)} /></label>
+                    <label>인테리어 (0-10)<input style={inputStyle} value={form.interior_score ?? ''} onChange={e => updateForm('interior_score', numberOrNull(e.target.value))} /></label>
+                    <label>노후화 원문<input style={inputStyle} value={form.aging_label ?? ''} onChange={e => updateForm('aging_label', e.target.value)} /></label>
+                    <label>노후화 (0-10)<input style={inputStyle} value={form.aging_score ?? ''} onChange={e => updateForm('aging_score', numberOrNull(e.target.value))} /></label>
                     <label>이미지 URL<input style={inputStyle} value={form.image_url ?? ''} onChange={e => updateForm('image_url', e.target.value)} /></label>
                     <label>예약 URL<input style={inputStyle} value={form.booking_url ?? ''} onChange={e => updateForm('booking_url', e.target.value)} /></label>
                     <label>출처 URL<input style={inputStyle} value={form.source_url ?? ''} onChange={e => updateForm('source_url', e.target.value)} /></label>
@@ -395,6 +482,10 @@ export function ThemeApprovalList() {
                     <dd style={{ margin: 0 }}>{theme.duration_minutes ? `${theme.duration_minutes}분` : '시간 미확인'} · {formatPlayers(theme)}</dd>
                     <dt style={mutedStyle}>가격</dt>
                     <dd style={{ margin: 0 }}>{formatPrice(theme)}</dd>
+                    <dt style={mutedStyle}>지표</dt>
+                    <dd style={{ margin: 0 }}>
+                      {formatScores(theme)}
+                    </dd>
                     <dt style={mutedStyle}>출처</dt>
                     <dd style={{ margin: 0 }}>{theme.source_url ? <a href={theme.source_url} target="_blank" rel="noreferrer">{theme.source_url}</a> : '출처 URL 미확인'}</dd>
                     <dt style={mutedStyle}>예약</dt>
