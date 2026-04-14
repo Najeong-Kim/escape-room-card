@@ -197,14 +197,14 @@ export function CafeApprovalList() {
 
             return (
               <article key={cafe.id} style={cardStyle}>
-                <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div>
+                <div className="approval-card-header">
+                  <div className="approval-card-title">
                     <p style={{ ...mutedStyle, margin: '0 0 4px' }}>{cafe.district} {cafe.area_label}</p>
                     <h2 style={{ margin: 0, fontSize: 20 }}>
                       {cafe.name}{cafe.branch_name ? ` ${cafe.branch_name}` : ''}
                     </h2>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <div className="approval-card-actions">
                     {isEditing ? (
                       <>
                         <Button label="저장" variant="contained" disabled={processingId === cafe.id} onClick={() => saveCafe(cafe.id)} />
@@ -221,7 +221,7 @@ export function CafeApprovalList() {
                 </div>
 
                 {isEditing ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+                  <div className="approval-edit-grid">
                     <label>매장명<input style={inputStyle} value={form.name} onChange={e => updateForm('name', e.target.value)} /></label>
                     <label>지점명<input style={inputStyle} value={form.branch_name ?? ''} onChange={e => updateForm('branch_name', e.target.value)} /></label>
                     <label>
@@ -249,7 +249,7 @@ export function CafeApprovalList() {
                     <label style={{ gridColumn: '1 / -1' }}>출처 URL<input style={inputStyle} value={form.source_url ?? ''} onChange={e => updateForm('source_url', e.target.value)} /></label>
                   </div>
                 ) : (
-                  <dl style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px 12px', marginBottom: 0 }}>
+                  <dl className="approval-detail-list">
                     <dt style={mutedStyle}>주소</dt>
                     <dd style={{ margin: 0 }}>{cafe.address ?? '주소 미확인'}</dd>
                     <dt style={mutedStyle}>전화번호</dt>

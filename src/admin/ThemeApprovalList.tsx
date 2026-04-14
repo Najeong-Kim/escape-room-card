@@ -327,12 +327,12 @@ export function ThemeApprovalList() {
 
             return (
               <article key={theme.id} style={cardStyle}>
-                <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div>
+                <div className="approval-card-header">
+                  <div className="approval-card-title">
                     <p style={{ ...mutedStyle, margin: '0 0 4px' }}>{cafeName}</p>
                     <h2 style={{ margin: 0, fontSize: 20 }}>{theme.name}</h2>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <div className="approval-card-actions">
                     {isEditing ? (
                       <>
                         <Button label="저장" variant="contained" disabled={processingId === theme.id} onClick={() => saveTheme(theme.id)} />
@@ -355,7 +355,7 @@ export function ThemeApprovalList() {
                 )}
 
                 {isEditing ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+                  <div className="approval-edit-grid">
                     <label>테마명<input style={inputStyle} value={form.name} onChange={e => updateForm('name', e.target.value)} /></label>
                     <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: 6, padding: 10 }}>
                       <legend>장르</legend>
@@ -383,7 +383,7 @@ export function ThemeApprovalList() {
                     <label style={{ gridColumn: '1 / -1' }}>소개<input style={inputStyle} value={form.description ?? ''} onChange={e => updateForm('description', e.target.value)} /></label>
                   </div>
                 ) : (
-                  <dl style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px 12px', marginBottom: 0 }}>
+                  <dl className="approval-detail-list">
                     <dt style={mutedStyle}>지역</dt>
                     <dd style={{ margin: 0 }}>{cafe ? `${cafe.district} ${cafe.area_label}` : '-'}</dd>
                     <dt style={mutedStyle}>주소</dt>
