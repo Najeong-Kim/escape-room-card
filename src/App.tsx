@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom'
 import type { QuizProfile } from './lib/traitMap'
 import { QuizFlow } from './components/Quiz/QuizFlow'
 import { ResultCard } from './components/ResultCard/ResultCard'
+import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 
 type HomeMode = 'home' | 'quiz' | 'result'
 
 export default function App() {
   const [savedProfile, setSavedProfile] = useState<QuizProfile | null>(() => loadSavedCard())
+  const [logs] = useState<RoomLog[]>(() => getLogs())
   const [activeProfile, setActiveProfile] = useState<QuizProfile | null>(null)
   const [mode, setMode] = useState<HomeMode>(() => savedProfile ? 'home' : 'quiz')
   const { t, i18n } = useTranslation()
@@ -80,6 +82,8 @@ export default function App() {
             onViewCard={viewSavedCard}
             onStartOver={startOver}
             onBrowseRooms={() => navigate('/rooms')}
+            onViewLogs={() => navigate('/my-rooms')}
+            logs={logs}
             t={t}
           />
         )}
@@ -106,18 +110,25 @@ function SavedCardHome({
   onViewCard,
   onStartOver,
   onBrowseRooms,
+  onViewLogs,
+  logs,
   t,
 }: {
   profile: QuizProfile
   onViewCard: () => void
   onStartOver: () => void
   onBrowseRooms: () => void
+  onViewLogs: () => void
+  logs: RoomLog[]
   t: (key: string) => string
 }) {
   const tagline = t(`tagline_${profile.characterId}`)
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
   const tierLabel = t(`tier_${profile.playCountTier.label}`)
+  const totalLogs = logs.length
+  const clearedLogs = logs.filter(log => log.cleared).length
+  const latestLog = logs[0]
 
   return (
     <div className="min-h-dvh max-w-md mx-auto px-6 py-24 flex flex-col gap-6">
@@ -134,6 +145,44 @@ function SavedCardHome({
           <ProfileStat label="경험" value={tierLabel} />
           <ProfileStat label="장르" value={profile.genres.map(genre => t(`opt_${genre}`)).join(', ') || '-'} />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-[#13131a] px-5 py-5">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">내 기록</p>
+            <h2 className="text-white text-lg font-bold">
+              {totalLogs > 0 ? `${totalLogs}개의 플레이 기록` : '아직 기록된 방이 없어요'}
+            </h2>
+          </div>
+          {totalLogs > 0 && (
+            <div className="text-right">
+              <p className="text-green-400 text-xl font-black">{clearedLogs}</p>
+              <p className="text-gray-500 text-xs">성공</p>
+            </div>
+          )}
+        </div>
+
+        {latestLog ? (
+          <div className="rounded-xl bg-[#0e0e16] border border-white/8 px-4 py-3">
+            <p className="text-gray-500 text-xs">{latestLog.brand} · {latestLog.played_at}</p>
+            <p className="text-white font-semibold mt-1">{latestLog.room_name}</p>
+            <p className={latestLog.cleared ? 'text-green-400 text-xs mt-2' : 'text-red-400 text-xs mt-2'}>
+              {latestLog.cleared ? '탈출 성공' : '탈출 실패'}
+            </p>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm leading-relaxed">
+            방을 둘러보고 플레이한 테마를 기록하면 여기에서 최근 기록을 바로 볼 수 있어요.
+          </p>
+        )}
+
+        <button
+          onClick={onViewLogs}
+          className="w-full mt-4 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white py-2.5 rounded-lg transition-all text-sm font-medium"
+        >
+          내 기록 보기
+        </button>
       </section>
 
       <div className="grid gap-3">
