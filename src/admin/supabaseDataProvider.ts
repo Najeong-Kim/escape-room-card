@@ -40,13 +40,14 @@ export function createSupabaseDataProvider(): DataProvider {
     },
 
     async getOne(resource, params) {
+      const select = typeof params.meta?.select === 'string' ? params.meta.select : '*'
       const { data, error } = await supabase
         .from(resource)
-        .select('*')
+        .select(select)
         .eq('id', params.id)
         .single()
       if (error) throw error
-      return { data }
+      return { data: data as never }
     },
 
     async getMany(resource, params) {

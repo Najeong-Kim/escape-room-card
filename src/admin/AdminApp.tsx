@@ -2,6 +2,7 @@ import { Admin, Resource } from 'react-admin'
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'
 import HomeWorkIcon from '@mui/icons-material/HomeWork'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
+import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import StorefrontIcon from '@mui/icons-material/Storefront'
 import { createSupabaseDataProvider } from './supabaseDataProvider'
 import { RoomList } from './RoomList'
@@ -10,6 +11,7 @@ import { RoomCreate } from './RoomCreate'
 import { CafeList } from './CafeList'
 import { CafeApprovalList } from './CafeApprovalList'
 import { ThemeApprovalList } from './ThemeApprovalList'
+import { ReportEdit, ReportList } from './ReportList'
 import { authProvider } from './authProvider'
 import { darkTheme, lightTheme } from './theme'
 import './admin.css'
@@ -25,6 +27,7 @@ export default function AdminApp() {
     <Admin dataProvider={dataProvider} authProvider={authProvider} basename="/admin" theme={lightTheme} darkTheme={darkTheme}>
       <Resource name="rooms" options={{ label: '방 목록' }} icon={MeetingRoomIcon} list={RoomList} edit={RoomEdit} create={RoomCreate} />
       <Resource name="cafes" options={{ label: '매장 목록' }} icon={StorefrontIcon} list={CafeList} />
+      <Resource name="reports" options={{ label: '제보 목록' }} icon={ReportProblemIcon} list={ReportList} edit={ReportEdit} />
       <Resource name="cafe-approvals" options={{ label: '매장 검수' }} icon={HomeWorkIcon} list={CafeApprovalList} />
       <Resource name="theme-approvals" options={{ label: '테마 검수' }} icon={AssignmentTurnedInIcon} list={ThemeApprovalList} />
     </Admin>

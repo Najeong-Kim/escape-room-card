@@ -6,6 +6,7 @@ import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import { hasLog } from '../../lib/roomLog'
 import { useRooms } from '../../lib/useRooms'
+import { ReportModal } from '../ReportModal'
 import { LogModal } from '../RoomLog/LogModal'
 
 const GENRE_LABEL: Record<string, string> = {
@@ -50,6 +51,7 @@ export default function RoomDetail() {
   const [communityRating, setCommunityRating] = useState<CommunityRating | undefined>()
   const [communityMetricStats, setCommunityMetricStats] = useState<CommunityMetricStats>({})
   const [showLog, setShowLog] = useState(false)
+  const [showReport, setShowReport] = useState(false)
   const [logged, setLogged] = useState(() => hasLog(roomId))
 
   const refetchRatings = useCallback(() => {
@@ -227,6 +229,13 @@ export default function RoomDetail() {
               </a>
             )}
           </div>
+
+          <button
+            onClick={() => setShowReport(true)}
+            className="w-full py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-gray-300 text-sm font-semibold transition-colors"
+          >
+            정보 제보하기
+          </button>
         </section>
       </main>
 
@@ -239,6 +248,13 @@ export default function RoomDetail() {
             setShowLog(false)
             refetchRatings()
           }}
+        />
+      )}
+      {showReport && (
+        <ReportModal
+          themeId={room.id}
+          defaultTitle={`${room.name} 정보 제보`}
+          onClose={() => setShowReport(false)}
         />
       )}
     </div>
