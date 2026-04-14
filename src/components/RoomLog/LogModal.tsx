@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { addLog } from '../../lib/roomLog'
 import type { Room } from '../../lib/recommend'
+import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
+import type { PathRating } from '../../lib/ratings'
 
 interface Props {
   room: Room
@@ -13,7 +15,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const today = new Date().toISOString().slice(0, 10)
   const [playedAt, setPlayedAt] = useState(today)
   const [cleared, setCleared] = useState(true)
-  const [rating, setRating] = useState<1|2|3|4|5|null>(null)
+  const [rating, setRating] = useState<PathRating | null>(null)
   const [memo, setMemo] = useState('')
 
   function save() {
@@ -99,22 +101,30 @@ export function LogModal({ room, onClose, onSaved }: Props) {
 
           {/* Rating */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs text-gray-400">별점 (선택)</label>
-            <div className="flex gap-2">
-              {([1, 2, 3, 4, 5] as const).map(n => (
-                <button
-                  key={n}
-                  onClick={() => setRating(rating === n ? null : n)}
-                  className={[
-                    'flex-1 py-2 rounded-xl border text-lg transition-all',
-                    rating !== null && rating >= n
-                      ? 'border-yellow-500/60 bg-yellow-900/20 text-yellow-400'
-                      : 'border-white/10 bg-[#0e0e16] text-gray-600 hover:border-gray-600',
-                  ].join(' ')}
-                >
-                  ★
-                </button>
-              ))}
+            <label className="text-xs text-gray-400">길 평가 (선택)</label>
+            <div className="grid grid-cols-3 gap-2">
+              {PATH_RATINGS.map(r => {
+                const isSelected = rating === r.value
+                return (
+                  <button
+                    key={r.value}
+                    onClick={() => setRating(rating === r.value ? null : r.value)}
+                    className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border transition-all"
+                    style={isSelected
+                      ? { backgroundColor: r.bg, borderColor: r.border, boxShadow: `0 0 8px ${r.border}40` }
+                      : { backgroundColor: '#0e0e16', borderColor: 'rgba(255,255,255,0.08)' }
+                    }
+                  >
+                    <RatingIcon value={r.value} size={28} />
+                    <span
+                      className="text-xs font-medium leading-none"
+                      style={{ color: isSelected ? r.color : '#6b7280' }}
+                    >
+                      {r.label}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 

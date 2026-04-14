@@ -3,12 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getLogs, deleteLog } from '../../lib/roomLog'
 import type { RoomLog } from '../../lib/roomLog'
+import { getRatingDef, RatingIcon } from '../../lib/ratings'
 
-function StarDisplay({ rating }: { rating: RoomLog['rating'] }) {
-  if (!rating) return <span className="text-gray-600 text-xs">별점 없음</span>
+function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
+  if (rating === null || rating === undefined) {
+    return <span className="text-gray-600 text-xs">평가 없음</span>
+  }
+  const def = getRatingDef(rating)
+  if (!def) return null
   return (
-    <span className="text-yellow-400 text-sm">
-      {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+    <span className="inline-flex items-center gap-1">
+      <RatingIcon value={def.value} size={18} />
+      <span className="text-xs font-medium" style={{ color: def.color }}>{def.label}</span>
     </span>
   )
 }
@@ -101,7 +107,7 @@ export default function MyRooms() {
 
               <div className="flex items-center gap-4 text-sm">
                 <span className="text-gray-500">{log.played_at}</span>
-                <StarDisplay rating={log.rating} />
+                <RatingDisplay rating={log.rating} />
               </div>
 
               {log.memo && (

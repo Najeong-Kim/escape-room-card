@@ -5,7 +5,7 @@ export interface RoomLog {
   brand: string
   played_at: string   // YYYY-MM-DD
   cleared: boolean
-  rating: 1 | 2 | 3 | 4 | 5 | null
+  rating: 0 | 1 | 2 | 3 | 4 | 5 | null
   memo: string
 }
 
