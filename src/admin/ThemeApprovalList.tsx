@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, useNotify } from 'react-admin'
+import Button from '@mui/material/Button'
+import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
 import { supabase } from './supabaseDataProvider'
 
@@ -306,7 +307,7 @@ export function ThemeApprovalList() {
             매장 검수가 끝난 테마를 승인, 거절, 수정합니다.
           </p>
         </div>
-        <Button label="새로고침" onClick={loadThemes} disabled={loading} />
+        <Button onClick={loadThemes} disabled={loading}>새로고침</Button>
       </div>
 
       {loading ? (
@@ -335,14 +336,14 @@ export function ThemeApprovalList() {
                   <div className="approval-card-actions">
                     {isEditing ? (
                       <>
-                        <Button label="저장" variant="contained" disabled={processingId === theme.id} onClick={() => saveTheme(theme.id)} />
-                        <Button label="취소" disabled={processingId === theme.id} onClick={() => { setEditingId(null); setForm(null) }} />
+                        <Button variant="contained" disabled={processingId === theme.id} onClick={() => saveTheme(theme.id)}>저장</Button>
+                        <Button disabled={processingId === theme.id} onClick={() => { setEditingId(null); setForm(null) }}>취소</Button>
                       </>
                     ) : (
                       <>
-                        <Button label="승인" variant="contained" disabled={processingId === theme.id || !cafeApproved} onClick={() => reviewTheme(theme, 'active')} />
-                        <Button label="거절" color="error" disabled={processingId === theme.id} onClick={() => reviewTheme(theme, 'rejected')} />
-                        <Button label="수정" disabled={processingId === theme.id} onClick={() => startEdit(theme)} />
+                        <Button variant="contained" disabled={processingId === theme.id || !cafeApproved} onClick={() => reviewTheme(theme, 'active')}>승인</Button>
+                        <Button color="error" disabled={processingId === theme.id} onClick={() => reviewTheme(theme, 'rejected')}>거절</Button>
+                        <Button disabled={processingId === theme.id} onClick={() => startEdit(theme)}>수정</Button>
                       </>
                     )}
                   </div>

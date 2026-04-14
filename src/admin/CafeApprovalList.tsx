@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, useNotify } from 'react-admin'
+import Button from '@mui/material/Button'
+import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
 import { supabase } from './supabaseDataProvider'
 
@@ -181,7 +182,7 @@ export function CafeApprovalList() {
             새로 수집된 방탈출 매장 정보를 승인, 거절, 수정합니다.
           </p>
         </div>
-        <Button label="새로고침" onClick={loadCafes} disabled={loading} />
+        <Button onClick={loadCafes} disabled={loading}>새로고침</Button>
       </div>
 
       {loading ? (
@@ -207,14 +208,14 @@ export function CafeApprovalList() {
                   <div className="approval-card-actions">
                     {isEditing ? (
                       <>
-                        <Button label="저장" variant="contained" disabled={processingId === cafe.id} onClick={() => saveCafe(cafe.id)} />
-                        <Button label="취소" disabled={processingId === cafe.id} onClick={() => { setEditingId(null); setForm(null) }} />
+                        <Button variant="contained" disabled={processingId === cafe.id} onClick={() => saveCafe(cafe.id)}>저장</Button>
+                        <Button disabled={processingId === cafe.id} onClick={() => { setEditingId(null); setForm(null) }}>취소</Button>
                       </>
                     ) : (
                       <>
-                        <Button label="승인" variant="contained" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'active')} />
-                        <Button label="거절" color="error" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'rejected')} />
-                        <Button label="수정" disabled={processingId === cafe.id} onClick={() => startEdit(cafe)} />
+                        <Button variant="contained" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'active')}>승인</Button>
+                        <Button color="error" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'rejected')}>거절</Button>
+                        <Button disabled={processingId === cafe.id} onClick={() => startEdit(cafe)}>수정</Button>
                       </>
                     )}
                   </div>
