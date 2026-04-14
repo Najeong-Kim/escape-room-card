@@ -23,6 +23,22 @@ export interface Room {
   max_players: number
   rating_avg: number
   tags: string[]
+  official_scores?: {
+    difficulty?: number | null
+    fear?: number | null
+    activity?: number | null
+    story?: number | null
+    interior?: number | null
+    aging?: number | null
+  }
+  official_labels?: {
+    difficulty?: string | null
+    fear?: string | null
+    activity?: string | null
+    story?: string | null
+    interior?: string | null
+    aging?: string | null
+  }
   website_url?: string
   image_url?: string
 }
@@ -52,9 +68,15 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'min_players',
       'max_players',
       'price_per_person',
+      'difficulty_label',
       'difficulty_score',
+      'fear_label',
       'fear_score',
+      'activity_label',
       'activity_score',
+      'story_label',
+      'interior_label',
+      'aging_label',
       'interior_score',
       'story_score',
       'aging_score',

@@ -6,6 +6,12 @@ export interface RoomLog {
   played_at: string   // YYYY-MM-DD
   cleared: boolean
   rating: 0 | 1 | 2 | 3 | 4 | 5 | null
+  difficulty_score?: number | null
+  fear_score?: number | null
+  activity_score?: number | null
+  story_score?: number | null
+  interior_score?: number | null
+  aging_score?: number | null
   memo: string
 }
 

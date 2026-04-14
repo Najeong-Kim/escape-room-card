@@ -4,7 +4,17 @@ import { addLog } from '../../lib/roomLog'
 import type { Room } from '../../lib/recommend'
 import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
-import { submitCommunityRating } from '../../lib/communityRatings'
+import { submitCommunityMetricRatings, submitCommunityRating } from '../../lib/communityRatings'
+import type { MetricKey, MetricScores } from '../../lib/communityRatings'
+
+const METRICS: { key: MetricKey; label: string; low: string; high: string }[] = [
+  { key: 'difficulty', label: '난이도', low: '쉬움', high: '어려움' },
+  { key: 'fear', label: '공포도', low: '안 무서움', high: '무서움' },
+  { key: 'activity', label: '활동성', low: '적음', high: '많음' },
+  { key: 'story', label: '스토리', low: '약함', high: '강함' },
+  { key: 'interior', label: '인테리어', low: '아쉬움', high: '좋음' },
+  { key: 'aging', label: '노후화', low: '새로움', high: '낡음' },
+]
 
 interface Props {
   room: Room
@@ -18,6 +28,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [cleared, setCleared] = useState(true)
   const [rating, setRating] = useState<PathRating | null>(null)
   const [memo, setMemo] = useState('')
+  const [metricScores, setMetricScores] = useState<MetricScores>({})
   const [saving, setSaving] = useState(false)
   const [ratingTouched, setRatingTouched] = useState(false)
 
@@ -35,11 +46,27 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       played_at: playedAt,
       cleared,
       rating,
+      difficulty_score: metricScores.difficulty ?? null,
+      fear_score: metricScores.fear ?? null,
+      activity_score: metricScores.activity ?? null,
+      story_score: metricScores.story ?? null,
+      interior_score: metricScores.interior ?? null,
+      aging_score: metricScores.aging ?? null,
       memo: memo.trim(),
     })
-    await submitCommunityRating(room.id, rating)
+    await Promise.all([
+      submitCommunityRating(room.id, rating),
+      submitCommunityMetricRatings(room.id, metricScores),
+    ])
     setSaving(false)
     onSaved()
+  }
+
+  function updateMetric(key: MetricKey, value: string) {
+    setMetricScores(current => ({
+      ...current,
+      [key]: value === '' ? null : Number(value),
+    }))
   }
 
   return (
@@ -143,6 +170,58 @@ export function LogModal({ room, onClose, onSaved }: Props) {
             {ratingTouched && rating === null && (
               <p className="text-xs text-red-400">길 평가를 선택해 주세요.</p>
             )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="text-xs text-gray-400">세부 평가 (선택)</label>
+              <p className="text-xs text-gray-600 mt-1">선택한 항목은 유저 평균에 반영돼요.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              {METRICS.map(metric => {
+                const value = metricScores[metric.key]
+                const officialScore = room.official_scores?.[metric.key]
+                const officialLabel = room.official_labels?.[metric.key]
+                const officialText = officialScore !== null && officialScore !== undefined
+                  ? `${officialScore}/10`
+                  : officialLabel
+                return (
+                  <div key={metric.key} className="bg-[#0e0e16] border border-white/10 rounded-xl px-3 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-gray-200">{metric.label}</p>
+                        {officialText && (
+                          <p className="text-[11px] text-amber-300 mt-0.5">공식 {officialText}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateMetric(metric.key, '')}
+                        className="text-xs text-gray-500 hover:text-gray-300"
+                      >
+                        미평가
+                      </button>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3">
+                      <span className="text-[11px] text-gray-600 w-12">{metric.low}</span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={10}
+                        step={1}
+                        value={value ?? 5}
+                        onChange={e => updateMetric(metric.key, e.target.value)}
+                        className="min-w-0 flex-1 accent-violet-500"
+                      />
+                      <span className="text-[11px] text-gray-600 w-12 text-right">{metric.high}</span>
+                      <span className="text-sm text-white tabular-nums w-10 text-right">
+                        {value ?? '-'}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           {/* Memo */}

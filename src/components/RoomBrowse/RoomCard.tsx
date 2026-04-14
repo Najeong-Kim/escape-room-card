@@ -4,7 +4,7 @@ import { hasLog } from '../../lib/roomLog'
 import { LogModal } from '../RoomLog/LogModal'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
-import type { CommunityRating } from '../../lib/communityRatings'
+import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -34,13 +34,27 @@ const FEAR_LABEL: Record<number, string> = {
   5: '매우 높음',
 }
 
+const METRIC_LABELS: { key: MetricKey; label: string }[] = [
+  { key: 'difficulty', label: '난이도' },
+  { key: 'fear', label: '공포도' },
+  { key: 'activity', label: '활동성' },
+  { key: 'story', label: '스토리' },
+  { key: 'interior', label: '인테리어' },
+  { key: 'aging', label: '노후화' },
+]
+
 interface RoomCardProps {
   room: Room
   communityRating?: CommunityRating
+  communityMetricStats?: CommunityMetricStats
   onRated?: () => void
 }
 
-export function RoomCard({ room, communityRating, onRated }: RoomCardProps) {
+function formatScore(score: number) {
+  return Number.isInteger(score) ? String(score) : score.toFixed(1)
+}
+
+export function RoomCard({ room, communityRating, communityMetricStats, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
   const [logged, setLogged] = useState(() => hasLog(room.id))
 
@@ -49,6 +63,14 @@ export function RoomCard({ room, communityRating, onRated }: RoomCardProps) {
     ? (Math.round(communityRating.score10 / 2) as PathRating)
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
+  const visibleMetrics = METRIC_LABELS.filter(metric => {
+    const officialScore = room.official_scores?.[metric.key]
+    return Boolean(
+      communityMetricStats?.[metric.key] ||
+      officialScore !== null && officialScore !== undefined ||
+      room.official_labels?.[metric.key]
+    )
+  })
 
   const inner = (
     <div className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex flex-col
@@ -107,6 +129,33 @@ export function RoomCard({ room, communityRating, onRated }: RoomCardProps) {
             </span>
           ))}
         </div>
+
+        {visibleMetrics.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {visibleMetrics.map(metric => {
+            const community = communityMetricStats?.[metric.key]
+            const officialScore = room.official_scores?.[metric.key]
+            const officialLabel = room.official_labels?.[metric.key]
+
+            return (
+              <div key={metric.key} className="rounded-lg bg-white/[0.03] px-2 py-1.5">
+                <p className="text-[11px] text-gray-500">{metric.label}</p>
+                {community ? (
+                  <p className="text-xs text-gray-200">
+                    유저 {formatScore(community.score10)}/10
+                    <span className="text-gray-600"> · {community.count}명</span>
+                  </p>
+                ) : null}
+                {officialScore !== null && officialScore !== undefined ? (
+                  <p className="text-xs text-amber-300">공식 {formatScore(officialScore)}/10</p>
+                ) : officialLabel ? (
+                  <p className="text-xs text-amber-300">공식 {officialLabel}</p>
+                ) : null}
+              </div>
+            )
+            })}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-y-2 text-sm">

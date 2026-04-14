@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useRooms, useRoomFilterOptions, THEMES, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
 import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
-import { fetchAllCommunityRatings } from '../../lib/communityRatings'
-import type { CommunityRating } from '../../lib/communityRatings'
+import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
+import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 
 export default function RoomBrowse() {
   const navigate = useNavigate()
@@ -12,9 +12,16 @@ export default function RoomBrowse() {
   const { locations, genres } = useRoomFilterOptions()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
   const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
+  const [communityMetricStats, setCommunityMetricStats] = useState<Record<number, CommunityMetricStats>>({})
 
   const refetchRatings = useCallback(() => {
-    fetchAllCommunityRatings().then(setCommunityRatings)
+    Promise.all([
+      fetchAllCommunityRatings(),
+      fetchAllCommunityMetricStats(),
+    ]).then(([ratings, metricStats]) => {
+      setCommunityRatings(ratings)
+      setCommunityMetricStats(metricStats)
+    })
   }, [])
 
   useEffect(() => { refetchRatings() }, [refetchRatings])
@@ -153,6 +160,7 @@ export default function RoomBrowse() {
                 key={room.id}
                 room={room}
                 communityRating={communityRatings[room.id]}
+                communityMetricStats={communityMetricStats[room.id]}
                 onRated={refetchRatings}
               />
             ))}

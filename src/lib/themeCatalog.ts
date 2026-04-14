@@ -21,11 +21,17 @@ export interface ThemeCatalogRow {
   min_players: number | null
   max_players: number | null
   price_per_person: number | null
+  difficulty_label: string | null
   difficulty_score: number | null
+  fear_label: string | null
   fear_score: number | null
+  activity_label: string | null
   activity_score: number | null
+  story_label: string | null
   interior_score: number | null
+  interior_label: string | null
   story_score: number | null
+  aging_label: string | null
   aging_score: number | null
   image_url: string | null
   booking_url: string | null
@@ -84,6 +90,22 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     max_players: theme.max_players ?? 1,
     rating_avg: 0,
     tags: [],
+    official_scores: {
+      difficulty: theme.difficulty_score,
+      fear: theme.fear_score,
+      activity: theme.activity_score,
+      story: theme.story_score,
+      interior: theme.interior_score,
+      aging: theme.aging_score,
+    },
+    official_labels: {
+      difficulty: theme.difficulty_label,
+      fear: theme.fear_label,
+      activity: theme.activity_label,
+      story: theme.story_label,
+      interior: theme.interior_label,
+      aging: theme.aging_label,
+    },
     website_url: theme.booking_url ?? cafe?.booking_url ?? cafe?.website_url ?? undefined,
     image_url: theme.image_url ?? undefined,
   }
