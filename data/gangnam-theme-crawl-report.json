@@ -1,0 +1,131 @@
+{
+  "source_url": "https://escape-cafe.too1s.com/theme/all",
+  "crawled_at": "2026-04-14T14:08:27.359Z",
+  "target_count": 60,
+  "matched_count": 12,
+  "unmatched_count": 48,
+  "matched": [
+    {
+      "target": "메아리",
+      "crawled_name": "메아리",
+      "cafe": "에피소드방탈출 강남점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/33-2-%EB%A9%94%EC%95%84%EB%A6%AC"
+    },
+    {
+      "target": "검은 운명의 밤",
+      "crawled_name": "검은 운명의 밤",
+      "cafe": "비트포비아 던전루나",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/15-2-%EA%B2%80%EC%9D%80-%EC%9A%B4%EB%AA%85%EC%9D%98-%EB%B0%A4"
+    },
+    {
+      "target": "둘이라면",
+      "crawled_name": "둘이라면",
+      "cafe": "도어이스케이프 강남가든점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/21-3-%EB%91%98%EC%9D%B4%EB%9D%BC%EB%A9%B4"
+    },
+    {
+      "target": "대호시장 살인사건",
+      "crawled_name": "대호시장 살인사건",
+      "cafe": "비트포비아 강남던전",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/13-2-%EB%8C%80%ED%98%B8%EC%8B%9C%EC%9E%A5-%EC%82%B4%EC%9D%B8%EC%82%AC%EA%B1%B4"
+    },
+    {
+      "target": "엔제리오",
+      "crawled_name": "엔제리오",
+      "cafe": "키이스케이프 더오름",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/4-2-%EC%97%94%EC%A0%9C%EB%A6%AC%EC%98%A4"
+    },
+    {
+      "target": "SOS",
+      "crawled_name": "SOS",
+      "cafe": "넥스트에디션 강남5호점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/28-1-SOS"
+    },
+    {
+      "target": "머니머니패키지",
+      "crawled_name": "머니머니패키지",
+      "cafe": "키이스케이프 로그인",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/5-1-%EB%A8%B8%EB%8B%88%EB%A8%B8%EB%8B%88%ED%8C%A8%ED%82%A4%EC%A7%80"
+    },
+    {
+      "target": "US",
+      "crawled_name": "US 어스",
+      "cafe": "키이스케이프 우주라이크",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/7-1-US-%EC%96%B4%EC%8A%A4"
+    },
+    {
+      "target": "네드",
+      "crawled_name": "네드",
+      "cafe": "키이스케이프 더오름",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/4-1-%EB%84%A4%EB%93%9C"
+    },
+    {
+      "target": "IMAGINE",
+      "crawled_name": "IMAGINE",
+      "cafe": "도어이스케이프 강남가든점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/21-4-IMAGINE"
+    },
+    {
+      "target": "유전",
+      "crawled_name": "유전",
+      "cafe": "도어이스케이프 레드 신논현점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/22-3-%EC%9C%A0%EC%A0%84"
+    },
+    {
+      "target": "DONE",
+      "crawled_name": "DONE",
+      "cafe": "제로월드 강남점",
+      "source_url": "https://escape-cafe.too1s.com/theme/detail/1-3-DONE"
+    }
+  ],
+  "unmatched": [
+    "베니",
+    "NOW HERE",
+    "이층 복도 끝 화장실",
+    "DKDK컴퍼니",
+    "유작",
+    "베타테스터",
+    "ALBA",
+    "오메가",
+    "헬로 프레이",
+    "FOR FREE",
+    "기억을 잃은 자들",
+    "STACY",
+    "갱생",
+    "고령화 사회",
+    "SCENE",
+    "테마팩토리",
+    "웨스턴 뱅",
+    "인생낚시",
+    "신비로운 직원생활",
+    "더 맨",
+    "향",
+    "WISH",
+    "D-DAY",
+    "A Gentle Monday",
+    "리허설",
+    "악몽",
+    "몬스터: 10800",
+    "음대출신 김수학",
+    "돌핀",
+    "짜불성설",
+    "호커스2-비밀의 방",
+    "A Gentle Monday (옵저버)",
+    "더 라스트 노트",
+    "리얼월드 더 스카우트 in 성수 (야외)",
+    "업사이드 다운",
+    "거상",
+    "Staff Only",
+    "Nostalgia Vista",
+    "EP02. 당신을 위한 연극 (야외)",
+    "머니머니부동산",
+    "버디",
+    "우정미술관 (온라인)",
+    "아이언 게이트 프리즌",
+    "구해줘 햄즈",
+    "우정공방 (온라인)",
+    "메모리 카니발 파피",
+    "메모리 카니발 토니",
+    "메모리 카니발 리키"
+  ]
+}
