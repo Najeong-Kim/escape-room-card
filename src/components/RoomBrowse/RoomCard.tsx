@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import type { Room } from '../../lib/recommend'
+import { hasLog } from '../../lib/roomLog'
+import { LogModal } from '../RoomLog/LogModal'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -29,6 +32,9 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ room }: RoomCardProps) {
+  const [showLog, setShowLog] = useState(false)
+  const [logged, setLogged] = useState(() => hasLog(room.id))
+
   const inner = (
     <div className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex flex-col
                     hover:border-violet-500/40 hover:bg-[#16161f] transition-all duration-200">
@@ -106,16 +112,40 @@ export function RoomCard({ room }: RoomCardProps) {
             <span className="text-xs text-violet-400">예약 페이지 →</span>
           </div>
         )}
+
+        {/* Log button */}
+        <div className="pt-2 border-t border-white/5 flex justify-end">
+          {logged ? (
+            <span className="text-xs text-green-500 font-medium">✓ 기록됨</span>
+          ) : (
+            <button
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setShowLog(true) }}
+              className="text-xs text-violet-400 hover:text-violet-300 border border-violet-500/30
+                         hover:bg-violet-900/20 px-3 py-1 rounded-lg transition-all"
+            >
+              + 기록하기
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
 
-  if (room.website_url) {
-    return (
-      <a href={room.website_url} target="_blank" rel="noopener noreferrer" className="block">
-        {inner}
-      </a>
-    )
-  }
-  return inner
+  return (
+    <>
+      {room.website_url ? (
+        <a href={room.website_url} target="_blank" rel="noopener noreferrer" className="block">
+          {inner}
+        </a>
+      ) : inner}
+      {showLog && (
+        <LogModal
+          room={room}
+          onClose={() => setShowLog(false)}
+          onSaved={() => { setLogged(true); setShowLog(false) }}
+        />
+      )}
+    </>
+  )
+
 }

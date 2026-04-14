@@ -7,6 +7,7 @@ import App from './App.tsx'
 
 const AdminApp = lazy(() => import('./admin/AdminApp'))
 const RoomBrowse = lazy(() => import('./components/RoomBrowse/RoomBrowse'))
+const MyRooms = lazy(() => import('./components/RoomLog/MyRooms'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -25,6 +26,14 @@ createRoot(document.getElementById('root')!).render(
           element={
             <Suspense fallback={<div className="min-h-dvh bg-[#0a0a0f]" />}>
               <RoomBrowse />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/my-rooms"
+          element={
+            <Suspense fallback={<div className="min-h-dvh bg-[#0a0a0f]" />}>
+              <MyRooms />
             </Suspense>
           }
         />
