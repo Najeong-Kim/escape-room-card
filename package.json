@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "import:gangnam-themes": "node scripts/import-gangnam-themes.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {

@@ -1,0 +1,103 @@
+{
+  "region": {
+    "city": "서울특별시",
+    "district": "강남구",
+    "area_label": "강남"
+  },
+  "source_note": "Bootstrap seed converted from the app's existing curated Gangnam rooms. Keep needs_review=true until each cafe/theme is verified against official pages.",
+  "cafes": [
+    {
+      "normalized_key": "개꿀이스케이프|강남",
+      "name": "개꿀이스케이프",
+      "branch_name": "강남",
+      "area_label": "강남",
+      "district": "강남구",
+      "status": "active",
+      "needs_review": true,
+      "themes": [
+        {
+          "normalized_key": "3인 적정 테마",
+          "name": "3인 적정 테마",
+          "genre_labels": ["미스터리/스릴러"],
+          "duration_minutes": 70,
+          "min_players": 2,
+          "max_players": 4,
+          "price_per_person": 18000,
+          "status": "active",
+          "needs_review": true,
+          "source_name": "existing rooms seed"
+        },
+        {
+          "normalized_key": "개꿀스피치센터",
+          "name": "개꿀스피치센터",
+          "genre_labels": ["코믹"],
+          "duration_minutes": 60,
+          "min_players": 2,
+          "max_players": 6,
+          "price_per_person": 15000,
+          "status": "active",
+          "needs_review": true,
+          "source_name": "existing rooms seed"
+        },
+        {
+          "normalized_key": "t_t",
+          "name": "T_T",
+          "genre_labels": ["감성"],
+          "duration_minutes": 60,
+          "min_players": 2,
+          "max_players": 4,
+          "price_per_person": 18000,
+          "status": "active",
+          "needs_review": true,
+          "source_name": "existing rooms seed"
+        }
+      ]
+    },
+    {
+      "normalized_key": "studio esc|강남",
+      "name": "Studio ESC",
+      "branch_name": "강남",
+      "area_label": "강남",
+      "district": "강남구",
+      "status": "active",
+      "needs_review": true,
+      "themes": [
+        {
+          "normalized_key": "검은마법사",
+          "name": "검은마법사",
+          "genre_labels": ["판타지/어드벤처"],
+          "duration_minutes": 70,
+          "min_players": 2,
+          "max_players": 6,
+          "price_per_person": 22000,
+          "status": "active",
+          "needs_review": true,
+          "source_name": "existing rooms seed"
+        }
+      ]
+    },
+    {
+      "normalized_key": "코드이스케이프|가로수길",
+      "name": "코드이스케이프",
+      "branch_name": "가로수길점",
+      "area_label": "강남",
+      "district": "강남구",
+      "status": "active",
+      "needs_review": true,
+      "themes": [
+        {
+          "normalized_key": "수산업스파이",
+          "name": "(수)산업스파이",
+          "genre_labels": ["미스터리/스릴러"],
+          "duration_minutes": 60,
+          "min_players": 2,
+          "max_players": 6,
+          "price_per_person": 22000,
+          "status": "active",
+          "needs_review": true,
+          "source_name": "existing rooms seed"
+        }
+      ]
+    }
+  ]
+}
