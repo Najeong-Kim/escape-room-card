@@ -11,9 +11,10 @@ import { getRecommendations, type Room } from '../../lib/recommend'
 interface Props {
   profile: QuizProfile
   onReset: () => void
+  onHome?: () => void
 }
 
-export function ResultCard({ profile, onReset }: Props) {
+export function ResultCard({ profile, onReset, onHome }: Props) {
   const [flipped, setFlipped] = useState(false)
   const [shareBlob, setShareBlob] = useState<Blob | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -103,6 +104,15 @@ export function ResultCard({ profile, onReset }: Props) {
       {/* Actions */}
       <div className="w-full flex flex-col gap-3">
         <ShareButton shareBlob={shareBlob} nickname={profile.nickname} t={t} />
+
+        {onHome && (
+          <button
+            onClick={onHome}
+            className="w-full bg-white text-gray-950 font-semibold py-3 rounded-2xl transition-all active:scale-95"
+          >
+            홈으로
+          </button>
+        )}
 
         <button
           onClick={onReset}
