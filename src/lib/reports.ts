@@ -12,9 +12,8 @@ export interface ReportInput {
 }
 
 export async function submitReport(input: ReportInput) {
-  const reportToken = crypto.randomUUID()
   const payload = {
-    report_token: reportToken,
+    report_token: crypto.randomUUID(),
     theme_id: input.themeId ?? null,
     report_type: input.reportType,
     title: input.title.trim(),
@@ -31,13 +30,5 @@ export async function submitReport(input: ReportInput) {
 
   if (error) throw error
 
-  const { error: mailError } = await supabase.functions.invoke('send-report-email', {
-    body: { reportToken },
-  })
-
-  if (mailError) {
-    console.warn('send-report-email failed', mailError.message)
-  }
-
-  return { reportToken }
+  return { ok: true }
 }
