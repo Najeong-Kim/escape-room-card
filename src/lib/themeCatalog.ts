@@ -4,6 +4,11 @@ interface ThemeCafe {
   name: string
   branch_name: string | null
   area_label: string
+  areas?: {
+    name: string
+  } | {
+    name: string
+  }[] | null
   booking_url: string | null
   website_url: string | null
 }
@@ -18,23 +23,34 @@ export interface ThemeCatalogRow {
   price_per_person: number | null
   image_url: string | null
   booking_url: string | null
+  theme_genres?: {
+    genres: {
+      code: string
+    } | {
+      code: string
+    }[] | null
+  }[]
   cafes: ThemeCafe | ThemeCafe[] | null
-}
-
-const GENRE_BY_LABEL: Record<string, string> = {
-  공포: 'Horror',
-  '미스터리/스릴러': 'MysteryThriller',
-  감성: 'Emotional',
-  코믹: 'Comic',
-  '판타지/어드벤처': 'FantasyAdventure',
 }
 
 function firstCafe(cafes: ThemeCatalogRow['cafes']) {
   return Array.isArray(cafes) ? (cafes[0] ?? null) : cafes
 }
 
+function firstArea(area: ThemeCafe['areas']) {
+  return Array.isArray(area) ? (area[0] ?? null) : area
+}
+
+function firstGenre(genre: NonNullable<ThemeCatalogRow['theme_genres']>[number]['genres']) {
+  return Array.isArray(genre) ? (genre[0] ?? null) : genre
+}
+
 export function themeToRoom(theme: ThemeCatalogRow): Room {
   const cafe = firstCafe(theme.cafes)
+  const genres = theme.theme_genres
+    ?.map(themeGenre => firstGenre(themeGenre.genres)?.code)
+    .filter((code): code is string => Boolean(code))
+  const area = cafe ? firstArea(cafe.areas)?.name : null
   const brand = cafe
     ? `${cafe.name}${cafe.branch_name ? ` ${cafe.branch_name}` : ''}`
     : '방탈출 카페'
@@ -43,8 +59,8 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     id: theme.id,
     name: theme.name,
     brand,
-    location: cafe?.area_label ?? '강남',
-    genres: theme.genre_labels.map(label => GENRE_BY_LABEL[label] ?? label),
+    location: area ?? cafe?.area_label ?? '기타',
+    genres: genres?.length ? genres : ['Etc'],
     fear_level: 1,
     puzzle_weight: 1,
     difficulty: 1,

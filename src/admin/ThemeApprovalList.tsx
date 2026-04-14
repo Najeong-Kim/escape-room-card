@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button, useNotify } from 'react-admin'
+import { useCatalogOptions } from './catalogOptions'
 import { supabase } from './supabaseDataProvider'
 
 interface ApprovalCafe {
@@ -31,6 +32,9 @@ interface ApprovalTheme {
   source_url: string | null
   status: string
   needs_review: boolean
+  theme_genres?: {
+    genre_id: number
+  }[]
   created_at: string
   cafes: ApprovalCafe | null
 }
@@ -52,7 +56,7 @@ type ThemeForm = Pick<
   | 'booking_url'
   | 'source_url'
 > & {
-  genre_labels: string
+  genre_ids: number[]
 }
 
 const containerStyle = { padding: 24 }
@@ -103,7 +107,7 @@ function themeToForm(theme: ApprovalTheme): ThemeForm {
   return {
     name: theme.name,
     description: theme.description,
-    genre_labels: theme.genre_labels.join(', '),
+    genre_ids: theme.theme_genres?.map(themeGenre => themeGenre.genre_id) ?? [],
     duration_minutes: theme.duration_minutes,
     min_players: theme.min_players,
     max_players: theme.max_players,
@@ -128,6 +132,7 @@ function numberOrNull(value: string) {
 
 export function ThemeApprovalList() {
   const notify = useNotify()
+  const { genres } = useCatalogOptions()
   const [themes, setThemes] = useState<ApprovalTheme[]>([])
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<number | null>(null)
@@ -154,6 +159,9 @@ export function ThemeApprovalList() {
         source_url,
         status,
         needs_review,
+        theme_genres (
+          genre_id
+        ),
         created_at,
         cafes (
           id,
@@ -199,6 +207,16 @@ export function ThemeApprovalList() {
     setForm(current => current ? { ...current, [key]: value } : current)
   }
 
+  function toggleGenre(genreId: number) {
+    setForm(current => {
+      if (!current) return current
+      const genreIds = current.genre_ids.includes(genreId)
+        ? current.genre_ids.filter(id => id !== genreId)
+        : [...current.genre_ids, genreId]
+      return { ...current, genre_ids: genreIds }
+    })
+  }
+
   async function saveTheme(themeId: number) {
     if (!form) return
     setProcessingId(themeId)
@@ -206,10 +224,9 @@ export function ThemeApprovalList() {
     const payload = {
       name: form.name.trim(),
       description: emptyToNull(form.description),
-      genre_labels: form.genre_labels
-        .split(',')
-        .map(label => label.trim())
-        .filter(Boolean),
+      genre_labels: genres
+        .filter(genre => form.genre_ids.includes(genre.id))
+        .map(genre => genre.name),
       duration_minutes: form.duration_minutes,
       min_players: form.min_players,
       max_players: form.max_players,
@@ -227,6 +244,27 @@ export function ThemeApprovalList() {
     if (error) {
       notify(`테마 수정에 실패했습니다: ${error.message}`, { type: 'error' })
       return
+    }
+
+    const { error: deleteGenreError } = await supabase
+      .from('theme_genres')
+      .delete()
+      .eq('theme_id', themeId)
+
+    if (deleteGenreError) {
+      notify(`장르 수정에 실패했습니다: ${deleteGenreError.message}`, { type: 'error' })
+      return
+    }
+
+    if (form.genre_ids.length) {
+      const { error: genreError } = await supabase
+        .from('theme_genres')
+        .insert(form.genre_ids.map(genreId => ({ theme_id: themeId, genre_id: genreId })))
+
+      if (genreError) {
+        notify(`장르 수정에 실패했습니다: ${genreError.message}`, { type: 'error' })
+        return
+      }
     }
 
     setEditingId(null)
@@ -319,7 +357,21 @@ export function ThemeApprovalList() {
                 {isEditing ? (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
                     <label>테마명<input style={inputStyle} value={form.name} onChange={e => updateForm('name', e.target.value)} /></label>
-                    <label>장르<input style={inputStyle} value={form.genre_labels} onChange={e => updateForm('genre_labels', e.target.value)} /></label>
+                    <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: 6, padding: 10 }}>
+                      <legend>장르</legend>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {genres.map(genre => (
+                          <label key={genre.id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <input
+                              type="checkbox"
+                              checked={form.genre_ids.includes(genre.id)}
+                              onChange={() => toggleGenre(genre.id)}
+                            />
+                            {genre.name}
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
                     <label>제한시간<input style={inputStyle} value={form.duration_minutes ?? ''} onChange={e => updateForm('duration_minutes', numberOrNull(e.target.value))} /></label>
                     <label>최소 인원<input style={inputStyle} value={form.min_players ?? ''} onChange={e => updateForm('min_players', numberOrNull(e.target.value))} /></label>
                     <label>최대 인원<input style={inputStyle} value={form.max_players ?? ''} onChange={e => updateForm('max_players', numberOrNull(e.target.value))} /></label>

@@ -19,10 +19,11 @@ export function createSupabaseDataProvider(): DataProvider {
       const order = params.sort?.order ?? 'ASC'
       const from = (page - 1) * perPage
       const to = from + perPage - 1
+      const select = typeof params.meta?.select === 'string' ? params.meta.select : '*'
 
       let query = supabase
         .from(resource)
-        .select('*', { count: 'exact' })
+        .select(select, { count: 'exact' })
         .order(field, { ascending: order === 'ASC' })
         .range(from, to)
 
@@ -35,7 +36,7 @@ export function createSupabaseDataProvider(): DataProvider {
 
       const { data, error, count } = await query
       if (error) throw error
-      return { data: data ?? [], total: count ?? 0 }
+      return { data: (data ?? []) as never[], total: count ?? 0 }
     },
 
     async getOne(resource, params) {

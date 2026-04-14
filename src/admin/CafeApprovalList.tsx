@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button, useNotify } from 'react-admin'
+import { useCatalogOptions } from './catalogOptions'
 import { supabase } from './supabaseDataProvider'
 
 interface ApprovalCafe {
@@ -8,6 +9,7 @@ interface ApprovalCafe {
   name: string
   branch_name: string | null
   area_label: string
+  area_id: number | null
   district: string
   address: string | null
   phone: string | null
@@ -22,7 +24,7 @@ interface ApprovalCafe {
 type CafeForm = Pick<
   ApprovalCafe,
   'name' | 'branch_name' | 'area_label' | 'district' | 'address' | 'phone' | 'website_url' | 'booking_url' | 'source_url'
->
+> & { area_id: number | null }
 
 const containerStyle = { padding: 24 }
 const headerStyle = {
@@ -54,6 +56,7 @@ function cafeToForm(cafe: ApprovalCafe): CafeForm {
     name: cafe.name,
     branch_name: cafe.branch_name,
     area_label: cafe.area_label,
+    area_id: cafe.area_id,
     district: cafe.district,
     address: cafe.address,
     phone: cafe.phone,
@@ -69,6 +72,7 @@ function emptyToNull(value: string | null) {
 
 export function CafeApprovalList() {
   const notify = useNotify()
+  const { areas } = useCatalogOptions()
   const [cafes, setCafes] = useState<ApprovalCafe[]>([])
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<number | null>(null)
@@ -112,6 +116,7 @@ export function CafeApprovalList() {
 
     const payload = {
       ...form,
+      area_label: areas.find(area => area.id === form.area_id)?.name ?? form.area_label,
       branch_name: emptyToNull(form.branch_name),
       address: emptyToNull(form.address),
       phone: emptyToNull(form.phone),
@@ -219,7 +224,23 @@ export function CafeApprovalList() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
                     <label>매장명<input style={inputStyle} value={form.name} onChange={e => updateForm('name', e.target.value)} /></label>
                     <label>지점명<input style={inputStyle} value={form.branch_name ?? ''} onChange={e => updateForm('branch_name', e.target.value)} /></label>
-                    <label>지역<input style={inputStyle} value={form.area_label} onChange={e => updateForm('area_label', e.target.value)} /></label>
+                    <label>
+                      지역
+                      <select
+                        style={inputStyle}
+                        value={form.area_id ?? ''}
+                        onChange={e => {
+                          const area = areas.find(option => option.id === Number(e.target.value))
+                          updateForm('area_id', area?.id ?? null)
+                          if (area) updateForm('area_label', area.name)
+                        }}
+                      >
+                        <option value="">지역 선택</option>
+                        {areas.map(area => (
+                          <option key={area.id} value={area.id}>{area.name}</option>
+                        ))}
+                      </select>
+                    </label>
                     <label>구<input style={inputStyle} value={form.district} onChange={e => updateForm('district', e.target.value)} /></label>
                     <label>주소<input style={inputStyle} value={form.address ?? ''} onChange={e => updateForm('address', e.target.value)} /></label>
                     <label>전화번호<input style={inputStyle} value={form.phone ?? ''} onChange={e => updateForm('phone', e.target.value)} /></label>

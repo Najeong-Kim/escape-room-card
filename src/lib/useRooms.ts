@@ -31,6 +31,11 @@ export interface RoomFilters {
   fearMax: number | null
 }
 
+export interface FilterOption {
+  id: string
+  label: string
+}
+
 export const INITIAL_FILTERS: RoomFilters = {
   themeId: null,
   location: null,
@@ -69,7 +74,8 @@ export function useRooms() {
         'price_per_person',
         'image_url',
         'booking_url',
-        'cafes!inner(name,branch_name,area_label,booking_url,website_url)',
+        'theme_genres(genres(code))',
+        'cafes!inner(name,branch_name,area_label,booking_url,website_url,areas(name))',
       ].join(','),
       status: 'eq.active',
       needs_review: 'eq.false',
@@ -90,4 +96,32 @@ export function useRooms() {
   }, [])
 
   return { rooms, loading, error }
+}
+
+export function useRoomFilterOptions() {
+  const [locations, setLocations] = useState<FilterOption[]>([])
+  const [genres, setGenres] = useState<FilterOption[]>([])
+
+  useEffect(() => {
+    const headers = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    }
+
+    Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/areas?select=name&order=sort_order.asc`, { headers })
+        .then(r => { if (!r.ok) throw new Error('areas fetch failed'); return r.json() }),
+      fetch(`${SUPABASE_URL}/rest/v1/genres?select=code,name&order=sort_order.asc`, { headers })
+        .then(r => { if (!r.ok) throw new Error('genres fetch failed'); return r.json() }),
+    ])
+      .then(([areaRows, genreRows]: [{ name: string }[], { code: string; name: string }[]]) => {
+        setLocations(areaRows.map(area => ({ id: area.name, label: area.name })))
+        setGenres(genreRows.map(genre => ({ id: genre.code, label: genre.name })))
+      })
+      .catch(error => {
+        console.warn('filter options fetch failed', error)
+      })
+  }, [])
+
+  return { locations, genres }
 }

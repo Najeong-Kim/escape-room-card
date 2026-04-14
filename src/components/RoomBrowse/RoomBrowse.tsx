@@ -1,24 +1,15 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useRooms, THEMES, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
+import { useRooms, useRoomFilterOptions, THEMES, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
 import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
 import { fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityRating } from '../../lib/communityRatings'
 
-const LOCATIONS = ['홍대', '강남', '건대', '신촌', '성수', '잠실', '신림', '노원', '용산', '대학로']
-
-const GENRES = [
-  { id: 'Horror', label: '공포' },
-  { id: 'MysteryThriller', label: '미스터리/스릴러' },
-  { id: 'Emotional', label: '감성' },
-  { id: 'Comic', label: '코믹' },
-  { id: 'FantasyAdventure', label: '판타지/어드벤처' },
-]
-
 export default function RoomBrowse() {
   const navigate = useNavigate()
   const { rooms, loading, error } = useRooms()
+  const { locations, genres } = useRoomFilterOptions()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
   const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
 
@@ -107,8 +98,8 @@ export default function RoomBrowse() {
                        focus:outline-none focus:border-violet-500/50 cursor-pointer"
           >
             <option value="">전체 지역</option>
-            {LOCATIONS.map(loc => (
-              <option key={loc} value={loc}>{loc}</option>
+            {locations.map(loc => (
+              <option key={loc.id} value={loc.id}>{loc.label}</option>
             ))}
           </select>
 
@@ -120,7 +111,7 @@ export default function RoomBrowse() {
                        focus:outline-none focus:border-violet-500/50 cursor-pointer"
           >
             <option value="">전체 장르</option>
-            {GENRES.map(g => (
+            {genres.map(g => (
               <option key={g.id} value={g.id}>{g.label}</option>
             ))}
           </select>
