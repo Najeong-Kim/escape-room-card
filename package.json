@@ -12,6 +12,7 @@
     "test": "vitest run",
     "crawl:gangnam-themes": "node scripts/crawl-gangnam-themes.mjs",
     "import:gangnam-themes": "node scripts/import-gangnam-themes.mjs",
+    "import:theme-posters": "node scripts/import-theme-posters.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {

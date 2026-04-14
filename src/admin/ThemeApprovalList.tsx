@@ -29,6 +29,9 @@ interface ApprovalTheme {
   price_text: string | null
   price_per_person: number | null
   image_url: string | null
+  image_source_url: string | null
+  image_source_name: string | null
+  image_status: string
   booking_url: string | null
   source_url: string | null
   difficulty_label: string | null
@@ -66,6 +69,9 @@ type ThemeForm = Pick<
   | 'price_text'
   | 'price_per_person'
   | 'image_url'
+  | 'image_source_url'
+  | 'image_source_name'
+  | 'image_status'
   | 'booking_url'
   | 'source_url'
   | 'difficulty_label'
@@ -154,6 +160,9 @@ function themeToForm(theme: ApprovalTheme): ThemeForm {
     price_text: theme.price_text,
     price_per_person: theme.price_per_person,
     image_url: theme.image_url,
+    image_source_url: theme.image_source_url,
+    image_source_name: theme.image_source_name,
+    image_status: theme.image_status,
     booking_url: theme.booking_url,
     source_url: theme.source_url,
     difficulty_label: theme.difficulty_label,
@@ -207,6 +216,9 @@ export function ThemeApprovalList() {
         price_text,
         price_per_person,
         image_url,
+        image_source_url,
+        image_source_name,
+        image_status,
         booking_url,
         source_url,
         difficulty_label,
@@ -297,6 +309,9 @@ export function ThemeApprovalList() {
       price_text: emptyToNull(form.price_text),
       price_per_person: form.price_per_person,
       image_url: emptyToNull(form.image_url),
+      image_source_url: emptyToNull(form.image_source_url),
+      image_source_name: emptyToNull(form.image_source_name),
+      image_status: form.image_status,
       booking_url: emptyToNull(form.booking_url),
       source_url: emptyToNull(form.source_url),
       difficulty_label: emptyToNull(form.difficulty_label),
@@ -466,12 +481,37 @@ export function ThemeApprovalList() {
                     <label>노후화 원문<input style={inputStyle} value={form.aging_label ?? ''} onChange={e => updateForm('aging_label', e.target.value)} /></label>
                     <label>노후화 (0-10)<input style={inputStyle} value={form.aging_score ?? ''} onChange={e => updateForm('aging_score', numberOrNull(e.target.value))} /></label>
                     <label>이미지 URL<input style={inputStyle} value={form.image_url ?? ''} onChange={e => updateForm('image_url', e.target.value)} /></label>
+                    <label>이미지 출처 URL<input style={inputStyle} value={form.image_source_url ?? ''} onChange={e => updateForm('image_source_url', e.target.value)} /></label>
+                    <label>이미지 출처<input style={inputStyle} value={form.image_source_name ?? ''} onChange={e => updateForm('image_source_name', e.target.value)} /></label>
+                    <label>이미지 상태
+                      <select style={inputStyle} value={form.image_status} onChange={e => updateForm('image_status', e.target.value)}>
+                        <option value="unverified">검수 전</option>
+                        <option value="verified">검수 완료</option>
+                        <option value="rejected">사용 안 함</option>
+                        <option value="manual">수동 등록</option>
+                      </select>
+                    </label>
                     <label>예약 URL<input style={inputStyle} value={form.booking_url ?? ''} onChange={e => updateForm('booking_url', e.target.value)} /></label>
                     <label>출처 URL<input style={inputStyle} value={form.source_url ?? ''} onChange={e => updateForm('source_url', e.target.value)} /></label>
                     <label style={{ gridColumn: '1 / -1' }}>소개<input style={inputStyle} value={form.description ?? ''} onChange={e => updateForm('description', e.target.value)} /></label>
                   </div>
                 ) : (
                   <dl className="approval-detail-list">
+                    <dt style={mutedStyle}>포스터</dt>
+                    <dd style={{ margin: 0 }}>
+                      {theme.image_url ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <img src={theme.image_url} alt={`${theme.name} 포스터`} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8 }} />
+                          <div>
+                            <div>상태: {theme.image_status}</div>
+                            <div>{theme.image_source_name ?? '출처 미확인'}</div>
+                            {theme.image_source_url && <a href={theme.image_source_url} target="_blank" rel="noreferrer">원본 열기</a>}
+                          </div>
+                        </div>
+                      ) : (
+                        '이미지 미확인'
+                      )}
+                    </dd>
                     <dt style={mutedStyle}>지역</dt>
                     <dd style={{ margin: 0 }}>{cafe ? `${cafe.district} ${cafe.area_label}` : '-'}</dd>
                     <dt style={mutedStyle}>주소</dt>

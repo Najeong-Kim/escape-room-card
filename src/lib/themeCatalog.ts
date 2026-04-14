@@ -34,6 +34,7 @@ export interface ThemeCatalogRow {
   aging_label: string | null
   aging_score: number | null
   image_url: string | null
+  image_status: string | null
   booking_url: string | null
   theme_genres?: {
     genres: {
@@ -107,6 +108,6 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
       aging: theme.aging_label,
     },
     website_url: theme.booking_url ?? cafe?.booking_url ?? cafe?.website_url ?? undefined,
-    image_url: theme.image_url ?? undefined,
+    image_url: theme.image_status === 'rejected' ? undefined : theme.image_url ?? undefined,
   }
 }

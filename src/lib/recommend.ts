@@ -81,6 +81,7 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'story_score',
       'aging_score',
       'image_url',
+      'image_status',
       'booking_url',
       'theme_genres(genres(code))',
       'cafes!inner(name,branch_name,area_label,booking_url,website_url,areas(name))',
