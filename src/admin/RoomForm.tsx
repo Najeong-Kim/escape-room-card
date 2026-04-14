@@ -13,9 +13,11 @@ const LOCATION_CHOICES = [
 export const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
   MysteryThriller: '미스터리/스릴러',
-  Emotional: '감성',
+  Emotional: '감성/드라마',
   Comic: '코믹',
-  FantasyAdventure: '판타지/어드벤처',
+  FantasyAdventure: '판타지/모험',
+  Crime: '범죄/잠입',
+  SF: 'SF',
 }
 
 const GENRE_CHOICES = Object.entries(GENRE_LABEL).map(([id, name]) => ({ id, name }))

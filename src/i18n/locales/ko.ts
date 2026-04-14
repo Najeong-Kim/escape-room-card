@@ -44,9 +44,11 @@ const ko = {
   // Options — genre
   opt_Horror: '공포',
   opt_MysteryThriller: '미스터리/스릴러',
-  opt_FantasyAdventure: '판타지/어드벤처',
-  opt_Emotional: '감성',
+  opt_Emotional: '감성/드라마',
   opt_Comic: '코믹',
+  opt_FantasyAdventure: '판타지/모험',
+  opt_Crime: '범죄/잠입',
+  opt_SF: 'SF',
 
   // Options — puzzle
   opt_surroundings: '주변을 탐색해 트리거 찾기',

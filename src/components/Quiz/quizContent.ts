@@ -23,9 +23,11 @@ export const FEAR_Q2_OPTIONS = [
 export const GENRE_OPTIONS = [
   { value: 'Horror', label: 'Horror', emoji: '👻' },
   { value: 'MysteryThriller', label: 'Mystery / Thriller', emoji: '🔍' },
-  { value: 'FantasyAdventure', label: 'Fantasy / Adventure', emoji: '🗺️' },
-  { value: 'Emotional', label: 'Emotional', emoji: '💭' },
+  { value: 'Emotional', label: 'Emotional / Drama', emoji: '💭' },
   { value: 'Comic', label: 'Comic', emoji: '🎈' },
+  { value: 'FantasyAdventure', label: 'Fantasy / Adventure', emoji: '🗺️' },
+  { value: 'Crime', label: 'Crime / Infiltration', emoji: '🕵️' },
+  { value: 'SF', label: 'SF', emoji: '🚀' },
 ]
 
 export const PUZZLE_Q1_OPTIONS = [

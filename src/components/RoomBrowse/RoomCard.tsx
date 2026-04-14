@@ -9,9 +9,11 @@ import type { CommunityRating } from '../../lib/communityRatings'
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
   MysteryThriller: '미스터리/스릴러',
-  Emotional: '감성',
+  Emotional: '감성/드라마',
   Comic: '코믹',
-  FantasyAdventure: '판타지/어드벤처',
+  FantasyAdventure: '판타지/모험',
+  Crime: '범죄/잠입',
+  SF: 'SF',
 }
 
 const GENRE_COLOR: Record<string, string> = {
@@ -20,6 +22,8 @@ const GENRE_COLOR: Record<string, string> = {
   Emotional: '#4a1040',
   Comic: '#c24b16',
   FantasyAdventure: '#23644e',
+  Crime: '#5f2933',
+  SF: '#1c5f7a',
 }
 
 const FEAR_LABEL: Record<number, string> = {

@@ -60,7 +60,7 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     name: theme.name,
     brand,
     location: area ?? cafe?.area_label ?? '기타',
-    genres: genres?.length ? genres : ['Etc'],
+    genres: genres ?? [],
     fear_level: 1,
     puzzle_weight: 1,
     difficulty: 1,

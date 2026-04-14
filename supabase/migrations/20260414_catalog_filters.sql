@@ -74,19 +74,23 @@ on conflict (code) do update set
 insert into genres (code, name, sort_order) values
   ('Horror', '공포', 10),
   ('MysteryThriller', '미스터리/스릴러', 20),
-  ('Emotional', '감성', 30),
+  ('Emotional', '감성/드라마', 30),
   ('Comic', '코믹', 40),
-  ('FantasyAdventure', '판타지/어드벤처', 50),
-  ('Drama', '드라마', 60),
-  ('Adventure', '어드벤처', 70),
-  ('Crime', '범죄', 80),
-  ('SF', 'SF', 90),
-  ('Outdoor', '야외', 100),
-  ('Online', '온라인', 110),
-  ('Etc', '기타', 999)
+  ('FantasyAdventure', '판타지/모험', 50),
+  ('Crime', '범죄/잠입', 60),
+  ('SF', 'SF', 70)
 on conflict (code) do update set
   name = excluded.name,
   sort_order = excluded.sort_order;
+
+delete from theme_genres
+where genre_id in (
+  select id from genres
+  where code not in ('Horror', 'MysteryThriller', 'Emotional', 'Comic', 'FantasyAdventure', 'Crime', 'SF')
+);
+
+delete from genres
+where code not in ('Horror', 'MysteryThriller', 'Emotional', 'Comic', 'FantasyAdventure', 'Crime', 'SF');
 
 update cafes
 set area_id = areas.id

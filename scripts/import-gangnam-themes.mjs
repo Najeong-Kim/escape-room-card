@@ -32,17 +32,14 @@ function genreCodesForLabels(labels = []) {
   for (const label of labels) {
     const normalized = label.toLowerCase()
     if (label.includes('공포') || normalized.includes('horror')) codes.add('Horror')
-    if (label.includes('스릴러') || label.includes('미스터리') || label.includes('추리') || label.includes('잠입')) codes.add('MysteryThriller')
+    if (label.includes('스릴러') || label.includes('미스터리') || label.includes('추리')) codes.add('MysteryThriller')
     if (label.includes('감성') || label.includes('드라마')) codes.add('Emotional')
     if (label.includes('코믹') || label.includes('개그')) codes.add('Comic')
     if (label.includes('판타지') || label.includes('모험') || label.includes('어드벤처')) codes.add('FantasyAdventure')
-    if (label.includes('범죄') || label.includes('살인')) codes.add('Crime')
+    if (label.includes('범죄') || label.includes('살인') || label.includes('잠입')) codes.add('Crime')
     if (label.includes('sf') || label.includes('SF')) codes.add('SF')
-    if (label.includes('야외')) codes.add('Outdoor')
-    if (label.includes('온라인')) codes.add('Online')
   }
 
-  if (codes.size === 0) codes.add('Etc')
   return [...codes]
 }
 

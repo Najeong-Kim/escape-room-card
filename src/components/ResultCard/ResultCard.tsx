@@ -294,8 +294,10 @@ const GENRE_LABELS: Record<string, string> = {
   Horror: '공포',
   MysteryThriller: '미스터리',
   FantasyAdventure: '판타지',
-  Emotional: '감성',
+  Emotional: '감성/드라마',
   Comic: '코믹',
+  Crime: '범죄/잠입',
+  SF: 'SF',
 }
 
 function RecommendedRooms({
@@ -474,6 +476,8 @@ const GENRE_COLORS: Record<string, string> = {
   FantasyAdventure: '#23644e',
   Emotional: '#d94f8a',
   Comic: '#c24b16',
+  Crime: '#5f2933',
+  SF: '#1c5f7a',
 }
 
 function getGenreStops(genres: string[]): string[] {
