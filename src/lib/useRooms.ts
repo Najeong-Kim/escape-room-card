@@ -69,10 +69,12 @@ export function useRooms() {
         'price_per_person',
         'image_url',
         'booking_url',
-        'cafes(name,branch_name,area_label,booking_url,website_url)',
+        'cafes!inner(name,branch_name,area_label,booking_url,website_url)',
       ].join(','),
       status: 'eq.active',
       needs_review: 'eq.false',
+      'cafes.status': 'eq.active',
+      'cafes.needs_review': 'eq.false',
       order: 'name.asc',
     })
 

@@ -54,10 +54,12 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'price_per_person',
       'image_url',
       'booking_url',
-      'cafes(name,branch_name,area_label,booking_url,website_url)',
+      'cafes!inner(name,branch_name,area_label,booking_url,website_url)',
     ].join(','),
     status: 'eq.active',
     needs_review: 'eq.false',
+    'cafes.status': 'eq.active',
+    'cafes.needs_review': 'eq.false',
   })
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/themes?${query.toString()}`, {
