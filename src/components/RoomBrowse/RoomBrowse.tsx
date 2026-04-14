@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRooms, THEMES, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
 import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
+import { fetchAllCommunityRatings } from '../../lib/communityRatings'
+import type { CommunityRating } from '../../lib/communityRatings'
 
 const LOCATIONS = ['홍대', '강남', '건대', '신촌', '성수', '잠실', '신림', '노원', '용산', '대학로']
 
@@ -18,6 +20,13 @@ export default function RoomBrowse() {
   const navigate = useNavigate()
   const { rooms, loading, error } = useRooms()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
+  const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
+
+  const refetchRatings = useCallback(() => {
+    fetchAllCommunityRatings().then(setCommunityRatings)
+  }, [])
+
+  useEffect(() => { refetchRatings() }, [refetchRatings])
 
   const filtered = useMemo(() => filterRooms(rooms, filters), [rooms, filters])
 
@@ -143,7 +152,12 @@ export default function RoomBrowse() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filtered.map(room => (
-              <RoomCard key={room.id} room={room} />
+              <RoomCard
+                key={room.id}
+                room={room}
+                communityRating={communityRatings[room.id]}
+                onRated={refetchRatings}
+              />
             ))}
           </div>
         )}

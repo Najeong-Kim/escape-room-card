@@ -2,6 +2,9 @@ import { useState } from 'react'
 import type { Room } from '../../lib/recommend'
 import { hasLog } from '../../lib/roomLog'
 import { LogModal } from '../RoomLog/LogModal'
+import { getRatingDef, RatingIcon } from '../../lib/ratings'
+import type { PathRating } from '../../lib/ratings'
+import type { CommunityRating } from '../../lib/communityRatings'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -29,11 +32,19 @@ const FEAR_LABEL: Record<number, string> = {
 
 interface RoomCardProps {
   room: Room
+  communityRating?: CommunityRating
+  onRated?: () => void
 }
 
-export function RoomCard({ room }: RoomCardProps) {
+export function RoomCard({ room, communityRating, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
   const [logged, setLogged] = useState(() => hasLog(room.id))
+
+  // 커뮤니티 평점을 PathRating 레벨로 변환 (소수 → 반올림)
+  const ratingLevel = communityRating
+    ? (Math.round(communityRating.score10 / 2) as PathRating)
+    : null
+  const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
 
   const inner = (
     <div className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex flex-col
@@ -60,7 +71,23 @@ export function RoomCard({ room }: RoomCardProps) {
             <h3 className="text-white font-semibold text-base leading-snug">{room.name}</h3>
           </div>
           <div className="flex-shrink-0 text-right">
-            <span className="text-violet-400 font-bold text-lg">⭐ {room.rating_avg?.toFixed(1) ?? '—'}</span>
+            {communityRating && ratingDef ? (
+              <div className="flex flex-col items-end gap-0.5">
+                <div className="flex items-center gap-1">
+                  <RatingIcon value={ratingDef.value} size={18} />
+                  <span className="text-sm font-bold" style={{ color: ratingDef.color }}>
+                    {communityRating.score10}
+                  </span>
+                  <span className="text-xs text-gray-500">/ 10</span>
+                </div>
+                <span className="text-xs font-medium" style={{ color: ratingDef.color }}>
+                  {ratingDef.label}
+                </span>
+                <span className="text-xs text-gray-600">{communityRating.count}명</span>
+              </div>
+            ) : (
+              <span className="text-xs text-gray-600 mt-1 block">평가 없음</span>
+            )}
           </div>
         </div>
 
@@ -142,7 +169,7 @@ export function RoomCard({ room }: RoomCardProps) {
         <LogModal
           room={room}
           onClose={() => setShowLog(false)}
-          onSaved={() => { setLogged(true); setShowLog(false) }}
+          onSaved={() => { setLogged(true); setShowLog(false); onRated?.() }}
         />
       )}
     </>

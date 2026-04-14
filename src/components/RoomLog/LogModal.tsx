@@ -4,6 +4,7 @@ import { addLog } from '../../lib/roomLog'
 import type { Room } from '../../lib/recommend'
 import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
+import { submitCommunityRating } from '../../lib/communityRatings'
 
 interface Props {
   room: Room
@@ -17,8 +18,10 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [cleared, setCleared] = useState(true)
   const [rating, setRating] = useState<PathRating | null>(null)
   const [memo, setMemo] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  function save() {
+  async function save() {
+    setSaving(true)
     addLog({
       room_id: room.id,
       room_name: room.name,
@@ -28,6 +31,8 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       rating,
       memo: memo.trim(),
     })
+    await submitCommunityRating(room.id, rating)
+    setSaving(false)
     onSaved()
   }
 
@@ -146,10 +151,11 @@ export function LogModal({ room, onClose, onSaved }: Props) {
           {/* Save */}
           <button
             onClick={save}
-            className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold
+            disabled={saving}
+            className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-semibold
                        py-3 rounded-2xl transition-all active:scale-95"
           >
-            기록 저장
+            {saving ? '저장 중…' : '기록 저장'}
           </button>
         </motion.div>
       </motion.div>
