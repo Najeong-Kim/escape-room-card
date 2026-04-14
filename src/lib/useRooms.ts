@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { Room } from './recommend'
+import { themeToRoom } from './themeCatalog'
+import type { ThemeCatalogRow } from './themeCatalog'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -56,14 +58,32 @@ export function useRooms() {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    fetch(`${SUPABASE_URL}/rest/v1/rooms?order=rating_avg.desc`, {
+    const query = new URLSearchParams({
+      select: [
+        'id',
+        'name',
+        'genre_labels',
+        'duration_minutes',
+        'min_players',
+        'max_players',
+        'price_per_person',
+        'image_url',
+        'booking_url',
+        'cafes(name,branch_name,area_label,booking_url,website_url)',
+      ].join(','),
+      status: 'eq.active',
+      needs_review: 'eq.false',
+      order: 'name.asc',
+    })
+
+    fetch(`${SUPABASE_URL}/rest/v1/themes?${query.toString()}`, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
     })
       .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.json() })
-      .then((data: Room[]) => { setRooms(data); setLoading(false) })
+      .then((data: ThemeCatalogRow[]) => { setRooms(data.map(themeToRoom)); setLoading(false) })
       .catch(e => { setError(e); setLoading(false) })
   }, [])
 

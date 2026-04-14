@@ -1,4 +1,6 @@
 import type { QuizProfile } from './traitMap'
+import { themeToRoom } from './themeCatalog'
+import type { ThemeCatalogRow } from './themeCatalog'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -41,14 +43,31 @@ function matches(room: Room, profile: QuizProfile, fearTolerance: number): boole
 }
 
 export async function getRecommendations(profile: QuizProfile, count = 3): Promise<Room[]> {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/rooms`, {
+  const query = new URLSearchParams({
+    select: [
+      'id',
+      'name',
+      'genre_labels',
+      'duration_minutes',
+      'min_players',
+      'max_players',
+      'price_per_person',
+      'image_url',
+      'booking_url',
+      'cafes(name,branch_name,area_label,booking_url,website_url)',
+    ].join(','),
+    status: 'eq.active',
+    needs_review: 'eq.false',
+  })
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/themes?${query.toString()}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
   })
-  if (!res.ok) throw new Error('Failed to fetch rooms')
-  const allRooms: Room[] = await res.json()
+  if (!res.ok) throw new Error('Failed to fetch themes')
+  const allRooms: Room[] = ((await res.json()) as ThemeCatalogRow[]).map(themeToRoom)
 
   // Try strict match first (±1 fear)
   let candidates = allRooms.filter(r => matches(r, profile, 1))
