@@ -72,14 +72,14 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-4"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={e => { if (e.target === e.currentTarget) onClose() }}
       >
         <motion.div
-          className="w-full max-w-md bg-[#16161f] border border-white/10 rounded-3xl p-6 flex flex-col gap-5"
+          className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-[#16161f] border border-white/10 rounded-3xl p-6 flex flex-col gap-5"
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 40, opacity: 0 }}
@@ -101,7 +101,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
 
           {/* Date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-400">언제 했어?</label>
+            <label className="text-xs text-gray-400">언제 하셨나요?</label>
             <input
               type="date"
               value={playedAt}
@@ -115,7 +115,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
 
           {/* Cleared */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs text-gray-400">클리어 했어?</label>
+            <label className="text-xs text-gray-400">클리어하셨나요?</label>
             <div className="flex gap-3">
               {[
                 { value: true,  label: '✅ 탈출 성공' },
@@ -175,7 +175,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
           <div className="flex flex-col gap-3">
             <div>
               <label className="text-xs text-gray-400">세부 평가 (선택)</label>
-              <p className="text-xs text-gray-600 mt-1">선택한 항목은 유저 평균에 반영돼요.</p>
+              <p className="text-xs text-gray-600 mt-1">선택한 항목은 유저 평균에 반영됩니다.</p>
             </div>
             <div className="grid grid-cols-1 gap-3">
               {METRICS.map(metric => {
@@ -230,7 +230,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
             <textarea
               value={memo}
               onChange={e => setMemo(e.target.value)}
-              placeholder="기억에 남는 것, 같이 간 사람, 힌트 몇 번..."
+              placeholder="기억에 남는 점, 같이 간 사람, 힌트 횟수..."
               maxLength={200}
               rows={3}
               className="bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-3
