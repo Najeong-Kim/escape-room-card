@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { createHmac } from 'node:crypto'
 import { dirname, resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '..')
@@ -38,6 +39,27 @@ function nextImageUrl(src) {
 function numberOrNull(value) {
   const match = value?.match(/\d+/)
   return match ? Number(match[0]) : null
+}
+
+function compactText(value) {
+  return decodeHtml(String(value ?? ''))
+    .replace(/\r/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .trim()
+}
+
+function base64Url(value) {
+  return Buffer.from(typeof value === 'string' ? value : JSON.stringify(value)).toString('base64url')
+}
+
+function createPlayTheWorldJwt(key, token) {
+  const header = base64Url({ alg: 'HS256', typ: 'JWT' })
+  const payload = base64Url({
+    'X-Auth-Token': token,
+    expired_at: Math.floor(Date.now() / 1000) + 3600,
+  })
+  const signature = createHmac('sha256', key).update(`${header}.${payload}`).digest('base64url')
+  return `${header}.${payload}.${signature}`
 }
 
 function districtFromAddress(address, fallbackArea) {
@@ -159,6 +181,93 @@ function parseZamfitDetail(html, sourceUrl, target) {
   }
 }
 
+function parsePrices(variables = []) {
+  const prices = variables
+    .filter(variable => variable.key === 'price')
+    .map(variable => ({
+      peopleCount: Number(variable.value1),
+      totalPrice: Number(variable.value2),
+    }))
+    .filter(price => Number.isFinite(price.peopleCount) && Number.isFinite(price.totalPrice) && price.peopleCount > 0 && price.totalPrice > 0)
+    .map(price => ({
+      ...price,
+      pricePerPerson: Math.round(price.totalPrice / price.peopleCount),
+    }))
+    .sort((a, b) => a.peopleCount - b.peopleCount)
+
+  return {
+    price_text: prices.length
+      ? prices.map(price => `${price.peopleCount}인 ${price.pricePerPerson.toLocaleString()}원/인`).join(' / ')
+      : null,
+    price_per_person: prices.length
+      ? Math.min(...prices.map(price => price.pricePerPerson))
+      : null,
+  }
+}
+
+function parseThemeDescription(description) {
+  const text = compactText(description)
+  const genre = text.match(/장르\s*[-:]\s*([^\n\r]+)/)?.[1]?.trim()
+  const duration = text.match(/(?:플레이\s*)?시간\s*[-:]\s*(\d+)\s*분/)?.[1]
+    ?? text.match(/\[\s*(\d+)\s*분\s*\]/)?.[1]
+  const players = text.match(/(?:추천|예약\s*가능|예약가능)\s*인원\s*[-:]\s*(\d+)\s*(?:인|명)?\s*[~-]\s*(\d+)\s*(?:인|명)?/)
+    ?? text.match(/(\d+)\s*(?:인|명)\s*[~-]\s*(\d+)\s*(?:인|명)?/)
+  const minOnlyPlayers = text.match(/(\d+)\s*인부터/)
+  const singlePrice = text.match(/1\s*인\s*([0-9,]+)\s*원?/)
+  const singlePriceValue = singlePrice ? Number(singlePrice[1].replace(/,/g, '')) : null
+
+  return {
+    genre_labels: genre && genre !== '?' ? [genre] : [],
+    duration_minutes: duration ? Number(duration) : null,
+    min_players: players ? Number(players[1]) : minOnlyPlayers ? Number(minOnlyPlayers[1]) : null,
+    max_players: players ? Number(players[2]) : null,
+    price_text: singlePriceValue ? `1인 ${singlePriceValue.toLocaleString()}원` : null,
+    price_per_person: singlePriceValue,
+  }
+}
+
+function parsePlayTheWorldTheme(theme, sourceUrl, target) {
+  const description = `${theme.description ?? ''}\n${theme.summary ?? ''}`
+  const parsedDescription = parseThemeDescription(description)
+  const parsedPrices = parsePrices(theme.variables ?? [])
+
+  return {
+    name: target,
+    crawled_name: theme.title,
+    genre_labels: parsedDescription.genre_labels,
+    duration_minutes: parsedDescription.duration_minutes,
+    min_players: parsedDescription.min_players,
+    max_players: parsedDescription.max_players,
+    price_text: parsedPrices.price_text ?? parsedDescription.price_text,
+    price_per_person: parsedPrices.price_per_person ?? parsedDescription.price_per_person,
+    image_url: theme.image_url ?? null,
+    booking_url: theme.booking_url ?? sourceUrl,
+    source_url: sourceUrl,
+    difficulty_label: description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]?.trim() ?? null,
+    fear_label: null,
+  }
+}
+
+function parseKeyescapeTheme(theme, sourceUrl, target) {
+  const parsedMemo = parseThemeDescription(theme.memo ?? '')
+
+  return {
+    name: target,
+    crawled_name: theme.name,
+    genre_labels: theme.genre ? [theme.genre] : parsedMemo.genre_labels,
+    duration_minutes: numberOrNull(String(theme.play_time ?? '')) ?? parsedMemo.duration_minutes,
+    min_players: parsedMemo.min_players,
+    max_players: parsedMemo.max_players,
+    price_text: parsedMemo.price_text,
+    price_per_person: parsedMemo.price_per_person,
+    image_url: theme.image_url ?? null,
+    booking_url: sourceUrl,
+    source_url: sourceUrl,
+    difficulty_label: theme.level ? String(theme.level) : null,
+    fear_label: null,
+  }
+}
+
 function splitCafeName(cafeName) {
   const branchMatch = cafeName.match(/(.+?)\s+([^ ]*점)$/)
   if (!branchMatch) return { name: cafeName, branch_name: null }
@@ -229,27 +338,38 @@ function fillMissing(record, key, value) {
   return true
 }
 
-function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName) {
+function writePresent(record, key, value, { overwrite = false } = {}) {
+  if (value == null) return false
+  if (Array.isArray(value) && value.length === 0) return false
+  if (value === '') return false
+  if (!overwrite) return fillMissing(record, key, value)
+  if (JSON.stringify(record[key]) === JSON.stringify(value)) return false
+  record[key] = value
+  return true
+}
+
+function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName, options = {}) {
   const themeKey = normalizeKey(target)
+  const overwrite = options.overwrite ?? false
 
   for (const cafe of cafesByKey.values()) {
     const theme = cafe.themes.find(item => item.normalized_key === themeKey)
     if (!theme) continue
 
     const changed = [
-      fillMissing(theme, 'genre_labels', themeInput.genre_labels ?? []),
-      fillMissing(theme, 'duration_minutes', themeInput.duration_minutes),
-      fillMissing(theme, 'min_players', themeInput.min_players),
-      fillMissing(theme, 'max_players', themeInput.max_players),
-      fillMissing(theme, 'price_text', themeInput.price_text),
-      fillMissing(theme, 'price_per_person', themeInput.price_per_person),
-      fillMissing(theme, 'image_url', themeInput.image_url),
-      fillMissing(theme, 'booking_url', themeInput.booking_url),
-      fillMissing(theme, 'difficulty_label', themeInput.difficulty_label),
-      fillMissing(cafe, 'address', cafeInput.address),
-      fillMissing(cafe, 'phone', cafeInput.phone),
-      fillMissing(cafe, 'website_url', cafeInput.website_url),
-      fillMissing(cafe, 'booking_url', cafeInput.booking_url),
+      writePresent(theme, 'genre_labels', themeInput.genre_labels ?? [], { overwrite }),
+      writePresent(theme, 'duration_minutes', themeInput.duration_minutes, { overwrite }),
+      writePresent(theme, 'min_players', themeInput.min_players, { overwrite }),
+      writePresent(theme, 'max_players', themeInput.max_players, { overwrite }),
+      writePresent(theme, 'price_text', themeInput.price_text, { overwrite }),
+      writePresent(theme, 'price_per_person', themeInput.price_per_person, { overwrite }),
+      writePresent(theme, 'image_url', themeInput.image_url),
+      writePresent(theme, 'booking_url', themeInput.booking_url, { overwrite }),
+      writePresent(theme, 'difficulty_label', themeInput.difficulty_label, { overwrite }),
+      writePresent(cafe, 'address', cafeInput.address, { overwrite }),
+      writePresent(cafe, 'phone', cafeInput.phone, { overwrite }),
+      writePresent(cafe, 'website_url', cafeInput.website_url, { overwrite }),
+      writePresent(cafe, 'booking_url', cafeInput.booking_url, { overwrite }),
     ].some(Boolean)
 
     if (changed) {
@@ -261,6 +381,107 @@ function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName) {
   }
 
   return false
+}
+
+async function fetchPlayTheWorldShop(candidate) {
+  const token = 'CodexVerifyToken'
+  const headers = {
+    'Bearer-Token': candidate.brandKey,
+    Name: candidate.nameHeader,
+    'Site-Referer': candidate.origin,
+    'X-Request-Origin': candidate.origin,
+    'X-Secure-Random': token,
+    'X-Request-Option': createPlayTheWorldJwt(candidate.brandKey, token),
+  }
+  const url = `${candidate.baseUrl ?? 'https://macro.playthe.world'}/${candidate.apiVersion}/shops/${candidate.shopKeycode}`
+  const response = await fetch(url, { headers })
+  if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  const json = await response.json()
+  if (json.result !== 'success') throw new Error(`Official API failed for ${candidate.target}: ${json.data ?? json.msg ?? 'unknown'}`)
+  return json.data
+}
+
+async function fetchKeyescapeShop(candidate) {
+  const url = 'https://www.keyescape.com/controller/run_proc.php'
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'x-requested-with': 'XMLHttpRequest',
+      'user-agent': 'Mozilla/5.0',
+      referer: candidate.source_url,
+    },
+    body: new URLSearchParams({
+      t: 'get_theme_info_list',
+      zizum_num: String(candidate.zizumNum),
+    }),
+  })
+  if (!response.ok) throw new Error(`Failed to fetch keyescape ${candidate.zizumNum}: ${response.status}`)
+  const json = await response.json()
+  if (!json.status) throw new Error(`Keyescape API failed for ${candidate.target}: ${json.msg ?? 'unknown'}`)
+  return json
+}
+
+async function parseOfficialCandidate(candidate) {
+  if (candidate.type === 'playtheworld') {
+    const data = await fetchPlayTheWorldShop(candidate)
+    const theme = data.themes?.find(item => normalizeKey(item.title) === normalizeKey(candidate.themeTitle ?? candidate.target))
+    if (!theme) return null
+
+    return {
+      cafe: {
+        raw_name: candidate.cafe?.raw_name ?? data.shop.name,
+        name: candidate.cafe?.name,
+        branch_name: candidate.cafe?.branch_name,
+        address: data.shop.address ?? null,
+        phone: data.shop.contact ?? null,
+        website_url: data.shop.brand_site_url ?? candidate.source_url,
+        booking_url: data.shop.brand_site_url ?? candidate.source_url,
+        area_label: candidate.cafe?.area_label ?? areaFromAddress(data.shop.address ?? '', '전국'),
+        district: candidate.cafe?.district ?? districtFromAddress(data.shop.address ?? '', '전국'),
+      },
+      theme: parsePlayTheWorldTheme(theme, candidate.source_url, candidate.target),
+    }
+  }
+
+  if (candidate.type === 'keyescape') {
+    const data = await fetchKeyescapeShop(candidate)
+    const listItem = data.data?.find(item => normalizeKey(item.info_name) === normalizeKey(candidate.themeTitle ?? candidate.target))
+    if (!listItem) return null
+    const themeResponse = await fetch('https://www.keyescape.com/controller/run_proc.php', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'x-requested-with': 'XMLHttpRequest',
+        'user-agent': 'Mozilla/5.0',
+        referer: candidate.source_url,
+      },
+      body: new URLSearchParams({
+        t: 'get_theme_date',
+        num: String(listItem.info_num),
+      }),
+    })
+    if (!themeResponse.ok) throw new Error(`Failed to fetch keyescape theme ${candidate.target}: ${themeResponse.status}`)
+    const themeJson = await themeResponse.json()
+    if (!themeJson.status) throw new Error(`Keyescape theme API failed for ${candidate.target}: ${themeJson.msg ?? 'unknown'}`)
+
+    return {
+      cafe: {
+        raw_name: candidate.cafe?.raw_name ?? `키이스케이프 ${data.zizum?.name ?? ''}`.trim(),
+        name: candidate.cafe?.name,
+        branch_name: candidate.cafe?.branch_name,
+        address: data.zizum?.addr ?? null,
+        phone: data.zizum?.phone ?? null,
+        website_url: candidate.source_url,
+        booking_url: candidate.source_url,
+        area_label: candidate.cafe?.area_label ?? areaFromAddress(data.zizum?.addr ?? '', '강남'),
+        district: candidate.cafe?.district ?? districtFromAddress(data.zizum?.addr ?? '', '강남'),
+      },
+      theme: parseKeyescapeTheme(themeJson.data, candidate.source_url, candidate.target),
+    }
+  }
+
+  return null
 }
 
 async function main() {
@@ -322,6 +543,53 @@ async function main() {
   }
 
   const remainingTargets = new Set(unmatched)
+  const officialVerified = []
+
+  for (const candidate of candidates.official ?? []) {
+    const parsed = await parseOfficialCandidate(candidate)
+    if (!parsed) continue
+
+    if (!remainingTargets.has(candidate.target)) {
+      const changed = enrichTheme(
+        cafesByKey,
+        candidate.target,
+        {
+          ...parsed.cafe,
+          source_url: candidate.source_url,
+        },
+        parsed.theme,
+        candidate.source_name ?? '공식 예약 페이지',
+        { overwrite: true },
+      )
+
+      if (changed) {
+        enriched.push({
+          target: candidate.target,
+          crawled_name: parsed.theme.crawled_name,
+          cafe: parsed.cafe.raw_name ?? parsed.cafe.name,
+          source_url: candidate.source_url,
+        })
+        officialVerified.push(candidate.target)
+      }
+      continue
+    }
+
+    const added = addTheme(cafesByKey, {
+      ...parsed.cafe,
+      source_url: candidate.source_url,
+    }, parsed.theme, candidate.source_name ?? '공식 예약 페이지')
+
+    if (added) {
+      remainingTargets.delete(candidate.target)
+      matched.push({
+        target: candidate.target,
+        crawled_name: parsed.theme.crawled_name,
+        cafe: parsed.cafe.raw_name ?? parsed.cafe.name,
+        source_url: candidate.source_url,
+      })
+      officialVerified.push(candidate.target)
+    }
+  }
 
   for (const candidate of candidates.zamfit ?? []) {
     const candidateHtml = await fetch(candidate.url).then(response => {
@@ -388,6 +656,7 @@ async function main() {
             booking_url: source.cafe.booking_url,
           },
           source.source_name,
+          { overwrite: source.overwrite ?? false },
         )
 
         if (changed) {
@@ -434,6 +703,7 @@ async function main() {
     source_note: 'Merged from public listing, Zamfit detail pages, and explicitly reviewed source candidates. Rows remain needs_review=true until official cafe/theme pages are verified.',
     source_urls: [
       SOURCE_URL,
+      ...((candidates.official ?? []).map(candidate => candidate.source_url)),
       ...((candidates.zamfit ?? []).map(candidate => candidate.url)),
       ...((candidates.manual ?? []).map(source => source.source_url)),
     ],
@@ -448,8 +718,10 @@ async function main() {
     matched_count: matched.length,
     unmatched_count: unmatched.length,
     enriched_count: enriched.length,
+    official_verified_count: officialVerified.length,
     matched,
     enriched,
+    official_verified: officialVerified,
     unmatched,
   }
 
@@ -458,6 +730,7 @@ async function main() {
   await writeFile(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`)
 
   console.log(`Matched ${matched.length}/${targets.length} targets.`)
+  if (officialVerified.length) console.log(`Officially verified ${officialVerified.length} targets.`)
   if (enriched.length) console.log(`Enriched ${enriched.length} previously matched targets.`)
   if (unmatched.length) console.log(`Unmatched: ${unmatched.join(', ')}`)
 }

@@ -1,4 +1,103 @@
 {
+  "official": [
+    {
+      "target": "둘이라면",
+      "type": "playtheworld",
+      "apiVersion": "v2",
+      "brandKey": "MmtAku42Sc4f1V2N",
+      "nameHeader": "door-escape",
+      "origin": "https://doorescape.co.kr",
+      "shopKeycode": "aAo1RDEnfyPkbeix",
+      "source_name": "도어이스케이프 공식 예약 API",
+      "source_url": "https://doorescape.co.kr/reservation.html?keycode=aAo1RDEnfyPkbeix",
+      "cafe": { "name": "도어이스케이프", "branch_name": "강남가든점", "area_label": "강남", "district": "서초구" }
+    },
+    {
+      "target": "IMAGINE",
+      "type": "playtheworld",
+      "apiVersion": "v2",
+      "brandKey": "MmtAku42Sc4f1V2N",
+      "nameHeader": "door-escape",
+      "origin": "https://doorescape.co.kr",
+      "shopKeycode": "aAo1RDEnfyPkbeix",
+      "source_name": "도어이스케이프 공식 예약 API",
+      "source_url": "https://doorescape.co.kr/reservation.html?keycode=aAo1RDEnfyPkbeix",
+      "cafe": { "name": "도어이스케이프", "branch_name": "강남가든점", "area_label": "강남", "district": "서초구" }
+    },
+    {
+      "target": "유전",
+      "type": "playtheworld",
+      "apiVersion": "v2",
+      "brandKey": "MmtAku42Sc4f1V2N",
+      "nameHeader": "door-escape",
+      "origin": "https://doorescape.co.kr",
+      "shopKeycode": "NeZqzMtPCBsSvbAq",
+      "source_name": "도어이스케이프 공식 예약 API",
+      "source_url": "https://doorescape.co.kr/reservation.html?keycode=NeZqzMtPCBsSvbAq",
+      "cafe": { "name": "도어이스케이프 레드", "branch_name": "신논현점", "area_label": "강남", "district": "서초구" }
+    },
+    {
+      "target": "FOR FREE",
+      "type": "keyescape",
+      "zizumNum": 19,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=19",
+      "cafe": { "name": "키이스케이프 LOG_IN 1", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "머니머니패키지",
+      "type": "keyescape",
+      "zizumNum": 19,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=19",
+      "cafe": { "name": "키이스케이프 로그인", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "엔제리오",
+      "type": "keyescape",
+      "zizumNum": 14,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=14",
+      "cafe": { "name": "키이스케이프 더오름", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "네드",
+      "type": "keyescape",
+      "zizumNum": 14,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=14",
+      "cafe": { "name": "키이스케이프 더오름", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "US",
+      "type": "keyescape",
+      "zizumNum": 16,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=16",
+      "cafe": { "name": "키이스케이프 우주라이크", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "A Gentle Monday",
+      "type": "keyescape",
+      "themeTitle": "A GENTLE MONDAY",
+      "zizumNum": 20,
+      "source_name": "키이스케이프 공식 예약 API",
+      "source_url": "https://www.keyescape.com/reservation1.php?zizum_num=20",
+      "cafe": { "name": "키이스케이프 LOG_IN 2", "branch_name": null, "area_label": "강남", "district": "강남구" }
+    },
+    {
+      "target": "아이언 게이트 프리즌",
+      "type": "playtheworld",
+      "apiVersion": "v1",
+      "brandKey": "LmnDt6wGgVEUpPC5",
+      "nameHeader": "roomsa",
+      "origin": "https://roomsa.co.kr",
+      "shopKeycode": "HUSqfLY6kenWuw5q",
+      "source_name": "룸즈에이 공식 예약 API",
+      "source_url": "https://roomsa.co.kr/reservation.html?keycode=HUSqfLY6kenWuw5q",
+      "cafe": { "name": "룸즈에이", "branch_name": "부평점", "area_label": "부평", "district": "부평구" }
+    }
+  ],
   "zamfit": [
     { "target": "메아리", "url": "https://web.zamfit.kr/escapes/5569/%EB%A9%94%EC%95%84%EB%A6%AC" },
     { "target": "검은 운명의 밤", "url": "https://web.zamfit.kr/escapes/5935" },
@@ -31,7 +130,8 @@
   "manual": [
     {
       "source_name": "마스터키 공식 예약 페이지",
-      "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32",
+      "source_url": "http://www.master-key.co.kr/booking/bk_detail?bid=35",
+      "overwrite": true,
       "cafe": {
         "name": "플레이포인트랩",
         "branch_name": "강남점",
@@ -39,37 +139,33 @@
         "district": "강남구",
         "address": "서울특별시 강남구 강남대로98길 11 3F",
         "phone": "070-8872-0142",
-        "website_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32",
-        "booking_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
-      },
-      "themes": [
-        { "target": "갱생", "name": "갱생", "genre_labels": ["잠입"], "duration_minutes": 80, "min_players": 2, "max_players": 4 },
-        { "target": "Staff Only", "name": "STAFF ONLY" },
-        { "target": "SCENE", "name": "SCENE : 404 NOT FOUND" }
-      ]
-    },
-    {
-      "source_name": "방탈출 블로그 리뷰",
-      "source_url": "https://m.blog.naver.com/jinki3612/223627759799",
-      "cafe": {
-        "name": "플레이포인트랩",
-        "branch_name": null,
-        "area_label": "강남",
-        "district": "강남구",
-        "address": "서울 강남구 테헤란로1길 20 B1",
-        "phone": null,
-        "website_url": null,
-        "booking_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
+        "website_url": "http://www.master-key.co.kr/booking/bk_detail?bid=35",
+        "booking_url": "http://www.master-key.co.kr/booking/bk_detail?bid=35"
       },
       "themes": [
         {
+          "target": "갱생",
+          "name": "갱생",
+          "genre_labels": ["잠입"],
+          "duration_minutes": 80,
+          "min_players": 2,
+          "max_players": 4,
+          "price_text": "1인 27,000원",
+          "price_per_person": 27000
+        },
+        {
+          "target": "리허설",
+          "name": "리허설",
+          "duration_minutes": 70,
+          "price_text": "1인 25,000원",
+          "price_per_person": 25000
+        },
+        {
           "target": "Staff Only",
           "name": "STAFF ONLY",
-          "duration_minutes": 65,
-          "min_players": 2,
-          "max_players": 6,
-          "price_text": "1인 23,000원",
-          "price_per_person": 23000
+          "duration_minutes": 70,
+          "price_text": "1인 25,000원",
+          "price_per_person": 25000
         }
       ]
     }
