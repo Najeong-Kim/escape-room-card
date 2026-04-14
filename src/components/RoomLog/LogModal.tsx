@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { addLog } from '../../lib/roomLog'
 import type { Room } from '../../lib/recommend'
@@ -31,10 +31,12 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [metricScores, setMetricScores] = useState<MetricScores>({})
   const [saving, setSaving] = useState(false)
   const [ratingTouched, setRatingTouched] = useState(false)
+  const ratingSectionRef = useRef<HTMLDivElement>(null)
 
   async function save() {
     if (rating === null) {
       setRatingTouched(true)
+      ratingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
 
@@ -138,7 +140,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
           </div>
 
           {/* Rating */}
-          <div className="flex flex-col gap-2">
+          <div ref={ratingSectionRef} className="flex flex-col gap-2 scroll-mt-4">
             <label className="text-xs text-gray-400">길 평가 (필수)</label>
             <div className="grid grid-cols-3 gap-2">
               {PATH_RATINGS.map(r => {
