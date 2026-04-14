@@ -1,9 +1,10 @@
 {
   "source_url": "https://escape-cafe.too1s.com/theme/all",
-  "crawled_at": "2026-04-14T14:20:50.283Z",
+  "crawled_at": "2026-04-14T15:06:08.739Z",
   "target_count": 60,
   "matched_count": 28,
   "unmatched_count": 32,
+  "enriched_count": 13,
   "matched": [
     {
       "target": "메아리",
@@ -126,10 +127,34 @@
       "source_url": "https://web.zamfit.kr/escapes/6813/%EA%B8%B0%EC%96%B5%EC%9D%84-%EC%9E%83%EC%9D%80-%EC%9E%90%EB%93%A4"
     },
     {
+      "target": "갱생",
+      "crawled_name": "갱생",
+      "cafe": "플레이포인트랩 강남점",
+      "source_url": "https://web.zamfit.kr/escapes/5198"
+    },
+    {
+      "target": "SCENE",
+      "crawled_name": "SCENE - 404 NOT FOUND",
+      "cafe": "마스터키 프라임 신촌퍼플릭점",
+      "source_url": "https://web.zamfit.kr/escapes/5189/SCENE---404-NOT-FOUND"
+    },
+    {
+      "target": "더 맨",
+      "crawled_name": "더 맨",
+      "cafe": "플레이포인트랩 강남점",
+      "source_url": "https://web.zamfit.kr/escapes/6704"
+    },
+    {
       "target": "A Gentle Monday",
       "crawled_name": "A GENTLE MONDAY",
       "cafe": "키이스케이프 LOG_IN 2",
       "source_url": "https://web.zamfit.kr/escapes/6782/A-GENTLE-MONDAY"
+    },
+    {
+      "target": "리허설",
+      "crawled_name": "리허설",
+      "cafe": "플레이포인트랩 강남점",
+      "source_url": "https://web.zamfit.kr/escapes/5199"
     },
     {
       "target": "호커스2-비밀의 방",
@@ -144,34 +169,90 @@
       "source_url": "https://web.zamfit.kr/escapes/6888"
     },
     {
-      "target": "갱생",
-      "crawled_name": "갱생",
-      "cafe": "플레이포인트랩 강남점",
-      "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
-    },
-    {
-      "target": "더 맨",
-      "crawled_name": "더 맨",
-      "cafe": "플레이포인트랩 강남점",
-      "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
-    },
-    {
-      "target": "리허설",
-      "crawled_name": "리허설",
-      "cafe": "플레이포인트랩 강남점",
-      "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
-    },
-    {
       "target": "Staff Only",
       "crawled_name": "STAFF ONLY",
       "cafe": "플레이포인트랩 강남점",
       "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
+    }
+  ],
+  "enriched": [
+    {
+      "target": "메아리",
+      "crawled_name": "메아리",
+      "cafe": "에피소드 방탈출 강남점",
+      "source_url": "https://web.zamfit.kr/escapes/5569/%EB%A9%94%EC%95%84%EB%A6%AC"
     },
     {
-      "target": "SCENE",
-      "crawled_name": "SCENE : 404 NOT FOUND",
-      "cafe": "플레이포인트랩 강남점",
-      "source_url": "https://www.master-key.co.kr/booking/bk_detail?bid=32"
+      "target": "검은 운명의 밤",
+      "crawled_name": "검은 운명의 밤",
+      "cafe": "비트포비아 던전루나",
+      "source_url": "https://web.zamfit.kr/escapes/5935"
+    },
+    {
+      "target": "둘이라면",
+      "crawled_name": "둘이라면",
+      "cafe": "도어이스케이프 강남 가든점",
+      "source_url": "https://web.zamfit.kr/escapes/4989"
+    },
+    {
+      "target": "대호시장 살인사건",
+      "crawled_name": "대호시장 살인사건",
+      "cafe": "비트포비아 강남던전",
+      "source_url": "https://web.zamfit.kr/escapes/5344"
+    },
+    {
+      "target": "엔제리오",
+      "crawled_name": "엔제리오",
+      "cafe": "키이스케이프 강남더오름점",
+      "source_url": "https://web.zamfit.kr/escapes/5816"
+    },
+    {
+      "target": "SOS",
+      "crawled_name": "SOS",
+      "cafe": "넥스트에디션 강남5호점",
+      "source_url": "https://web.zamfit.kr/escapes/4863/SOS"
+    },
+    {
+      "target": "머니머니패키지",
+      "crawled_name": "머니머니패키지",
+      "cafe": "키이스케이프 LOG_IN 1",
+      "source_url": "https://web.zamfit.kr/escapes/5827"
+    },
+    {
+      "target": "US",
+      "crawled_name": "US (어스)",
+      "cafe": "키이스케이프 우주라이크점",
+      "source_url": "https://web.zamfit.kr/escapes/5823/US-%EC%96%B4%EC%8A%A4"
+    },
+    {
+      "target": "네드",
+      "crawled_name": "NERD (네드)",
+      "cafe": "키이스케이프 강남더오름점",
+      "source_url": "https://web.zamfit.kr/escapes/5815/NERD-%EB%84%A4%EB%93%9C"
+    },
+    {
+      "target": "IMAGINE",
+      "crawled_name": "IMAGINE",
+      "cafe": "도어이스케이프 강남 가든점",
+      "source_url": "https://web.zamfit.kr/escapes/5934/IMAGINE"
+    },
+    {
+      "target": "유전",
+      "crawled_name": "유전",
+      "cafe": "도어이스케이프 레드 신논현점",
+      "source_url": "https://web.zamfit.kr/escapes/4992"
+    },
+    {
+      "target": "DONE",
+      "crawled_name": "DONE (돈)",
+      "cafe": "제로월드 강남점",
+      "source_url": "https://web.zamfit.kr/escapes/5701/DONE-%EB%8F%88"
+    },
+    {
+      "target": "Staff Only",
+      "crawled_name": "STAFF ONLY",
+      "cafe": "플레이포인트랩",
+      "source_url": "https://m.blog.naver.com/jinki3612/223627759799"
     }
   ],
   "unmatched": [

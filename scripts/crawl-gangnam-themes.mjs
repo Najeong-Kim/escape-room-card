@@ -104,11 +104,26 @@ function parseZamfitDetail(html, sourceUrl, target) {
   const description = decodeHtml(html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '')
   const imageUrl = html.match(/<meta property="og:image" content="([^"]*)"/)?.[1] ?? null
   const genre = description.match(/장르\s*:\s*([^.]*)/)?.[1]?.trim()
+  const fallbackGenre = decodeHtml(html.match(/장르:\s*([^<\\"]+)/)?.[1] ?? '').trim()
   const players = description.match(/추천인원\s*:\s*([^.]*)/)?.[1]?.trim()
   const difficulty = description.match(/난이도\s*:\s*([^.]*)/)?.[1]?.trim()
   const activity = description.match(/활동성\s*:\s*([^.]*)/)?.[1]?.trim()
   const duration = description.match(/이용시간\s*:\s*([^.]*)/)?.[1]?.trim()
   const minMax = players?.match(/(\d+)\s*-\s*(\d+)/)
+  const minPeopleFromJson = html.match(/\\"recommendMinPeopleCount\\":(\d+)/)?.[1]
+  const maxPeopleFromJson = html.match(/\\"recommendMaxPeopleCount\\":(\d+)/)?.[1]
+  const priceMatches = [...html.matchAll(/\\"peopleCount\\":(\d+),\\"price\\":(\d+)/g)]
+  const prices = priceMatches.map(match => ({
+    peopleCount: Number(match[1]),
+    totalPrice: Number(match[2]),
+    pricePerPerson: Math.round(Number(match[2]) / Number(match[1])),
+  }))
+  const pricePerPerson = prices.length
+    ? Math.min(...prices.map(price => price.pricePerPerson))
+    : null
+  const priceText = prices.length
+    ? prices.map(price => `${price.peopleCount}인 ${price.pricePerPerson.toLocaleString()}원/인`).join(' / ')
+    : null
   const address = decodeHtml(html.match(/\\"address\\":\\"([^\\"]*)/)?.[1] ?? '')
   const phone = decodeHtml(html.match(/\\"tel\\":\\"([^\\"]*)/)?.[1] ?? '')
   const homepageUrl = decodeHtml(html.match(/\\"homepageUrl\\":\\"([^\\"]*)/)?.[1] ?? '')
@@ -128,12 +143,12 @@ function parseZamfitDetail(html, sourceUrl, target) {
     theme: {
       name: target,
       crawled_name: name,
-      genre_labels: genre && genre !== '?' ? [genre] : [],
+      genre_labels: genre && genre !== '?' ? [genre] : fallbackGenre ? [fallbackGenre] : [],
       duration_minutes: numberOrNull(duration ?? ''),
-      min_players: minMax ? Number(minMax[1]) : null,
-      max_players: minMax ? Number(minMax[2]) : null,
-      price_text: null,
-      price_per_person: null,
+      min_players: minMax ? Number(minMax[1]) : numberOrNull(minPeopleFromJson ?? ''),
+      max_players: minMax ? Number(minMax[2]) : numberOrNull(maxPeopleFromJson ?? ''),
+      price_text: priceText,
+      price_per_person: pricePerPerson,
       image_url: imageUrl,
       booking_url: homepageUrl || sourceUrl,
       source_url: sourceUrl,
@@ -202,6 +217,52 @@ function addTheme(cafesByKey, cafeInput, themeInput, sourceName) {
   return true
 }
 
+function fillMissing(record, key, value) {
+  if (value == null) return false
+  if (Array.isArray(value) && value.length === 0) return false
+
+  const current = record[key]
+  const isEmpty = current == null || (Array.isArray(current) && current.length === 0) || current === ''
+  if (!isEmpty) return false
+
+  record[key] = value
+  return true
+}
+
+function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName) {
+  const themeKey = normalizeKey(target)
+
+  for (const cafe of cafesByKey.values()) {
+    const theme = cafe.themes.find(item => item.normalized_key === themeKey)
+    if (!theme) continue
+
+    const changed = [
+      fillMissing(theme, 'genre_labels', themeInput.genre_labels ?? []),
+      fillMissing(theme, 'duration_minutes', themeInput.duration_minutes),
+      fillMissing(theme, 'min_players', themeInput.min_players),
+      fillMissing(theme, 'max_players', themeInput.max_players),
+      fillMissing(theme, 'price_text', themeInput.price_text),
+      fillMissing(theme, 'price_per_person', themeInput.price_per_person),
+      fillMissing(theme, 'image_url', themeInput.image_url),
+      fillMissing(theme, 'booking_url', themeInput.booking_url),
+      fillMissing(theme, 'difficulty_label', themeInput.difficulty_label),
+      fillMissing(cafe, 'address', cafeInput.address),
+      fillMissing(cafe, 'phone', cafeInput.phone),
+      fillMissing(cafe, 'website_url', cafeInput.website_url),
+      fillMissing(cafe, 'booking_url', cafeInput.booking_url),
+    ].some(Boolean)
+
+    if (changed) {
+      theme.source_url = themeInput.source_url
+      theme.source_name = `${theme.source_name} + ${sourceName}`
+    }
+
+    return changed
+  }
+
+  return false
+}
+
 async function main() {
   const targets = (await readFile(TARGETS_PATH, 'utf8'))
     .split(/\r?\n/)
@@ -219,6 +280,7 @@ async function main() {
   const cafesByKey = new Map()
   const unmatched = []
   const matched = []
+  const enriched = []
 
   for (const target of targets) {
     const lookupName = NAME_ALIASES.get(target) ?? target
@@ -262,7 +324,6 @@ async function main() {
   const remainingTargets = new Set(unmatched)
 
   for (const candidate of candidates.zamfit ?? []) {
-    if (!remainingTargets.has(candidate.target)) continue
     const candidateHtml = await fetch(candidate.url).then(response => {
       if (!response.ok) throw new Error(`Failed to fetch ${candidate.url}: ${response.status}`)
       return response.text()
@@ -270,6 +331,29 @@ async function main() {
     const parsed = parseZamfitDetail(candidateHtml, candidate.url, candidate.target)
 
     if (!parsed.cafe.raw_name) continue
+
+    if (!remainingTargets.has(candidate.target)) {
+      const changed = enrichTheme(
+        cafesByKey,
+        candidate.target,
+        {
+          ...parsed.cafe,
+          source_url: candidate.url,
+        },
+        parsed.theme,
+        '잼핏 테마 상세',
+      )
+
+      if (changed) {
+        enriched.push({
+          target: candidate.target,
+          crawled_name: parsed.theme.crawled_name,
+          cafe: parsed.cafe.raw_name,
+          source_url: candidate.url,
+        })
+      }
+      continue
+    }
 
     const added = addTheme(cafesByKey, {
       ...parsed.cafe,
@@ -289,7 +373,34 @@ async function main() {
 
   for (const source of candidates.manual ?? []) {
     for (const theme of source.themes ?? []) {
-      if (!remainingTargets.has(theme.target)) continue
+      if (!remainingTargets.has(theme.target)) {
+        const changed = enrichTheme(
+          cafesByKey,
+          theme.target,
+          {
+            ...source.cafe,
+            source_url: source.source_url,
+          },
+          {
+            ...theme,
+            name: theme.target,
+            source_url: source.source_url,
+            booking_url: source.cafe.booking_url,
+          },
+          source.source_name,
+        )
+
+        if (changed) {
+          enriched.push({
+            target: theme.target,
+            crawled_name: theme.name,
+            cafe: `${source.cafe.name}${source.cafe.branch_name ? ` ${source.cafe.branch_name}` : ''}`,
+            source_url: source.source_url,
+          })
+        }
+        continue
+      }
+
       const added = addTheme(cafesByKey, {
         ...source.cafe,
         source_url: source.source_url,
@@ -336,7 +447,9 @@ async function main() {
     target_count: targets.length,
     matched_count: matched.length,
     unmatched_count: unmatched.length,
+    enriched_count: enriched.length,
     matched,
+    enriched,
     unmatched,
   }
 
@@ -345,6 +458,7 @@ async function main() {
   await writeFile(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`)
 
   console.log(`Matched ${matched.length}/${targets.length} targets.`)
+  if (enriched.length) console.log(`Enriched ${enriched.length} previously matched targets.`)
   if (unmatched.length) console.log(`Unmatched: ${unmatched.join(', ')}`)
 }
 
