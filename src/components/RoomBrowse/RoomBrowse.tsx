@@ -28,7 +28,13 @@ export default function RoomBrowse() {
 
   useEffect(() => { refetchRatings() }, [refetchRatings])
 
-  const filtered = useMemo(() => filterRooms(rooms, filters), [rooms, filters])
+  const filtered = useMemo(() => {
+    return [...filterRooms(rooms, filters)].sort((a, b) => {
+      const aHasRating = communityRatings[a.id] ? 1 : 0
+      const bHasRating = communityRatings[b.id] ? 1 : 0
+      return bHasRating - aHasRating
+    })
+  }, [rooms, filters, communityRatings])
 
   function selectTheme(id: string) {
     setFilters(f => ({
