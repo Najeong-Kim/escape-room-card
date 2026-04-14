@@ -18,6 +18,11 @@
   flex-shrink: 0;
 }
 
+.approval-card-actions .MuiButton-containedPrimary,
+.approval-card-actions .MuiButton-containedPrimary.Mui-disabled {
+  color: #fff;
+}
+
 .approval-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
