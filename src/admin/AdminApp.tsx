@@ -1,4 +1,7 @@
 import { Admin, Resource } from 'react-admin'
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'
+import HomeWorkIcon from '@mui/icons-material/HomeWork'
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import { createSupabaseDataProvider } from './supabaseDataProvider'
 import { RoomList } from './RoomList'
 import { RoomEdit } from './RoomEdit'
@@ -17,9 +20,9 @@ const dataProvider = createSupabaseDataProvider()
 export default function AdminApp() {
   return (
     <Admin dataProvider={dataProvider} authProvider={authProvider} basename="/admin" theme={lightTheme} darkTheme={darkTheme}>
-      <Resource name="rooms" list={RoomList} edit={RoomEdit} create={RoomCreate} />
-      <Resource name="cafe-approvals" options={{ label: '매장 검수' }} list={CafeApprovalList} />
-      <Resource name="theme-approvals" options={{ label: '테마 검수' }} list={ThemeApprovalList} />
+      <Resource name="rooms" options={{ label: '방 목록' }} icon={MeetingRoomIcon} list={RoomList} edit={RoomEdit} create={RoomCreate} />
+      <Resource name="cafe-approvals" options={{ label: '매장 검수' }} icon={HomeWorkIcon} list={CafeApprovalList} />
+      <Resource name="theme-approvals" options={{ label: '테마 검수' }} icon={AssignmentTurnedInIcon} list={ThemeApprovalList} />
     </Admin>
   )
 }
