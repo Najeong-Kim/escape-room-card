@@ -14,6 +14,11 @@ function displayEmail(session: Session | null) {
   return `${name.slice(0, 10)}@${domain}`
 }
 
+function authRedirectUrl() {
+  const configuredUrl = import.meta.env.VITE_AUTH_REDIRECT_URL as string | undefined
+  return configuredUrl?.replace(/\/$/, '') || window.location.origin
+}
+
 export function UserAuthButton({ className = 'top-24', floating = true }: { className?: string; floating?: boolean }) {
   const [session, setSession] = useState<Session | null>(null)
   const [open, setOpen] = useState(false)
@@ -47,7 +52,7 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
     const { error } = await supabase.auth.signInWithOtp({
       email: trimmed,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: authRedirectUrl(),
         shouldCreateUser: true,
       },
     })
