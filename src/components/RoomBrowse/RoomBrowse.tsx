@@ -7,12 +7,15 @@ import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../li
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import { Footer } from '../Footer'
 import { AppThemeToggle } from '../AppThemeToggle'
+import { getLogs } from '../../lib/roomLog'
+import { buildPersonalRecommendationModel, predictionLabel } from '../../lib/personalRecommendations'
 
 export default function RoomBrowse() {
   const navigate = useNavigate()
   const { rooms, loading, error } = useRooms()
   const { locations, genres } = useRoomFilterOptions()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
+  const [logs, setLogs] = useState(() => getLogs())
   const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
   const [communityMetricStats, setCommunityMetricStats] = useState<Record<number, CommunityMetricStats>>({})
 
@@ -27,6 +30,11 @@ export default function RoomBrowse() {
   }, [])
 
   useEffect(() => { refetchRatings() }, [refetchRatings])
+
+  const personalModel = useMemo(
+    () => buildPersonalRecommendationModel(rooms, logs, communityMetricStats),
+    [rooms, logs, communityMetricStats],
+  )
 
   const filtered = useMemo(() => {
     return [...filterRooms(rooms, filters)].sort((a, b) => {
@@ -78,6 +86,33 @@ export default function RoomBrowse() {
 
       <div className="px-4 pt-5 pb-24 max-w-2xl mx-auto space-y-5">
         {/* Theme chips */}
+        {personalModel?.lifeTheme && (
+          <section className="personal-score rounded-2xl border border-violet-500/30 bg-violet-950/20 px-4 py-4">
+            <p className="text-xs text-violet-300 font-semibold mb-1">나의 인생테마 후보</p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-white font-bold text-lg truncate">{personalModel.lifeTheme.room.name}</h2>
+                <p className="text-sm text-gray-400 mt-0.5">{personalModel.lifeTheme.room.brand}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-xl text-violet-300 font-black">
+                  {predictionLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
+                </p>
+                <p className="text-xs text-gray-500">예상 평점</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate(`/rooms/${personalModel.lifeTheme?.room.id}`)}
+              className="app-secondary-action w-full mt-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold transition-colors"
+            >
+              후보 자세히 보기
+            </button>
+          </section>
+        )}
+
         <section>
           <p className="text-xs text-gray-500 mb-2">테마 추천</p>
           <div className="flex flex-wrap gap-2">
@@ -164,7 +199,8 @@ export default function RoomBrowse() {
                 room={room}
                 communityRating={communityRatings[room.id]}
                 communityMetricStats={communityMetricStats[room.id]}
-                onRated={refetchRatings}
+                personalPrediction={personalModel?.predictions[room.id]}
+                onRated={() => { setLogs(getLogs()); refetchRatings() }}
               />
             ))}
           </div>

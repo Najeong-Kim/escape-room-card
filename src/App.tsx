@@ -9,6 +9,8 @@ import { Footer } from './components/Footer'
 import { AppThemeToggle } from './components/AppThemeToggle'
 import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
+import { useRooms } from './lib/useRooms'
+import { buildPersonalRecommendationModel, predictionLabel } from './lib/personalRecommendations'
 
 type HomeMode = 'home' | 'quiz' | 'result'
 
@@ -126,6 +128,7 @@ function SavedCardHome({
   logs: RoomLog[]
   t: (key: string) => string
 }) {
+  const { rooms } = useRooms()
   const tagline = t(`tagline_${profile.characterId}`)
   const fearLabel = t(`fear_${profile.fearLevel}`)
   const styleLabel = t(`style_${profile.puzzleStyle}`)
@@ -133,6 +136,7 @@ function SavedCardHome({
   const totalLogs = logs.length
   const clearedLogs = logs.filter(log => log.cleared).length
   const latestLog = logs[0]
+  const personalModel = buildPersonalRecommendationModel(rooms, logs)
 
   return (
     <div className="min-h-dvh max-w-md mx-auto px-6 py-24 flex flex-col gap-6">
@@ -150,6 +154,29 @@ function SavedCardHome({
           <ProfileStat label="장르" value={profile.genres.map(genre => t(`opt_${genre}`)).join(', ') || '-'} />
         </div>
       </section>
+
+      {personalModel?.lifeTheme && (
+        <section className="personal-score rounded-2xl border border-violet-500/30 bg-violet-950/20 px-5 py-5">
+          <p className="text-violet-300 text-xs font-semibold uppercase tracking-widest mb-2">
+            나의 인생테마 후보
+          </p>
+          <h2 className="text-white text-xl font-black leading-tight">
+            {personalModel.lifeTheme.room.name}
+          </h2>
+          <p className="text-gray-400 text-sm mt-1">{personalModel.lifeTheme.room.brand}</p>
+          <div className="mt-4 flex items-end justify-between gap-3">
+            <p className="text-gray-500 text-sm">
+              {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
+            </p>
+            <div className="text-right flex-shrink-0">
+              <p className="text-violet-300 text-2xl font-black">
+                {predictionLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
+              </p>
+              <p className="text-gray-500 text-xs">예상 평점</p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-2xl border border-white/10 bg-[#13131a] px-5 py-5">
         <div className="flex items-start justify-between gap-3 mb-4">

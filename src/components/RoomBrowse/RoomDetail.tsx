@@ -5,8 +5,9 @@ import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../li
 import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
-import { hasLog } from '../../lib/roomLog'
+import { getLogs, hasLog } from '../../lib/roomLog'
 import { useRooms } from '../../lib/useRooms'
+import { buildPersonalRecommendationModel, predictionLabel } from '../../lib/personalRecommendations'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
@@ -73,6 +74,7 @@ export default function RoomDetail() {
   const [communityMetricStats, setCommunityMetricStats] = useState<CommunityMetricStats>({})
   const [showLog, setShowLog] = useState(false)
   const [showReport, setShowReport] = useState(false)
+  const [logs, setLogs] = useState(() => getLogs())
   const [logged, setLogged] = useState(() => hasLog(roomId))
 
   const refetchRatings = useCallback(() => {
@@ -91,6 +93,11 @@ export default function RoomDetail() {
     ? (Math.round(communityRating.score10 / 2) as PathRating)
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
+  const personalModel = useMemo(
+    () => buildPersonalRecommendationModel(rooms, logs, { [roomId]: communityMetricStats }),
+    [rooms, logs, roomId, communityMetricStats],
+  )
+  const personalPrediction = personalModel?.predictions[roomId]
 
   if (!Number.isFinite(roomId)) {
     return (
@@ -210,6 +217,23 @@ export default function RoomDetail() {
             )}
           </div>
 
+          {personalPrediction && (
+            <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-violet-300 font-semibold">나의 예상 평점</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    {personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}
+                  </p>
+                </div>
+                <p className="text-2xl text-white font-black">{predictionLabel(personalPrediction).replace('예상 ', '')}</p>
+              </div>
+              {personalPrediction.played && (
+                <p className="text-xs text-gray-500 mt-2">이미 기록한 테마라 후보 순위에서는 제외됩니다.</p>
+              )}
+            </div>
+          )}
+
           <div className="space-y-3">
             <h3 className="font-semibold">세부 지표</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -280,6 +304,7 @@ export default function RoomDetail() {
           onClose={() => setShowLog(false)}
           onSaved={() => {
             setLogged(true)
+            setLogs(getLogs())
             setShowLog(false)
             refetchRatings()
           }}

@@ -50,6 +50,10 @@
   box-shadow: var(--rating-shadow);
 }
 
+.personal-score {
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.12);
+}
+
 :root[data-app-theme='light'] .app-theme-toggle {
   color: #34344a;
   border-color: rgb(209 213 219);
@@ -165,6 +169,12 @@
 
 :root[data-app-theme='light'] .official-label {
   color: #92400e !important;
+}
+
+:root[data-app-theme='light'] .personal-score {
+  background-color: #ffffff !important;
+  border-color: rgb(124 58 237 / 0.28) !important;
+  box-shadow: 0 10px 24px rgb(15 23 42 / 0.08);
 }
 
 :root[data-app-theme='light'] :where(select, input, textarea) {

@@ -7,6 +7,8 @@ import { LogModal } from '../RoomLog/LogModal'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
+import type { PersonalPrediction } from '../../lib/personalRecommendations'
+import { predictionLabel } from '../../lib/personalRecommendations'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -59,6 +61,7 @@ interface RoomCardProps {
   room: Room
   communityRating?: CommunityRating
   communityMetricStats?: CommunityMetricStats
+  personalPrediction?: PersonalPrediction
   onRated?: () => void
 }
 
@@ -66,7 +69,7 @@ function formatScore(score: number) {
   return Number.isInteger(score) ? String(score) : score.toFixed(1)
 }
 
-export function RoomCard({ room, communityRating, communityMetricStats, onRated }: RoomCardProps) {
+export function RoomCard({ room, communityRating, communityMetricStats, personalPrediction, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
   const [logged, setLogged] = useState(() => hasLog(room.id))
 
@@ -144,6 +147,18 @@ export function RoomCard({ room, communityRating, communityMetricStats, onRated 
             </span>
           ))}
         </div>
+
+        {personalPrediction && (
+          <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-violet-300 font-semibold">나의 예상 평점</span>
+              <span className="text-sm text-white font-black">{predictionLabel(personalPrediction)}</span>
+            </div>
+            {personalPrediction.reasons[0] && (
+              <p className="text-[11px] text-gray-500 mt-1">{personalPrediction.reasons[0]}</p>
+            )}
+          </div>
+        )}
 
         {visibleMetrics.length > 0 && (
           <div className="grid grid-cols-2 gap-2 pt-1">
