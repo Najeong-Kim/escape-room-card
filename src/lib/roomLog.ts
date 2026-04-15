@@ -18,6 +18,18 @@ export interface RoomLog {
 }
 
 const KEY = 'escape-room-logs'
+export const ROOM_LOGS_CHANGED = 'escape-room-logs-changed'
+
+function notifyLogsChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(ROOM_LOGS_CHANGED))
+  }
+}
+
+function persistLogs(logs: RoomLog[]) {
+  localStorage.setItem(KEY, JSON.stringify(logs))
+  notifyLogsChanged()
+}
 
 export function getLogs(): RoomLog[] {
   try {
@@ -30,18 +42,25 @@ export function getLogs(): RoomLog[] {
 export function addLog(log: Omit<RoomLog, 'id'>): RoomLog {
   const newLog: RoomLog = { ...log, id: crypto.randomUUID() }
   const logs = getLogs()
-  localStorage.setItem(KEY, JSON.stringify([newLog, ...logs]))
+  persistLogs([newLog, ...logs])
   return newLog
 }
 
-export function updateLog(id: string, patch: Partial<Omit<RoomLog, 'id'>>): void {
+export function updateLog(id: string, patch: Partial<Omit<RoomLog, 'id'>>): RoomLog | null {
+  let updated: RoomLog | null = null
   const logs = getLogs().map(l => l.id === id ? { ...l, ...patch } : l)
-  localStorage.setItem(KEY, JSON.stringify(logs))
+  updated = logs.find(l => l.id === id) ?? null
+  persistLogs(logs)
+  return updated
 }
 
 export function deleteLog(id: string): void {
   const logs = getLogs().filter(l => l.id !== id)
-  localStorage.setItem(KEY, JSON.stringify(logs))
+  persistLogs(logs)
+}
+
+export function replaceLogs(logs: RoomLog[]): void {
+  persistLogs(logs)
 }
 
 export function hasLog(room_id: number): boolean {

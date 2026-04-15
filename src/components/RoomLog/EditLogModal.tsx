@@ -7,6 +7,7 @@ import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import { submitCommunityRating, submitCommunityMetricRatings } from '../../lib/communityRatings'
 import type { MetricKey, MetricScores } from '../../lib/communityRatings'
+import { saveUserRoomLog } from '../../lib/userRoomLogs'
 
 const METRICS: { key: MetricKey; label: string; low: string; high: string }[] = [
   { key: 'difficulty', label: '난이도', low: '쉬움', high: '어려움' },
@@ -40,14 +41,14 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
   const [ratingTouched, setRatingTouched] = useState(false)
   const ratingSectionRef = useRef<HTMLDivElement>(null)
 
-  function save() {
+  async function save() {
     if (rating === null) {
       setRatingTouched(true)
       ratingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
 
-    updateLog(log.id, {
+    const updated = updateLog(log.id, {
       played_at: playedAt,
       cleared,
       rating,
@@ -60,8 +61,11 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
       aging_score: metricScores.aging ?? null,
     })
 
-    submitCommunityRating(log.room_id, rating)
-    submitCommunityMetricRatings(log.room_id, metricScores)
+    await Promise.all([
+      updated ? saveUserRoomLog(updated) : Promise.resolve(),
+      submitCommunityRating(log.room_id, rating),
+      submitCommunityMetricRatings(log.room_id, metricScores),
+    ])
 
     onSaved()
   }

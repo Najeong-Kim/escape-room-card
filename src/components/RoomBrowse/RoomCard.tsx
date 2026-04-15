@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Room } from '../../lib/recommend'
-import { hasLog } from '../../lib/roomLog'
+import { useRoomLogs } from '../../lib/useRoomLogs'
 import { LogModal } from '../RoomLog/LogModal'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
@@ -84,7 +84,8 @@ interface RoomCardProps {
 
 export function RoomCard({ room, communityRating, communityMetricStats, personalPrediction, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
-  const [logged, setLogged] = useState(() => hasLog(room.id))
+  const [logs] = useRoomLogs()
+  const logged = logs.some(log => log.room_id === room.id)
 
   // 커뮤니티 평점을 PathRating 레벨로 변환 (소수 → 반올림)
   const ratingLevel = communityRating
@@ -262,7 +263,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
         <LogModal
           room={room}
           onClose={() => setShowLog(false)}
-          onSaved={() => { setLogged(true); setShowLog(false); onRated?.() }}
+          onSaved={() => { setShowLog(false); onRated?.() }}
         />
       )}
     </>

@@ -8,7 +8,7 @@ import type { CommunityMetricStats, CommunityRating } from '../../lib/communityR
 import { Footer } from '../Footer'
 import { AppThemeToggle } from '../AppThemeToggle'
 import { UserAuthButton } from '../UserAuthButton'
-import { getLogs } from '../../lib/roomLog'
+import { useRoomLogs } from '../../lib/useRoomLogs'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { RatingIcon } from '../../lib/ratings'
 
@@ -17,7 +17,7 @@ export default function RoomBrowse() {
   const { rooms, loading, error } = useRooms()
   const { locations, genres } = useRoomFilterOptions()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
-  const [logs, setLogs] = useState(() => getLogs())
+  const [logs] = useRoomLogs()
   const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
   const [communityMetricStats, setCommunityMetricStats] = useState<Record<number, CommunityMetricStats>>({})
 
@@ -204,7 +204,7 @@ export default function RoomBrowse() {
                 communityRating={communityRatings[room.id]}
                 communityMetricStats={communityMetricStats[room.id]}
                 personalPrediction={personalModel?.predictions[room.id]}
-                onRated={() => { setLogs(getLogs()); refetchRatings() }}
+                onRated={refetchRatings}
               />
             ))}
           </div>

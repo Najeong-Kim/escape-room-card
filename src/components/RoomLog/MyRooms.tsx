@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getLogs, deleteLog } from '../../lib/roomLog'
+import { deleteLog } from '../../lib/roomLog'
 import type { RoomLog } from '../../lib/roomLog'
+import { useRoomLogs } from '../../lib/useRoomLogs'
+import { deleteUserRoomLog } from '../../lib/userRoomLogs'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import { Footer } from '../Footer'
 import { AppThemeToggle } from '../AppThemeToggle'
@@ -25,13 +27,13 @@ function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
 
 export default function MyRooms() {
   const navigate = useNavigate()
-  const [logs, setLogs] = useState<RoomLog[]>(() => getLogs())
+  const [logs] = useRoomLogs()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingLog, setEditingLog] = useState<RoomLog | null>(null)
 
   const handleDelete = useCallback((id: string) => {
     deleteLog(id)
-    setLogs(getLogs())
+    deleteUserRoomLog(id)
     setDeletingId(null)
   }, [])
 
@@ -167,7 +169,6 @@ export default function MyRooms() {
           log={editingLog}
           onClose={() => setEditingLog(null)}
           onSaved={() => {
-            setLogs(getLogs())
             setEditingLog(null)
           }}
         />

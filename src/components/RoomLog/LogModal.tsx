@@ -7,6 +7,7 @@ import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import { submitCommunityEscapeStats, submitCommunityMetricRatings, submitCommunityRating } from '../../lib/communityRatings'
 import type { MetricKey, MetricScores } from '../../lib/communityRatings'
+import { saveUserRoomLog } from '../../lib/userRoomLogs'
 
 const METRICS: { key: MetricKey; label: string; low: string; high: string }[] = [
   { key: 'difficulty', label: '난이도', low: '쉬움', high: '어려움' },
@@ -44,7 +45,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
     }
 
     setSaving(true)
-    addLog({
+    const newLog = addLog({
       room_id: room.id,
       room_name: room.name,
       brand: room.brand,
@@ -62,6 +63,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       memo: memo.trim(),
     })
     await Promise.all([
+      saveUserRoomLog(newLog),
       submitCommunityRating(room.id, rating),
       submitCommunityMetricRatings(room.id, metricScores),
       submitCommunityEscapeStats(room.id, cleared, cleared ? hintsUsed : null, cleared ? remainingMinutes : null),

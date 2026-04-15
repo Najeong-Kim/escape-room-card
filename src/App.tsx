@@ -8,7 +8,8 @@ import { ResultCard } from './components/ResultCard/ResultCard'
 import { Footer } from './components/Footer'
 import { AppThemeToggle } from './components/AppThemeToggle'
 import { UserAuthButton } from './components/UserAuthButton'
-import { getLogs, type RoomLog } from './lib/roomLog'
+import type { RoomLog } from './lib/roomLog'
+import { useRoomLogs } from './lib/useRoomLogs'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 import { useRooms } from './lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
@@ -18,7 +19,7 @@ type HomeMode = 'home' | 'quiz' | 'result'
 
 export default function App() {
   const [savedProfile, setSavedProfile] = useState<QuizProfile | null>(() => loadSavedCard())
-  const [logs] = useState<RoomLog[]>(() => getLogs())
+  const [logs] = useRoomLogs()
   const [activeProfile, setActiveProfile] = useState<QuizProfile | null>(null)
   const [mode, setMode] = useState<HomeMode>(() => savedProfile ? 'home' : 'quiz')
   const { t, i18n } = useTranslation()

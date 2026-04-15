@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabaseClient'
+import { syncLocalRoomLogsToUser } from '../lib/userRoomLogs'
 
 type AuthStatus = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -21,10 +22,16 @@ export function UserAuthButton({ className = 'top-24' }: { className?: string })
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      if (data.session) syncLocalRoomLogsToUser()
+    })
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
-      if (nextSession) setOpen(false)
+      if (nextSession) {
+        setOpen(false)
+        syncLocalRoomLogsToUser()
+      }
     })
 
     return () => listener.subscription.unsubscribe()

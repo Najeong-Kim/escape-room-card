@@ -5,7 +5,7 @@ import { fetchAllCommunityEscapeStats, fetchAllCommunityMetricStats, fetchAllCom
 import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
-import { getLogs, hasLog } from '../../lib/roomLog'
+import { useRoomLogs } from '../../lib/useRoomLogs'
 import { useRooms } from '../../lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { ReportModal } from '../ReportModal'
@@ -96,8 +96,8 @@ export default function RoomDetail() {
   const [escapeStats, setEscapeStats] = useState<CommunityEscapeStats | undefined>()
   const [showLog, setShowLog] = useState(false)
   const [showReport, setShowReport] = useState(false)
-  const [logs, setLogs] = useState(() => getLogs())
-  const [logged, setLogged] = useState(() => hasLog(roomId))
+  const [logs] = useRoomLogs()
+  const logged = useMemo(() => logs.some(log => log.room_id === roomId), [logs, roomId])
 
   const refetchRatings = useCallback(() => {
     Promise.all([
@@ -382,8 +382,6 @@ export default function RoomDetail() {
           room={room}
           onClose={() => setShowLog(false)}
           onSaved={() => {
-            setLogged(true)
-            setLogs(getLogs())
             setShowLog(false)
             refetchRatings()
           }}
