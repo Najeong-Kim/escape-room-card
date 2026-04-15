@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { extname, resolve } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import { applyOrSuggestThemeUpdate } from './lib/safe-theme-updates.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const SEED_PATH = resolve(ROOT, 'data/gangnam-gu-themes.seed.json')
@@ -89,29 +90,14 @@ async function ensureBucket(supabase) {
   if (error) throw error
 }
 
-async function updateThemeImage(supabase, themeId, payload) {
-  const { error } = await supabase
-    .from('themes')
-    .update(payload)
-    .eq('id', themeId)
-  if (!error) return
-
-  if (
-    error.message.includes('image_source_url') ||
-    error.message.includes('image_source_name') ||
-    error.message.includes('image_status')
-  ) {
-    const { error: fallbackError } = await supabase
-      .from('themes')
-      .update({ image_url: payload.image_url })
-      .eq('id', themeId)
-    if (fallbackError) throw fallbackError
-    console.warn(`WARN image metadata columns missing; updated image_url only for theme ${themeId}`)
-    return
-  }
-
-  throw error
+async function updateThemeImage(supabase, theme, payload) {
+  const result = await applyOrSuggestThemeUpdate(supabase, theme, payload, {
+    sourceName: 'theme poster import',
+    sourceUrl: payload.image_source_url,
+  })
+  return result
 }
+
 
 async function fetchImage(url) {
   const response = await fetch(url, {
@@ -156,7 +142,7 @@ async function main() {
 
   const { data: themes, error } = await supabase
     .from('themes')
-    .select('id,name,normalized_key,image_url,cafes!inner(normalized_key,name,branch_name)')
+    .select('id,name,normalized_key,image_url,image_source_url,image_source_name,image_status,status,needs_review,cafes!inner(normalized_key,name,branch_name)')
     .order('id')
   if (error) throw error
 
@@ -193,14 +179,14 @@ async function main() {
       if (uploadError) throw uploadError
 
       const { data: publicUrl } = supabase.storage.from(BUCKET).getPublicUrl(objectPath)
-      await updateThemeImage(supabase, theme.id, {
+      const updateResult = await updateThemeImage(supabase, theme, {
         image_url: publicUrl.publicUrl,
         image_source_url: candidateUrl,
         image_source_name: sourceName(candidateUrl),
         image_status: 'unverified',
       })
 
-      console.log(`UPLOAD ${theme.id} ${theme.name} <- ${candidateUrl}`)
+      console.log(`UPLOAD ${theme.id} ${theme.name} ${updateResult.action} <- ${candidateUrl}`)
       results.uploaded += 1
     } catch (err) {
       console.warn(`FAIL ${theme.id} ${theme.name}: ${err instanceof Error ? err.message : String(err)}`)

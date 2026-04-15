@@ -4,6 +4,7 @@ import HomeWorkIcon from '@mui/icons-material/HomeWork'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import StorefrontIcon from '@mui/icons-material/Storefront'
+import UpdateIcon from '@mui/icons-material/Update'
 import { createSupabaseDataProvider } from './supabaseDataProvider'
 import { RoomList } from './RoomList'
 import { RoomEdit } from './RoomEdit'
@@ -11,6 +12,7 @@ import { RoomCreate } from './RoomCreate'
 import { CafeList } from './CafeList'
 import { CafeApprovalList } from './CafeApprovalList'
 import { ThemeApprovalList } from './ThemeApprovalList'
+import { ThemeUpdateSuggestionList } from './ThemeUpdateSuggestionList'
 import { ReportEdit, ReportList } from './ReportList'
 import { authProvider } from './authProvider'
 import { darkTheme, lightTheme } from './theme'
@@ -30,6 +32,7 @@ export default function AdminApp() {
       <Resource name="reports" options={{ label: '제보 목록' }} icon={ReportProblemIcon} list={ReportList} edit={ReportEdit} />
       <Resource name="cafe-approvals" options={{ label: '매장 검수' }} icon={HomeWorkIcon} list={CafeApprovalList} />
       <Resource name="theme-approvals" options={{ label: '테마 검수' }} icon={AssignmentTurnedInIcon} list={ThemeApprovalList} />
+      <Resource name="theme-update-suggestions" options={{ label: '테마 변경 제안' }} icon={UpdateIcon} list={ThemeUpdateSuggestionList} />
     </Admin>
   )
 }

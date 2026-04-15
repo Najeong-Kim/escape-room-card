@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import { applyOrSuggestThemeUpdate, omitUndefined } from './lib/safe-theme-updates.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const SEED_PATH = resolve(ROOT, 'data/gangnam-gu-themes.seed.json')
@@ -17,12 +18,6 @@ function parseEnv(content) {
         return [line.slice(0, index), line.slice(index + 1)]
       })
       .filter(([key]) => key),
-  )
-}
-
-function omitUndefined(record) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined),
   )
 }
 
@@ -69,6 +64,8 @@ async function main() {
 
   let cafeCount = 0
   let themeCount = 0
+  let suggestionCount = 0
+  let directUpdateCount = 0
   let themeGenreCount = 0
   let sourceCount = 0
 
@@ -88,20 +85,40 @@ async function main() {
       const { source_name: sourceName, ...themeInput } = theme
       const sourceUrl = theme.source_url ?? cafe.source_url ?? 'local://data/gangnam-gu-themes.seed.json'
 
-      const { data: savedTheme, error: themeError } = await supabase
-        .from('themes')
-        .upsert(
-          omitUndefined({
-            ...themeInput,
-            cafe_id: savedCafe.id,
-            source_url: sourceUrl,
-          }),
-          { onConflict: 'cafe_id,normalized_key' },
-        )
-        .select('id')
-        .single()
+      const patch = omitUndefined({
+        ...themeInput,
+        cafe_id: savedCafe.id,
+        source_url: sourceUrl,
+      })
 
-      if (themeError) throw themeError
+      const { data: existingTheme, error: existingThemeError } = await supabase
+        .from('themes')
+        .select('*')
+        .eq('cafe_id', savedCafe.id)
+        .eq('normalized_key', themeInput.normalized_key)
+        .maybeSingle()
+      if (existingThemeError) throw existingThemeError
+
+      let savedTheme = existingTheme
+
+      if (existingTheme) {
+        const result = await applyOrSuggestThemeUpdate(supabase, existingTheme, patch, {
+          sourceName: sourceName ?? seed.source_note ?? 'manual seed',
+          sourceUrl,
+        })
+        if (result.action === 'suggested' || result.action === 'suggested_existing') suggestionCount += 1
+        if (result.action === 'updated') directUpdateCount += 1
+      } else {
+        const { data: insertedTheme, error: themeError } = await supabase
+          .from('themes')
+          .insert(patch)
+          .select('*')
+          .single()
+        if (themeError) throw themeError
+        savedTheme = insertedTheme
+        directUpdateCount += 1
+      }
+
       themeCount += 1
 
       const genreRows = genreCodesForLabels(theme.genre_labels)
@@ -109,7 +126,7 @@ async function main() {
         .filter(Boolean)
         .map(genreId => ({ theme_id: savedTheme.id, genre_id: genreId }))
 
-      if (genreRows.length) {
+      if (genreRows.length && (savedTheme.needs_review === true || savedTheme.status !== 'active')) {
         await supabase.from('theme_genres').delete().eq('theme_id', savedTheme.id)
         const { error: themeGenreError } = await supabase
           .from('theme_genres')
@@ -136,7 +153,7 @@ async function main() {
     }
   }
 
-  console.log(`Imported ${cafeCount} cafes, ${themeCount} themes, ${themeGenreCount} theme genres, ${sourceCount} source rows.`)
+  console.log(`Imported ${cafeCount} cafes, processed ${themeCount} themes (${directUpdateCount} direct updates/inserts, ${suggestionCount} suggestions), ${themeGenreCount} theme genres, ${sourceCount} source rows.`)
 }
 
 main().catch(error => {
