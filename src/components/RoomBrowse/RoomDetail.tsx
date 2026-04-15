@@ -8,6 +8,7 @@ import type { PathRating } from '../../lib/ratings'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { useRooms } from '../../lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { fetchThemeReviewLinks, REVIEW_SOURCE_LABEL, type ThemeReviewLink } from '../../lib/themeReviewLinks'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
@@ -93,6 +94,7 @@ export default function RoomDetail() {
   const [communityRating, setCommunityRating] = useState<CommunityRating | undefined>()
   const [communityMetricStats, setCommunityMetricStats] = useState<CommunityMetricStats>({})
   const [escapeStats, setEscapeStats] = useState<CommunityEscapeStats | undefined>()
+  const [reviewLinks, setReviewLinks] = useState<ThemeReviewLink[]>([])
   const [showLog, setShowLog] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [logs] = useRoomLogs()
@@ -111,6 +113,11 @@ export default function RoomDetail() {
   }, [roomId])
 
   useEffect(() => { refetchRatings() }, [refetchRatings])
+
+  useEffect(() => {
+    if (!Number.isFinite(roomId)) return
+    fetchThemeReviewLinks(roomId).then(setReviewLinks)
+  }, [roomId])
 
   const ratingLevel = communityRating
     ? (Math.round(communityRating.score10 / 2) as PathRating)
@@ -363,6 +370,51 @@ export default function RoomDetail() {
               </a>
             )}
           </div>
+
+          {reviewLinks.length > 0 && (
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-semibold">후기 모아보기</h3>
+                <p className="text-xs text-gray-500 mt-1">블로그, 유튜브, 인스타 후기를 한 곳에서 확인해 보세요.</p>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                {reviewLinks.map(review => (
+                  <a
+                    key={review.id}
+                    href={review.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="review-link-card rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-violet-500/40 hover:bg-[#16161f]"
+                  >
+                    <div className="flex gap-3">
+                      {review.thumbnail_url && (
+                        <img
+                          src={review.thumbnail_url}
+                          alt=""
+                          className="w-16 h-16 rounded-lg object-cover bg-[#0e0e16] flex-shrink-0"
+                          onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }}
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="review-source-badge rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                            {REVIEW_SOURCE_LABEL[review.source_type]}
+                          </span>
+                          {review.published_at && (
+                            <span className="text-[11px] text-gray-600">{review.published_at}</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-white font-semibold leading-snug">{review.title}</p>
+                        {review.author && (
+                          <p className="text-xs text-gray-500 mt-1">{review.author}</p>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={() => setShowReport(true)}

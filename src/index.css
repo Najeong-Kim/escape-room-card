@@ -200,6 +200,26 @@
   box-shadow: 0 10px 24px rgb(15 23 42 / 0.08);
 }
 
+.review-source-badge {
+  background: rgb(124 58 237 / 0.18);
+  color: rgb(196 181 253);
+}
+
+:root[data-app-theme='light'] .review-link-card {
+  background-color: #ffffff !important;
+  border-color: rgb(17 24 39 / 0.1) !important;
+}
+
+:root[data-app-theme='light'] .review-link-card:hover {
+  background-color: rgb(245 243 255) !important;
+  border-color: rgb(124 58 237 / 0.35) !important;
+}
+
+:root[data-app-theme='light'] .review-source-badge {
+  background: rgb(124 58 237 / 0.12);
+  color: #5b21b6;
+}
+
 :root[data-app-theme='light'] .auth-modal {
   background-color: #ffffff !important;
   border-color: rgb(17 24 39 / 0.1) !important;
