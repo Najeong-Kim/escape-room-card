@@ -72,6 +72,16 @@ function difficultyScore10OrNull(value) {
   return score > 5 ? score : clampScore10(score * 2)
 }
 
+function pricePerPersonForTwo(prices) {
+  if (!prices.length) return null
+  return prices.find(price => price.peopleCount === 2)?.pricePerPerson ?? prices[0].pricePerPerson
+}
+
+function maxPeopleForPrices(prices) {
+  if (!prices.length) return null
+  return Math.max(...prices.map(price => price.peopleCount))
+}
+
 function compactText(value) {
   return decodeHtml(String(value ?? ''))
     .replace(/\r/g, '\n')
@@ -171,9 +181,7 @@ function parseZamfitDetail(html, sourceUrl, target) {
     totalPrice: Number(match[2]),
     pricePerPerson: Math.round(Number(match[2]) / Number(match[1])),
   }))
-  const pricePerPerson = prices.length
-    ? Math.min(...prices.map(price => price.pricePerPerson))
-    : null
+  const pricePerPerson = pricePerPersonForTwo(prices)
   const priceText = prices.length
     ? prices.map(price => `${price.peopleCount}인 ${price.pricePerPerson.toLocaleString()}원/인`).join(' / ')
     : null
@@ -199,7 +207,10 @@ function parseZamfitDetail(html, sourceUrl, target) {
       genre_labels: genre && genre !== '?' ? [genre] : fallbackGenre ? [fallbackGenre] : [],
       duration_minutes: numberOrNull(duration ?? ''),
       min_players: minMax ? Number(minMax[1]) : numberOrNull(minPeopleFromJson ?? ''),
-      max_players: minMax ? Number(minMax[2]) : numberOrNull(maxPeopleFromJson ?? ''),
+      max_players: Math.max(
+        minMax ? Number(minMax[2]) : numberOrNull(maxPeopleFromJson ?? '') ?? 0,
+        maxPeopleForPrices(prices) ?? 0,
+      ) || null,
       price_text: priceText,
       price_per_person: pricePerPerson,
       image_url: imageUrl,
@@ -233,9 +244,9 @@ function parsePrices(variables = []) {
     price_text: prices.length
       ? prices.map(price => `${price.peopleCount}인 ${price.pricePerPerson.toLocaleString()}원/인`).join(' / ')
       : null,
-    price_per_person: prices.length
-      ? Math.min(...prices.map(price => price.pricePerPerson))
-      : null,
+    price_per_person: pricePerPersonForTwo(prices),
+    min_players: prices.length ? Math.min(...prices.map(price => price.peopleCount)) : null,
+    max_players: maxPeopleForPrices(prices),
   }
 }
 
@@ -271,7 +282,7 @@ function parsePlayTheWorldTheme(theme, sourceUrl, target) {
     genre_labels: parsedDescription.genre_labels,
     duration_minutes: parsedDescription.duration_minutes,
     min_players: parsedDescription.min_players,
-    max_players: parsedDescription.max_players,
+    max_players: Math.max(parsedDescription.max_players ?? 0, parsedPrices.max_players ?? 0) || null,
     price_text: parsedPrices.price_text ?? parsedDescription.price_text,
     price_per_person: parsedPrices.price_per_person ?? parsedDescription.price_per_person,
     image_url: theme.image_url ?? null,

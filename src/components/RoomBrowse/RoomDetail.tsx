@@ -169,7 +169,7 @@ export default function RoomDetail() {
               <p className="text-sm text-gray-200 mt-1">{room.duration_minutes}분</p>
             </div>
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-              <p className="text-xs text-gray-500">가격</p>
+              <p className="text-xs text-gray-500">가격 (2인 기준)</p>
               <p className="text-sm text-gray-200 mt-1">
                 {room.price_per_person > 0 ? `${room.price_per_person.toLocaleString()}원` : '미확인'}
               </p>
