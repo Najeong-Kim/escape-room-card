@@ -20,6 +20,94 @@
   }
 }
 
+:root[data-app-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-app-theme='light'] body {
+  background: #f7f7fb;
+  color: #171720;
+}
+
+.app-theme-toggle {
+  color: rgb(156 163 175);
+  border-color: rgb(31 41 55);
+  background: rgb(10 10 15 / 0.8);
+}
+
+.app-theme-toggle:hover {
+  color: rgb(229 231 235);
+  border-color: rgb(75 85 99);
+}
+
+:root[data-app-theme='light'] .app-theme-toggle {
+  color: #34344a;
+  border-color: rgb(209 213 219);
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: 0 6px 18px rgb(15 23 42 / 0.08);
+}
+
+:root[data-app-theme='light'] .app-theme-toggle:hover {
+  color: #111827;
+  border-color: rgb(156 163 175);
+}
+
+:root[data-app-theme='light'] :where([class*='bg-[#0a0a0f]']) {
+  background-color: #f7f7fb !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-[#0a0a0f]/']) {
+  background-color: rgb(247 247 251 / 0.9) !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-[#13131a]']) {
+  background-color: #ffffff !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-[#16161f]']) {
+  background-color: #f1f3f8 !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-[#0e0e16]']) {
+  background-color: #f3f4f8 !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-white/5'], [class*='bg-white/[0.03]']) {
+  background-color: rgb(17 24 39 / 0.04) !important;
+}
+
+:root[data-app-theme='light'] :where(.text-white, [class*='text-white/']) {
+  color: #171720 !important;
+}
+
+:root[data-app-theme='light'] :where(.text-gray-200, .text-gray-300, .text-gray-400) {
+  color: #34344a !important;
+}
+
+:root[data-app-theme='light'] :where(.text-gray-500, .text-gray-600) {
+  color: #6b7280 !important;
+}
+
+:root[data-app-theme='light'] :where(.border-white\/5, .border-white\/8, .border-white\/10) {
+  border-color: rgb(17 24 39 / 0.1) !important;
+}
+
+:root[data-app-theme='light'] :where(.border-gray-800, .border-gray-700) {
+  border-color: rgb(209 213 219) !important;
+}
+
+:root[data-app-theme='light'] :where(.hover\:text-white:hover) {
+  color: #111827 !important;
+}
+
+:root[data-app-theme='light'] :where(.hover\:border-gray-600:hover, .hover\:border-gray-500:hover) {
+  border-color: rgb(156 163 175) !important;
+}
+
+:root[data-app-theme='light'] :where(select, input, textarea) {
+  color-scheme: light;
+}
+
 /* 3D card flip */
 .card-scene {
   perspective: 1000px;

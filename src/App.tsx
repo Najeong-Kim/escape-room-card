@@ -6,6 +6,7 @@ import type { QuizProfile } from './lib/traitMap'
 import { QuizFlow } from './components/Quiz/QuizFlow'
 import { ResultCard } from './components/ResultCard/ResultCard'
 import { Footer } from './components/Footer'
+import { AppThemeToggle } from './components/AppThemeToggle'
 import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 
@@ -47,9 +48,10 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f]">
+      <AppThemeToggle />
       <button
         onClick={toggleLang}
-        className="fixed top-4 right-4 z-50 text-xs text-gray-500 hover:text-gray-300
+        className="fixed top-14 right-4 z-50 text-xs text-gray-500 hover:text-gray-300
                    border border-gray-800 hover:border-gray-600 px-3 py-1.5 rounded-full
                    transition-colors bg-[#0a0a0f]/80 backdrop-blur-sm"
       >
