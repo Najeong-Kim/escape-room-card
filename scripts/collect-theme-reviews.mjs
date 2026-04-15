@@ -57,7 +57,7 @@ function sleep(ms) {
 }
 
 function decodeHtml(value = '') {
-  return value
+  return String(value ?? '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
@@ -72,6 +72,22 @@ function normalizeText(value = '') {
   return decodeHtml(value)
     .toLowerCase()
     .replace(/[\s'".,()[\]{}:;!?/\\|·\-_=+~`]/g, '')
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function includesName(haystack, name) {
+  const decodedHaystack = decodeHtml(haystack).toLowerCase()
+  const decodedName = decodeHtml(name).trim().toLowerCase()
+  if (!decodedName) return false
+
+  if (/^[a-z0-9]+$/i.test(decodedName) && decodedName.length <= 3) {
+    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(decodedName)}([^a-z0-9]|$)`, 'i').test(decodedHaystack)
+  }
+
+  return normalizeText(decodedHaystack).includes(normalizeText(decodedName))
 }
 
 function first(value) {
@@ -94,33 +110,27 @@ function queryTerms(theme) {
 
 function scoreCandidate(theme, candidate) {
   const cafe = first(theme.cafes)
-  const themeKey = normalizeText(theme.name)
-  const cafeKey = normalizeText(cafe?.name)
-  const branchKey = normalizeText(cafe?.branch_name)
-  const titleKey = normalizeText(candidate.title)
-  const bodyKey = normalizeText(candidate.description)
-  const combinedKey = `${titleKey} ${bodyKey}`
   const combinedText = decodeHtml(`${candidate.title} ${candidate.description}`)
   const reasons = []
   let score = 0
 
-  if (themeKey && titleKey.includes(themeKey)) {
+  if (includesName(candidate.title, theme.name)) {
     score += 40
     reasons.push('제목에 테마명 일치')
-  } else if (themeKey && bodyKey.includes(themeKey)) {
+  } else if (includesName(candidate.description, theme.name)) {
     score += 25
     reasons.push('본문에 테마명 일치')
   }
 
-  if (cafeKey && titleKey.includes(cafeKey)) {
+  if (includesName(candidate.title, cafe?.name)) {
     score += 25
     reasons.push('제목에 매장명 일치')
-  } else if (cafeKey && combinedKey.includes(cafeKey)) {
+  } else if (includesName(combinedText, cafe?.name)) {
     score += 15
     reasons.push('본문에 매장명 일치')
   }
 
-  if (branchKey && branchKey.length >= 2 && combinedKey.includes(branchKey)) {
+  if (normalizeText(cafe?.branch_name).length >= 2 && includesName(combinedText, cafe?.branch_name)) {
     score += 10
     reasons.push('지점명 일치')
   }
