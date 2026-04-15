@@ -33,8 +33,8 @@ export default function RoomBrowse() {
   useEffect(() => { refetchRatings() }, [refetchRatings])
 
   const personalModel = useMemo(
-    () => buildPersonalRecommendationModel(rooms, logs, communityMetricStats),
-    [rooms, logs, communityMetricStats],
+    () => buildPersonalRecommendationModel(rooms, logs, communityMetricStats, communityRatings),
+    [rooms, logs, communityMetricStats, communityRatings],
   )
 
   const filtered = useMemo(() => {

@@ -1,4 +1,4 @@
-import type { CommunityMetricStats, MetricKey } from './communityRatings'
+import type { CommunityMetricStats, CommunityRating, MetricKey } from './communityRatings'
 import type { Room } from './recommend'
 import type { RoomLog } from './roomLog'
 import type { PathRating } from './ratings'
@@ -64,6 +64,7 @@ export function buildPersonalRecommendationModel(
   rooms: Room[],
   logs: RoomLog[],
   communityMetricStats: Record<number, CommunityMetricStats> = {},
+  communityRatings: Record<number, CommunityRating> = {},
 ): PersonalRecommendationModel | null {
   const roomById = new Map(rooms.map(room => [room.id, room]))
   const ratedLogs = logs
@@ -129,6 +130,14 @@ export function buildPersonalRecommendationModel(
     if (metricMatches > 0) {
       score += clamp(metricAdjustment, -1.3, 1.3)
       if (metricAdjustment > 0.35) reasons.push('난이도와 분위기가 취향에 맞아요')
+    }
+
+    const communityRating = communityRatings[room.id]
+    if (communityRating && communityRating.count >= 3) {
+      const communityAdj = clamp((communityRating.score10 - 5) * 0.3, -1.5, 1.5)
+      score += communityAdj
+      if (communityRating.score10 >= 7.5) reasons.push('많은 사람들이 재밌다고 평가했어요')
+      else if (communityRating.score10 <= 4) reasons.push('사람들의 평가가 낮은 편이에요')
     }
 
     if (playedIds.has(room.id)) {

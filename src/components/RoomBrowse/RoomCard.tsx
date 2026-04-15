@@ -6,7 +6,7 @@ import { hasLog } from '../../lib/roomLog'
 import { LogModal } from '../RoomLog/LogModal'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
-import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
+import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
 import { predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 
@@ -48,14 +48,30 @@ const FEAR_LABEL: Record<number, string> = {
   5: '매우 높음',
 }
 
-const METRIC_LABELS: { key: MetricKey; label: string }[] = [
-  { key: 'difficulty', label: '난이도' },
-  { key: 'fear', label: '공포도' },
-  { key: 'activity', label: '활동성' },
-  { key: 'story', label: '스토리' },
-  { key: 'interior', label: '인테리어' },
-  { key: 'aging', label: '노후화' },
-]
+function clampDots(value: number) {
+  return Math.max(0, Math.min(5, Math.round(value)))
+}
+
+function levelLabel(value: number) {
+  return FEAR_LABEL[clampDots(value)] ?? String(value)
+}
+
+function DifficultyDots({ value }: { value: number }) {
+  const dots = clampDots(value)
+  return (
+    <span className="flex gap-[3px]">
+      {Array.from({ length: 5 }, (_, i) => (
+        <span
+          key={i}
+          className={`inline-block w-1.5 h-1.5 rounded-full ${
+            i < dots ? 'bg-amber-400' : 'bg-white/15'
+          }`}
+        />
+      ))}
+    </span>
+  )
+}
+
 
 interface RoomCardProps {
   room: Room
@@ -65,9 +81,6 @@ interface RoomCardProps {
   onRated?: () => void
 }
 
-function formatScore(score: number) {
-  return Number.isInteger(score) ? String(score) : score.toFixed(1)
-}
 
 export function RoomCard({ room, communityRating, communityMetricStats, personalPrediction, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
@@ -78,14 +91,22 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
     ? (Math.round(communityRating.score10 / 2) as PathRating)
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
-  const visibleMetrics = METRIC_LABELS.filter(metric => {
-    const officialScore = room.official_scores?.[metric.key]
-    return Boolean(
-      communityMetricStats?.[metric.key] ||
-      officialScore !== null && officialScore !== undefined ||
-      room.official_labels?.[metric.key]
-    )
-  })
+  const difficultyRawScore =
+    communityMetricStats?.difficulty?.score10 ??
+    room.official_scores?.difficulty ??
+    null
+  const difficultyRawLabel = room.official_labels?.difficulty ?? null
+  const difficultyLabelAsNum =
+    difficultyRawLabel !== null && !isNaN(Number(difficultyRawLabel))
+      ? Number(difficultyRawLabel)
+      : null
+  const difficultyDots =
+    difficultyRawScore !== null
+      ? clampDots(difficultyRawScore / 2)
+      : difficultyLabelAsNum !== null
+      ? clampDots(difficultyLabelAsNum)
+      : null
+  const difficultyTextLabel = difficultyDots === null ? difficultyRawLabel : null
 
   const inner = (
     <div className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex flex-col
@@ -132,8 +153,8 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           </div>
         </div>
 
-        {/* Genres */}
-        <div className="flex flex-wrap gap-1.5">
+        {/* Genres + difficulty */}
+        <div className="flex flex-wrap items-center gap-1.5">
           {room.genres?.map(g => (
             <span
               key={g}
@@ -146,6 +167,16 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
               {GENRE_LABEL[g] ?? g}
             </span>
           ))}
+          {(difficultyDots !== null || difficultyTextLabel) && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-xs text-gray-400">
+              <span className="text-gray-500">난이도</span>
+              {difficultyDots !== null ? (
+                <DifficultyDots value={difficultyDots} />
+              ) : (
+                <span className="text-amber-400">{difficultyTextLabel}</span>
+              )}
+            </span>
+          )}
         </div>
 
         {personalPrediction && !logged && (
@@ -163,33 +194,6 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           </div>
         )}
 
-        {visibleMetrics.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {visibleMetrics.map(metric => {
-            const community = communityMetricStats?.[metric.key]
-            const officialScore = room.official_scores?.[metric.key]
-            const officialLabel = room.official_labels?.[metric.key]
-
-            return (
-              <div key={metric.key} className="rounded-lg bg-white/[0.03] px-2 py-1.5">
-                <p className="text-[11px] text-gray-500">{metric.label}</p>
-                {community ? (
-                  <p className="text-xs text-gray-200">
-                    유저 {formatScore(community.score10)}/10
-                    <span className="text-gray-600"> · {community.count}명</span>
-                  </p>
-                ) : null}
-                {officialScore !== null && officialScore !== undefined ? (
-                  <p className="official-label text-xs text-amber-300">공식 {formatScore(officialScore)}/10</p>
-                ) : officialLabel ? (
-                  <p className="official-label text-xs text-amber-300">공식 {officialLabel}</p>
-                ) : null}
-              </div>
-            )
-            })}
-          </div>
-        )}
-
         {/* Stats */}
         <div className="grid grid-cols-2 gap-y-2 text-sm">
           <div>
@@ -198,7 +202,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           </div>
           <div>
             <span className="text-gray-500 text-xs">공포도</span>
-            <p className="text-gray-200">{FEAR_LABEL[room.fear_level] ?? room.fear_level}</p>
+            <p className="text-gray-200">{levelLabel(room.fear_level)}</p>
           </div>
           <div>
             <span className="text-gray-500 text-xs">인원</span>
