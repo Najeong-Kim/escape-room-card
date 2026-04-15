@@ -4,6 +4,7 @@ import { updateLog } from '../../lib/roomLog'
 import type { RoomLog } from '../../lib/roomLog'
 import { PATH_RATINGS, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
+import { submitCommunityRating, submitCommunityMetricRatings } from '../../lib/communityRatings'
 import type { MetricKey, MetricScores } from '../../lib/communityRatings'
 
 const METRICS: { key: MetricKey; label: string; low: string; high: string }[] = [
@@ -57,6 +58,10 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
       interior_score: metricScores.interior ?? null,
       aging_score: metricScores.aging ?? null,
     })
+
+    submitCommunityRating(log.room_id, rating)
+    submitCommunityMetricRatings(log.room_id, metricScores)
+
     onSaved()
   }
 
