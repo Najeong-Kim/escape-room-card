@@ -106,6 +106,63 @@ export async function submitCommunityRating(
   if (error) console.warn('submitCommunityRating failed', error.message)
 }
 
+export interface CommunityEscapeStats {
+  totalCount: number
+  clearedCount: number
+  clearRate: number          // 0–100 정수
+  avgHintsCleared: number | null
+  avgRemainingMinutes: number | null
+}
+
+type EscapeSummaryRow = {
+  room_id: number
+  total_count: number
+  cleared_count: number
+  clear_rate: number
+  avg_hints_cleared: number | null
+  avg_remaining_minutes_cleared: number | null
+}
+
+export async function fetchAllCommunityEscapeStats(): Promise<Record<number, CommunityEscapeStats>> {
+  const { data, error } = await supabase
+    .from('room_escape_summary')
+    .select('room_id,total_count,cleared_count,clear_rate,avg_hints_cleared,avg_remaining_minutes_cleared')
+
+  if (error) {
+    console.warn('community escape stats fetch failed', error.message)
+    return {}
+  }
+
+  return Object.fromEntries(
+    ((data ?? []) as unknown as EscapeSummaryRow[]).map(row => [
+      row.room_id,
+      {
+        totalCount: row.total_count,
+        clearedCount: row.cleared_count,
+        clearRate: row.clear_rate,
+        avgHintsCleared: row.avg_hints_cleared !== null ? Number(row.avg_hints_cleared) : null,
+        avgRemainingMinutes: row.avg_remaining_minutes_cleared !== null ? Number(row.avg_remaining_minutes_cleared) : null,
+      },
+    ])
+  )
+}
+
+export async function submitCommunityEscapeStats(
+  roomId: number,
+  cleared: boolean,
+  hintsUsed: number | null,
+  remainingMinutes: number | null,
+): Promise<void> {
+  const sessionId = getSessionId()
+  const { error } = await supabase
+    .from('room_escape_stats')
+    .upsert(
+      { room_id: roomId, session_id: sessionId, cleared, hints_used: hintsUsed, remaining_minutes: remainingMinutes },
+      { onConflict: 'room_id,session_id' },
+    )
+  if (error) console.warn('submitCommunityEscapeStats failed', error.message)
+}
+
 export async function submitCommunityMetricRatings(
   roomId: number,
   scores: MetricScores,

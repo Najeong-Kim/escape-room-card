@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
-import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
+import { fetchAllCommunityEscapeStats, fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
+import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import { getLogs, hasLog } from '../../lib/roomLog'
@@ -57,6 +57,26 @@ function formatScore(score: number) {
   return Number.isInteger(score) ? String(score) : score.toFixed(1)
 }
 
+function clampDots(value: number) {
+  return Math.max(0, Math.min(5, Math.round(value)))
+}
+
+function DifficultyDots({ value }: { value: number }) {
+  const dots = clampDots(value)
+  return (
+    <span className="inline-flex gap-[3px] align-middle">
+      {Array.from({ length: 5 }, (_, i) => (
+        <span
+          key={i}
+          className={`inline-block w-1.5 h-1.5 rounded-full ${
+            i < dots ? 'bg-amber-400' : 'bg-white/15'
+          }`}
+        />
+      ))}
+    </span>
+  )
+}
+
 function naverMapUrl(room: Room) {
   if (room.naver_place_url) return room.naver_place_url
   if (room.naver_place_id) return `https://map.naver.com/p/entry/place/${room.naver_place_id}`
@@ -72,6 +92,7 @@ export default function RoomDetail() {
   const room = useMemo(() => rooms.find(item => item.id === roomId), [rooms, roomId])
   const [communityRating, setCommunityRating] = useState<CommunityRating | undefined>()
   const [communityMetricStats, setCommunityMetricStats] = useState<CommunityMetricStats>({})
+  const [escapeStats, setEscapeStats] = useState<CommunityEscapeStats | undefined>()
   const [showLog, setShowLog] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [logs, setLogs] = useState(() => getLogs())
@@ -81,9 +102,11 @@ export default function RoomDetail() {
     Promise.all([
       fetchAllCommunityRatings(),
       fetchAllCommunityMetricStats(),
-    ]).then(([ratings, metricStats]) => {
+      fetchAllCommunityEscapeStats(),
+    ]).then(([ratings, metricStats, escapeStatMap]) => {
       setCommunityRating(ratings[roomId])
       setCommunityMetricStats(metricStats[roomId] ?? {})
+      setEscapeStats(escapeStatMap[roomId])
     })
   }, [roomId])
 
@@ -94,8 +117,12 @@ export default function RoomDetail() {
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
   const personalModel = useMemo(
-    () => buildPersonalRecommendationModel(rooms, logs, { [roomId]: communityMetricStats }),
-    [rooms, logs, roomId, communityMetricStats],
+    () => buildPersonalRecommendationModel(
+      rooms, logs,
+      { [roomId]: communityMetricStats },
+      communityRating ? { [roomId]: communityRating } : {},
+    ),
+    [rooms, logs, roomId, communityMetricStats, communityRating],
   )
   const personalPrediction = personalModel?.predictions[roomId]
 
@@ -217,7 +244,52 @@ export default function RoomDetail() {
             )}
           </div>
 
-          {personalPrediction && (
+          {escapeStats && escapeStats.totalCount >= 1 && (
+            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
+              <p className="text-xs text-gray-500 mb-3">유저 탈출 통계</p>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative w-14 h-14 flex-shrink-0">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3.2" />
+                    <circle
+                      cx="18" cy="18" r="15.9" fill="none"
+                      stroke={escapeStats.clearRate >= 60 ? '#22c55e' : escapeStats.clearRate >= 35 ? '#f59e0b' : '#ef4444'}
+                      strokeWidth="3.2"
+                      strokeDasharray={`${escapeStats.clearRate} ${100 - escapeStats.clearRate}`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+                    {escapeStats.clearRate}%
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">탈출 성공률</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {escapeStats.clearedCount}/{escapeStats.totalCount}명 성공
+                  </p>
+                </div>
+              </div>
+              {(escapeStats.avgHintsCleared !== null || escapeStats.avgRemainingMinutes !== null) && (
+                <div className="flex gap-3 pt-3 border-t border-white/5">
+                  {escapeStats.avgHintsCleared !== null && (
+                    <div className="flex-1 bg-white/[0.03] rounded-lg px-3 py-2">
+                      <p className="text-[11px] text-gray-500">성공 시 평균 힌트</p>
+                      <p className="text-sm font-semibold text-white mt-0.5">{escapeStats.avgHintsCleared}개</p>
+                    </div>
+                  )}
+                  {escapeStats.avgRemainingMinutes !== null && (
+                    <div className="flex-1 bg-white/[0.03] rounded-lg px-3 py-2">
+                      <p className="text-[11px] text-gray-500">성공 시 평균 남은 시간</p>
+                      <p className="text-sm font-semibold text-white mt-0.5">{escapeStats.avgRemainingMinutes}분</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {personalPrediction && !logged && (
             <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -231,9 +303,6 @@ export default function RoomDetail() {
                   {predictionPathLabel(personalPrediction).replace('예상 ', '')}
                 </div>
               </div>
-              {personalPrediction.played && (
-                <p className="text-xs text-gray-500 mt-2">이미 기록한 테마라 후보 순위에서는 제외됩니다.</p>
-              )}
             </div>
           )}
 
@@ -255,7 +324,11 @@ export default function RoomDetail() {
                     ) : (
                       <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>
                     )}
-                    {officialScore !== null && officialScore !== undefined ? (
+                    {metric.key === 'difficulty' && (officialScore !== null && officialScore !== undefined || officialLabel !== null && !isNaN(Number(officialLabel))) ? (
+                      <p className="official-label text-sm text-amber-300 mt-1">
+                        공식 <DifficultyDots value={officialScore !== null && officialScore !== undefined ? officialScore / 2 : Number(officialLabel)} />
+                      </p>
+                    ) : officialScore !== null && officialScore !== undefined ? (
                       <p className="official-label text-sm text-amber-300 mt-1">공식 {formatScore(officialScore)}/10</p>
                     ) : officialLabel ? (
                       <p className="official-label text-sm text-amber-300 mt-1">공식 {officialLabel}</p>
