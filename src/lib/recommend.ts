@@ -10,6 +10,7 @@ export interface Room {
   name: string
   brand: string
   location: string
+  address?: string
   genres: string[]
   fear_level: number
   puzzle_weight: number
@@ -84,7 +85,7 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'image_status',
       'booking_url',
       'theme_genres(genres(code))',
-      'cafes!inner(name,branch_name,area_label,booking_url,website_url,areas(name))',
+      'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,areas(name))',
     ].join(','),
     status: 'eq.active',
     needs_review: 'eq.false',

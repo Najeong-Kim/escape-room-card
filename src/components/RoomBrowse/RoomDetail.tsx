@@ -43,6 +43,10 @@ function formatScore(score: number) {
   return Number.isInteger(score) ? String(score) : score.toFixed(1)
 }
 
+function naverMapUrl(query: string) {
+  return `https://map.naver.com/p/search/${encodeURIComponent(query)}`
+}
+
 export default function RoomDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -142,9 +146,19 @@ export default function RoomDetail() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 col-span-2">
               <p className="text-xs text-gray-500">위치</p>
-              <p className="text-sm text-gray-200 mt-1">{room.location}</p>
+              <p className="text-sm text-gray-200 mt-1">{room.address ?? room.location}</p>
+              {room.address && (
+                <a
+                  href={naverMapUrl(`${room.address} ${room.brand}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex mt-2 text-xs text-green-400 hover:text-green-300"
+                >
+                  네이버 지도에서 보기 →
+                </a>
+              )}
             </div>
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
               <p className="text-xs text-gray-500">인원</p>

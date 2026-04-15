@@ -4,6 +4,7 @@ interface ThemeCafe {
   name: string
   branch_name: string | null
   area_label: string
+  address: string | null
   areas?: {
     name: string
   } | {
@@ -78,6 +79,7 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     name: theme.name,
     brand,
     location: area ?? cafe?.area_label ?? '기타',
+    address: cafe?.address ?? undefined,
     genres: genres ?? [],
     fear_level: score10To5(theme.fear_score, 1),
     puzzle_weight: 1,

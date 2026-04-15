@@ -88,7 +88,7 @@ export function useRooms() {
         'image_status',
         'booking_url',
         'theme_genres(genres(code))',
-        'cafes!inner(name,branch_name,area_label,booking_url,website_url,areas(name))',
+        'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,areas(name))',
       ].join(','),
       status: 'eq.active',
       needs_review: 'eq.false',
