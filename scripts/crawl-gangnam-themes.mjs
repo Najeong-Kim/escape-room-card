@@ -306,13 +306,15 @@ function splitCafeName(cafeName) {
 
 function ensureCafe(cafesByKey, cafeInput) {
   const cafeParts = splitCafeName(cafeInput.raw_name ?? cafeInput.name)
-  const cafeKey = normalizeKey(`${cafeInput.raw_name ?? cafeInput.name}|${cafeInput.area_label}`)
+  const cafeName = cafeInput.name ?? cafeParts.name
+  const branchName = cafeInput.branch_name ?? cafeParts.branch_name
+  const cafeKey = normalizeKey(`${cafeName}${branchName ? ` ${branchName}` : ''}|${cafeInput.area_label}`)
 
   if (!cafesByKey.has(cafeKey)) {
     cafesByKey.set(cafeKey, {
       normalized_key: cafeKey,
-      name: cafeInput.name ?? cafeParts.name,
-      branch_name: cafeInput.branch_name ?? cafeParts.branch_name,
+      name: cafeName,
+      branch_name: branchName,
       area_label: cafeInput.area_label,
       district: cafeInput.district,
       address: cafeInput.address ?? null,
