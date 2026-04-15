@@ -6,8 +6,7 @@ import { RoomCard } from './RoomCard'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import { Footer } from '../Footer'
-import { AppThemeToggle } from '../AppThemeToggle'
-import { UserAuthButton } from '../UserAuthButton'
+import { AppTopActions } from '../AppTopActions'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { RatingIcon } from '../../lib/ratings'
@@ -70,8 +69,7 @@ export default function RoomBrowse() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
-      <AppThemeToggle />
-      <UserAuthButton className="top-14" />
+      <AppTopActions />
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3">
         <button

@@ -14,7 +14,7 @@ function displayEmail(session: Session | null) {
   return `${name.slice(0, 10)}@${domain}`
 }
 
-export function UserAuthButton({ className = 'top-24' }: { className?: string }) {
+export function UserAuthButton({ className = 'top-24', floating = true }: { className?: string; floating?: boolean }) {
   const [session, setSession] = useState<Session | null>(null)
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
@@ -74,7 +74,8 @@ export function UserAuthButton({ className = 'top-24' }: { className?: string })
         type="button"
         onClick={() => setOpen(true)}
         className={[
-          'app-auth-button fixed right-4 z-50 text-xs px-3 py-1.5 rounded-full',
+          'app-auth-button text-xs px-3 py-1.5 rounded-full',
+          floating ? 'fixed right-4 z-50' : '',
           'border transition-colors backdrop-blur-sm',
           className,
         ].join(' ')}

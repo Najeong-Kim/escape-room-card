@@ -14,7 +14,7 @@ function applyTheme(theme: AppTheme) {
   document.documentElement.dataset.appTheme = theme
 }
 
-export function AppThemeToggle({ className = '' }: { className?: string }) {
+export function AppThemeToggle({ className = '', floating = true }: { className?: string; floating?: boolean }) {
   const [theme, setTheme] = useState<AppTheme>(initialTheme)
 
   useEffect(() => {
@@ -29,7 +29,8 @@ export function AppThemeToggle({ className = '' }: { className?: string }) {
       type="button"
       onClick={() => setTheme(nextTheme)}
       className={[
-        'app-theme-toggle fixed top-4 right-4 z-50 text-xs px-3 py-1.5 rounded-full',
+        'app-theme-toggle text-xs px-3 py-1.5 rounded-full',
+        floating ? 'fixed top-4 right-4 z-50' : '',
         'border transition-colors backdrop-blur-sm',
         className,
       ].join(' ')}

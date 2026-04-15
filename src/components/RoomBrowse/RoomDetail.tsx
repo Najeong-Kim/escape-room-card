@@ -11,8 +11,7 @@ import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRa
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
-import { AppThemeToggle } from '../AppThemeToggle'
-import { UserAuthButton } from '../UserAuthButton'
+import { AppTopActions } from '../AppTopActions'
 import type { Room } from '../../lib/recommend'
 
 const GENRE_LABEL: Record<string, string> = {
@@ -142,8 +141,7 @@ export default function RoomDetail() {
   if (error || !room) {
     return (
       <div className="min-h-dvh bg-[#0a0a0f] text-white">
-        <AppThemeToggle />
-        <UserAuthButton className="top-14" />
+        <AppTopActions />
         <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3">
           <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white">← 뒤로</button>
         </div>
@@ -156,8 +154,7 @@ export default function RoomDetail() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
-      <AppThemeToggle />
-      <UserAuthButton className="top-14" />
+      <AppTopActions />
       <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
