@@ -9,6 +9,7 @@ import { useRooms } from '../../lib/useRooms'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
+import type { Room } from '../../lib/recommend'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -43,8 +44,11 @@ function formatScore(score: number) {
   return Number.isInteger(score) ? String(score) : score.toFixed(1)
 }
 
-function naverMapUrl(query: string) {
-  return `https://map.naver.com/p/search/${encodeURIComponent(query)}`
+function naverMapUrl(room: Room) {
+  if (room.naver_place_url) return room.naver_place_url
+  if (room.naver_place_id) return `https://map.naver.com/p/entry/place/${room.naver_place_id}`
+
+  return `https://map.naver.com/p/search/${encodeURIComponent(`${room.brand} ${room.location} 방탈출`)}`
 }
 
 export default function RoomDetail() {
@@ -149,16 +153,14 @@ export default function RoomDetail() {
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 col-span-2">
               <p className="text-xs text-gray-500">위치</p>
               <p className="text-sm text-gray-200 mt-1">{room.address ?? room.location}</p>
-              {room.address && (
-                <a
-                  href={naverMapUrl(`${room.address} ${room.brand}`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex mt-2 text-xs text-green-400 hover:text-green-300"
-                >
-                  네이버 지도에서 보기 →
-                </a>
-              )}
+              <a
+                href={naverMapUrl(room)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex mt-2 text-xs text-green-400 hover:text-green-300"
+              >
+                네이버 지도에서 보기 →
+              </a>
             </div>
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
               <p className="text-xs text-gray-500">인원</p>

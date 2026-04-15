@@ -42,6 +42,8 @@ export interface Room {
   }
   website_url?: string
   image_url?: string
+  naver_place_id?: string
+  naver_place_url?: string
 }
 
 // Map profile fearLevel to numeric fear score (1-5 scale)
@@ -85,7 +87,7 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'image_status',
       'booking_url',
       'theme_genres(genres(code))',
-      'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,areas(name))',
+      'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,naver_place_id,naver_place_url,areas(name))',
     ].join(','),
     status: 'eq.active',
     needs_review: 'eq.false',

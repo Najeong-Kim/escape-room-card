@@ -11,6 +11,9 @@ interface CafeRecord {
   area_label?: string
   needs_review?: boolean
   status?: string
+  naver_place_url?: string | null
+  naver_place_id?: string | null
+  naver_place_checked_at?: string | null
 }
 
 function areaName(record: CafeRecord) {
@@ -20,7 +23,7 @@ function areaName(record: CafeRecord) {
 
 export const CafeList = () => (
   <List perPage={50} sort={{ field: 'created_at', order: 'DESC' }} queryOptions={{ meta: { select: '*,areas(name)' } }}>
-    <Datagrid rowClick={false}>
+    <Datagrid rowClick="edit">
       <FunctionField
         label="매장"
         render={(record: CafeRecord) =>
@@ -32,6 +35,14 @@ export const CafeList = () => (
       <TextField source="address" label="주소" />
       <TextField source="phone" label="전화번호" />
       <TextField source="booking_url" label="예약 URL" />
+      <FunctionField
+        label="네이버 지도"
+        render={(record: CafeRecord) => {
+          if (record.naver_place_url) return '링크 있음'
+          if (record.naver_place_id) return 'ID 있음'
+          return '-'
+        }}
+      />
       <FunctionField
         label="검수"
         render={(record: CafeRecord) => record.needs_review ? '대기' : '완료'}

@@ -12,6 +12,8 @@ interface ThemeCafe {
   }[] | null
   booking_url: string | null
   website_url: string | null
+  naver_place_id: string | null
+  naver_place_url: string | null
 }
 
 export interface ThemeCatalogRow {
@@ -111,5 +113,7 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     },
     website_url: theme.booking_url ?? cafe?.booking_url ?? cafe?.website_url ?? undefined,
     image_url: theme.image_status === 'rejected' ? undefined : theme.image_url ?? undefined,
+    naver_place_id: cafe?.naver_place_id ?? undefined,
+    naver_place_url: cafe?.naver_place_url ?? undefined,
   }
 }
