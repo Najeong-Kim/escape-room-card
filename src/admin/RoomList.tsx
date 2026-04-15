@@ -1,20 +1,20 @@
-import { List, Datagrid, TextField, NumberField, FunctionField } from 'react-admin'
-import { GENRE_LABEL } from './RoomForm'
+import { List, Datagrid, TextField, NumberField, BooleanField, FunctionField } from 'react-admin'
 
 export const RoomList = () => (
-  <List perPage={50}>
+  <List perPage={50} sort={{ field: 'id', order: 'DESC' }}>
     <Datagrid rowClick="edit">
-      <TextField source="name" label="방 이름" />
-      <TextField source="brand" label="브랜드" />
-      <TextField source="location" label="지역" />
+      <TextField source="name" label="테마명" />
+      <TextField source="status" label="상태" />
+      <BooleanField source="needs_review" label="검수 필요" />
       <FunctionField
         label="장르"
-        render={(record: { genres?: string[] }) =>
-          record.genres?.map(g => GENRE_LABEL[g] ?? g).join(', ') ?? ''
+        render={(record: { genre_labels?: string[] }) =>
+          record.genre_labels?.join(', ') ?? ''
         }
       />
-      <NumberField source="fear_level" label="공포도" />
-      <NumberField source="rating_avg" label="평점" />
+      <NumberField source="fear_score" label="공포도" />
+      <NumberField source="difficulty_score" label="난이도" />
+      <NumberField source="price_per_person" label="인당 가격" />
     </Datagrid>
   </List>
 )

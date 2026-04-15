@@ -2,57 +2,68 @@ import {
   TextInput,
   NumberInput,
   SelectInput,
+  BooleanInput,
   ArrayInput,
   SimpleFormIterator,
 } from 'react-admin'
 
-const LOCATION_CHOICES = [
-  '홍대', '강남', '건대', '신촌', '성수', '잠실', '신림', '노원', '용산', '대학로',
-].map(v => ({ id: v, name: v }))
+const STATUS_CHOICES = [
+  { id: 'active', name: '활성' },
+  { id: 'inactive', name: '비활성' },
+  { id: 'rejected', name: '거절' },
+]
 
-export const GENRE_LABEL: Record<string, string> = {
-  Horror: '공포',
-  MysteryThriller: '미스터리/스릴러',
-  Emotional: '감성/드라마',
-  Comic: '코믹',
-  FantasyAdventure: '판타지/모험',
-  Crime: '범죄/잠입',
-  SF: 'SF',
-}
-
-const GENRE_CHOICES = Object.entries(GENRE_LABEL).map(([id, name]) => ({ id, name }))
+const IMAGE_STATUS_CHOICES = [
+  { id: 'unverified', name: '검수 전' },
+  { id: 'verified', name: '검수 완료' },
+  { id: 'rejected', name: '사용 안 함' },
+  { id: 'manual', name: '수동 등록' },
+]
 
 export const RoomFormFields = () => (
   <>
-    <TextInput source="name" label="방 이름" fullWidth required />
-    <TextInput source="brand" label="브랜드" fullWidth required />
-    <SelectInput source="location" label="지역" choices={LOCATION_CHOICES} required />
+    <TextInput source="name" label="테마명" fullWidth required />
+    <SelectInput source="status" label="상태" choices={STATUS_CHOICES} required />
+    <BooleanInput source="needs_review" label="검수 필요" />
 
-    <ArrayInput source="genres" label="장르">
-      <SimpleFormIterator>
-        <SelectInput source="" label="장르" choices={GENRE_CHOICES} />
-      </SimpleFormIterator>
-    </ArrayInput>
+    <TextInput source="description" label="소개" fullWidth multiline />
 
-    <NumberInput source="fear_level" label="공포도 (1-5)" min={1} max={5} step={1} />
-    <NumberInput source="puzzle_weight" label="퍼즐 비중 (1-5)" min={1} max={5} step={1} />
-    <NumberInput source="difficulty" label="난이도 (1-5)" min={1} max={5} step={1} />
-    <NumberInput source="activity_level" label="활동성 (1-5)" min={1} max={5} step={1} />
-    <NumberInput source="interior_score" label="인테리어 (1-5)" min={1} max={5} step={0.5} />
-
-    <NumberInput source="hint_count" label="힌트 횟수" min={0} />
-    <NumberInput source="duration_minutes" label="제한시간 (분)" min={30} />
-    <NumberInput source="price_per_person" label="인당 가격 (원)" min={0} step={1000} />
+    <NumberInput source="duration_minutes" label="제한시간 (분)" min={10} />
     <NumberInput source="min_players" label="최소 인원" min={1} max={20} />
     <NumberInput source="max_players" label="최대 인원" min={1} max={20} />
-    <NumberInput source="rating_avg" label="평점 (1-5)" min={1} max={5} step={0.1} />
 
-    <TextInput source="website_url" label="홈페이지 URL" fullWidth />
+    <TextInput source="price_text" label="가격 원문" fullWidth />
+    <NumberInput source="price_per_person" label="인당 가격 (원)" min={0} step={1000} />
+
+    <TextInput source="difficulty_label" label="난이도 원문" fullWidth />
+    <NumberInput source="difficulty_score" label="난이도 (0-10)" min={0} max={10} step={0.1} />
+
+    <TextInput source="fear_label" label="공포도 원문" fullWidth />
+    <NumberInput source="fear_score" label="공포도 (0-10)" min={0} max={10} step={0.1} />
+
+    <TextInput source="activity_label" label="활동성 원문" fullWidth />
+    <NumberInput source="activity_score" label="활동성 (0-10)" min={0} max={10} step={0.1} />
+
+    <TextInput source="story_label" label="스토리 원문" fullWidth />
+    <NumberInput source="story_score" label="스토리 (0-10)" min={0} max={10} step={0.1} />
+
+    <TextInput source="interior_label" label="인테리어 원문" fullWidth />
+    <NumberInput source="interior_score" label="인테리어 (0-10)" min={0} max={10} step={0.1} />
+
+    <TextInput source="aging_label" label="노후화 원문" fullWidth />
+    <NumberInput source="aging_score" label="노후화 (0-10)" min={0} max={10} step={0.1} />
+
     <TextInput source="image_url" label="이미지 URL" fullWidth />
+    <TextInput source="image_source_url" label="이미지 출처 URL" fullWidth />
+    <TextInput source="image_source_name" label="이미지 출처명" fullWidth />
+    <SelectInput source="image_status" label="이미지 상태" choices={IMAGE_STATUS_CHOICES} />
 
-    <ArrayInput source="tags" label="태그">
+    <TextInput source="booking_url" label="예약 URL" fullWidth />
+    <TextInput source="source_url" label="출처 URL" fullWidth />
+
+    <ArrayInput source="genre_labels" label="장르 레이블">
       <SimpleFormIterator>
-        <TextInput source="" label="태그" />
+        <TextInput source="" label="장르" />
       </SimpleFormIterator>
     </ArrayInput>
   </>

@@ -25,7 +25,7 @@ const dataProvider = createSupabaseDataProvider()
 export default function AdminApp() {
   return (
     <Admin dataProvider={dataProvider} authProvider={authProvider} basename="/admin" theme={lightTheme} darkTheme={darkTheme}>
-      <Resource name="rooms" options={{ label: '방 목록' }} icon={MeetingRoomIcon} list={RoomList} edit={RoomEdit} create={RoomCreate} />
+      <Resource name="themes" options={{ label: '방 목록' }} icon={MeetingRoomIcon} list={RoomList} edit={RoomEdit} create={RoomCreate} />
       <Resource name="cafes" options={{ label: '매장 목록' }} icon={StorefrontIcon} list={CafeList} />
       <Resource name="reports" options={{ label: '제보 목록' }} icon={ReportProblemIcon} list={ReportList} edit={ReportEdit} />
       <Resource name="cafe-approvals" options={{ label: '매장 검수' }} icon={HomeWorkIcon} list={CafeApprovalList} />
