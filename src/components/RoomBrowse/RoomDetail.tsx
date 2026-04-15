@@ -7,7 +7,7 @@ import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import { getLogs, hasLog } from '../../lib/roomLog'
 import { useRooms } from '../../lib/useRooms'
-import { buildPersonalRecommendationModel, predictionLabel } from '../../lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
@@ -221,12 +221,15 @@ export default function RoomDetail() {
             <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs text-violet-300 font-semibold">나의 예상 평점</p>
+                  <p className="text-xs text-violet-300 font-semibold">나의 예상 길</p>
                   <p className="text-sm text-gray-400 mt-1">
                     {personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}
                   </p>
                 </div>
-                <p className="text-2xl text-white font-black">{predictionLabel(personalPrediction).replace('예상 ', '')}</p>
+                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
+                  <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
+                  {predictionPathLabel(personalPrediction).replace('예상 ', '')}
+                </div>
               </div>
               {personalPrediction.played && (
                 <p className="text-xs text-gray-500 mt-2">이미 기록한 테마라 후보 순위에서는 제외됩니다.</p>

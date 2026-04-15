@@ -10,7 +10,8 @@ import { AppThemeToggle } from './components/AppThemeToggle'
 import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 import { useRooms } from './lib/useRooms'
-import { buildPersonalRecommendationModel, predictionLabel } from './lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
+import { RatingIcon } from './lib/ratings'
 
 type HomeMode = 'home' | 'quiz' | 'result'
 
@@ -169,10 +170,11 @@ function SavedCardHome({
               {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
             </p>
             <div className="text-right flex-shrink-0">
-              <p className="text-violet-300 text-2xl font-black">
-                {predictionLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
-              </p>
-              <p className="text-gray-500 text-xs">예상 평점</p>
+              <div className="flex items-center gap-1 text-violet-300 text-xl font-black">
+                <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />
+                {predictionPathLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
+              </div>
+              <p className="text-gray-500 text-xs">예상 길</p>
             </div>
           </div>
         </section>

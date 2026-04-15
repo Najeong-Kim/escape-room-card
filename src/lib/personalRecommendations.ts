@@ -1,6 +1,8 @@
 import type { CommunityMetricStats, MetricKey } from './communityRatings'
 import type { Room } from './recommend'
 import type { RoomLog } from './roomLog'
+import type { PathRating } from './ratings'
+import { getRatingDef } from './ratings'
 
 const METRICS: MetricKey[] = ['difficulty', 'fear', 'activity', 'story', 'interior', 'aging']
 
@@ -166,4 +168,13 @@ export function buildPersonalRecommendationModel(
 
 export function predictionLabel(prediction: PersonalPrediction) {
   return `예상 ${formatScore(prediction.score10)}/10`
+}
+
+export function predictionPathRating(prediction: PersonalPrediction): PathRating {
+  return Math.max(0, Math.min(5, Math.round(prediction.score10 / 2))) as PathRating
+}
+
+export function predictionPathLabel(prediction: PersonalPrediction) {
+  const def = getRatingDef(predictionPathRating(prediction))
+  return def ? `예상 ${def.label}` : '예상 길'
 }

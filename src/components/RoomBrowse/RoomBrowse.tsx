@@ -8,7 +8,8 @@ import type { CommunityMetricStats, CommunityRating } from '../../lib/communityR
 import { Footer } from '../Footer'
 import { AppThemeToggle } from '../AppThemeToggle'
 import { getLogs } from '../../lib/roomLog'
-import { buildPersonalRecommendationModel, predictionLabel } from '../../lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { RatingIcon } from '../../lib/ratings'
 
 export default function RoomBrowse() {
   const navigate = useNavigate()
@@ -98,10 +99,11 @@ export default function RoomBrowse() {
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-xl text-violet-300 font-black">
-                  {predictionLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
-                </p>
-                <p className="text-xs text-gray-500">예상 평점</p>
+                <div className="flex items-center gap-1 text-violet-300 text-xl font-black">
+                  <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />
+                  {predictionPathLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
+                </div>
+                <p className="text-xs text-gray-500">예상 길</p>
               </div>
             </div>
             <button

@@ -8,7 +8,7 @@ import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import type { PathRating } from '../../lib/ratings'
 import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
-import { predictionLabel } from '../../lib/personalRecommendations'
+import { predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -148,11 +148,14 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           ))}
         </div>
 
-        {personalPrediction && (
+        {personalPrediction && !logged && (
           <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-3 py-2">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-violet-300 font-semibold">나의 예상 평점</span>
-              <span className="text-sm text-white font-black">{predictionLabel(personalPrediction)}</span>
+              <span className="text-xs text-violet-300 font-semibold">나의 예상 길</span>
+              <span className="inline-flex items-center gap-1 text-sm text-white font-black">
+                <RatingIcon value={predictionPathRating(personalPrediction)} size={18} />
+                {predictionPathLabel(personalPrediction)}
+              </span>
             </div>
             {personalPrediction.reasons[0] && (
               <p className="text-[11px] text-gray-500 mt-1">{personalPrediction.reasons[0]}</p>

@@ -181,6 +181,39 @@
   color-scheme: light;
 }
 
+/* Quiz / form 버튼의 dark 배경 → 라이트 모드 */
+:root[data-app-theme='light'] :where(.bg-gray-900) {
+  background-color: #ffffff !important;
+}
+
+:root[data-app-theme='light'] :where([class*='bg-gray-900\/']) {
+  background-color: rgb(255 255 255 / 0.7) !important;
+}
+
+:root[data-app-theme='light'] :where(.bg-gray-800) {
+  background-color: #e5e7eb !important;
+}
+
+:root[data-app-theme='light'] :where(.hover\:bg-gray-800:hover) {
+  background-color: #f1f3f8 !important;
+}
+
+:root[data-app-theme='light'] :where(.disabled\:bg-gray-800:disabled) {
+  background-color: #e5e7eb !important;
+}
+
+:root[data-app-theme='light'] :where(.disabled\:text-gray-600:disabled) {
+  color: #9ca3af !important;
+}
+
+:root[data-app-theme='light'] :where(.text-gray-700) {
+  color: #374151 !important;
+}
+
+:root[data-app-theme='light'] :where(.placeholder-gray-600)::placeholder {
+  color: #9ca3af !important;
+}
+
 /* 3D card flip */
 .card-scene {
   perspective: 1000px;
