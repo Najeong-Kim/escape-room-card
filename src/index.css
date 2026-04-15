@@ -40,6 +40,17 @@
   border-color: rgb(75 85 99);
 }
 
+.app-auth-button {
+  color: rgb(156 163 175);
+  border-color: rgb(31 41 55);
+  background: rgb(10 10 15 / 0.8);
+}
+
+.app-auth-button:hover {
+  color: rgb(229 231 235);
+  border-color: rgb(75 85 99);
+}
+
 .genre-tag {
   background-color: var(--genre-bg);
 }
@@ -62,6 +73,18 @@
 }
 
 :root[data-app-theme='light'] .app-theme-toggle:hover {
+  color: #111827;
+  border-color: rgb(156 163 175);
+}
+
+:root[data-app-theme='light'] .app-auth-button {
+  color: #34344a;
+  border-color: rgb(209 213 219);
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: 0 6px 18px rgb(15 23 42 / 0.08);
+}
+
+:root[data-app-theme='light'] .app-auth-button:hover {
   color: #111827;
   border-color: rgb(156 163 175);
 }
@@ -175,6 +198,11 @@
   background-color: #ffffff !important;
   border-color: rgb(124 58 237 / 0.28) !important;
   box-shadow: 0 10px 24px rgb(15 23 42 / 0.08);
+}
+
+:root[data-app-theme='light'] .auth-modal {
+  background-color: #ffffff !important;
+  border-color: rgb(17 24 39 / 0.1) !important;
 }
 
 :root[data-app-theme='light'] :where(select, input, textarea) {

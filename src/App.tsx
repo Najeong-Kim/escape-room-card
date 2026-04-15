@@ -7,6 +7,7 @@ import { QuizFlow } from './components/Quiz/QuizFlow'
 import { ResultCard } from './components/ResultCard/ResultCard'
 import { Footer } from './components/Footer'
 import { AppThemeToggle } from './components/AppThemeToggle'
+import { UserAuthButton } from './components/UserAuthButton'
 import { getLogs, type RoomLog } from './lib/roomLog'
 import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
 import { useRooms } from './lib/useRooms'
@@ -52,6 +53,7 @@ export default function App() {
   return (
     <div className="min-h-dvh bg-[#0a0a0f]">
       <AppThemeToggle />
+      <UserAuthButton />
       <button
         onClick={toggleLang}
         className="fixed top-14 right-4 z-50 text-xs text-gray-500 hover:text-gray-300
