@@ -101,7 +101,7 @@ export default function MyRooms() {
                   <h3 className="text-white font-semibold text-base leading-snug">{log.room_name}</h3>
                 </div>
                 <span className={[
-                  'flex-shrink-0 text-xs font-medium px-2.5 py-1 rounded-full',
+                  'escape-result-badge flex-shrink-0 text-xs font-medium px-2.5 py-1 rounded-full',
                   log.cleared
                     ? 'bg-green-900/40 text-green-400'
                     : 'bg-red-900/40 text-red-400',

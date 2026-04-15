@@ -192,7 +192,7 @@ function SavedCardHome({
       <div className="grid gap-3">
         <button
           onClick={onViewCard}
-          className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-3 rounded-lg transition-all"
+          className="app-primary-action w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-3 rounded-lg transition-all"
         >
           카드 다시 보기
         </button>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
@@ -30,6 +31,16 @@ const GENRE_COLOR: Record<string, string> = {
   FantasyAdventure: '#23644e',
   Crime: '#5f2933',
   SF: '#1c5f7a',
+}
+
+const GENRE_LIGHT_COLOR: Record<string, string> = {
+  Horror: '#8f1f48',
+  MysteryThriller: '#275aa8',
+  Emotional: '#a32975',
+  Comic: '#b33d12',
+  FantasyAdventure: '#24775a',
+  Crime: '#a0354b',
+  SF: '#21749a',
 }
 
 const METRICS: { key: MetricKey; label: string }[] = [
@@ -143,8 +154,11 @@ export default function RoomDetail() {
               {room.genres.map(genre => (
                 <span
                   key={genre}
-                  className="px-2 py-0.5 rounded-full text-xs font-medium text-white/80"
-                  style={{ backgroundColor: GENRE_COLOR[genre] ?? '#2a2a3a' }}
+                  className="genre-tag px-2 py-0.5 rounded-full text-xs font-medium text-white/80"
+                  style={{
+                    '--genre-bg': GENRE_COLOR[genre] ?? '#2a2a3a',
+                    '--genre-light-bg': GENRE_LIGHT_COLOR[genre] ?? '#374151',
+                  } as CSSProperties}
                 >
                   {GENRE_LABEL[genre] ?? genre}
                 </span>
@@ -215,9 +229,9 @@ export default function RoomDetail() {
                       <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>
                     )}
                     {officialScore !== null && officialScore !== undefined ? (
-                      <p className="text-sm text-amber-300 mt-1">공식 {formatScore(officialScore)}/10</p>
+                      <p className="official-label text-sm text-amber-300 mt-1">공식 {formatScore(officialScore)}/10</p>
                     ) : officialLabel ? (
-                      <p className="text-sm text-amber-300 mt-1">공식 {officialLabel}</p>
+                      <p className="official-label text-sm text-amber-300 mt-1">공식 {officialLabel}</p>
                     ) : null}
                   </div>
                 )
@@ -233,7 +247,7 @@ export default function RoomDetail() {
             ) : (
               <button
                 onClick={() => setShowLog(true)}
-                className="flex-1 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors"
+                className="app-primary-action flex-1 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors"
               >
                 기록하기
               </button>
@@ -243,7 +257,7 @@ export default function RoomDetail() {
                 href={room.website_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
+                className="app-secondary-action flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
               >
                 예약 페이지
               </a>

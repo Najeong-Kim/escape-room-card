@@ -40,6 +40,16 @@
   border-color: rgb(75 85 99);
 }
 
+.genre-tag {
+  background-color: var(--genre-bg);
+}
+
+.path-rating-option {
+  background-color: var(--rating-bg);
+  border-color: var(--rating-border);
+  box-shadow: var(--rating-shadow);
+}
+
 :root[data-app-theme='light'] .app-theme-toggle {
   color: #34344a;
   border-color: rgb(209 213 219);
@@ -102,6 +112,59 @@
 
 :root[data-app-theme='light'] :where(.hover\:border-gray-600:hover, .hover\:border-gray-500:hover) {
   border-color: rgb(156 163 175) !important;
+}
+
+:root[data-app-theme='light'] .genre-tag {
+  background-color: var(--genre-light-bg) !important;
+  color: #ffffff !important;
+}
+
+:root[data-app-theme='light'] .app-primary-action {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+:root[data-app-theme='light'] .app-primary-action:hover {
+  background-color: #6d28d9 !important;
+  color: #ffffff !important;
+}
+
+:root[data-app-theme='light'] .app-secondary-action {
+  background-color: #ffffff !important;
+  border-color: rgb(124 58 237 / 0.35) !important;
+  color: #5b21b6 !important;
+}
+
+:root[data-app-theme='light'] .app-secondary-action:hover {
+  background-color: rgb(245 243 255) !important;
+  border-color: rgb(124 58 237 / 0.55) !important;
+  color: #4c1d95 !important;
+}
+
+:root[data-app-theme='light'] .path-rating-option {
+  background-color: #ffffff !important;
+  border-color: rgb(209 213 219) !important;
+  box-shadow: none !important;
+}
+
+:root[data-app-theme='light'] .path-rating-option.is-selected {
+  background-color: color-mix(in srgb, var(--rating-border) 18%, #ffffff) !important;
+  border-color: var(--rating-border) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rating-border) 24%, transparent) !important;
+}
+
+:root[data-app-theme='light'] .escape-result-badge.text-green-400 {
+  background-color: rgb(220 252 231) !important;
+  color: #166534 !important;
+}
+
+:root[data-app-theme='light'] .escape-result-badge.text-red-400 {
+  background-color: rgb(254 226 226) !important;
+  color: #991b1b !important;
+}
+
+:root[data-app-theme='light'] .official-label {
+  color: #92400e !important;
 }
 
 :root[data-app-theme='light'] :where(select, input, textarea) {

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Room } from '../../lib/recommend'
 import { hasLog } from '../../lib/roomLog'
@@ -25,6 +26,16 @@ const GENRE_COLOR: Record<string, string> = {
   FantasyAdventure: '#23644e',
   Crime: '#5f2933',
   SF: '#1c5f7a',
+}
+
+const GENRE_LIGHT_COLOR: Record<string, string> = {
+  Horror: '#8f1f48',
+  MysteryThriller: '#275aa8',
+  Emotional: '#a32975',
+  Comic: '#b33d12',
+  FantasyAdventure: '#24775a',
+  Crime: '#a0354b',
+  SF: '#21749a',
 }
 
 const FEAR_LABEL: Record<number, string> = {
@@ -123,8 +134,11 @@ export function RoomCard({ room, communityRating, communityMetricStats, onRated 
           {room.genres?.map(g => (
             <span
               key={g}
-              className="px-2 py-0.5 rounded-full text-xs font-medium text-white/80"
-              style={{ backgroundColor: GENRE_COLOR[g] ?? '#2a2a3a' }}
+              className="genre-tag px-2 py-0.5 rounded-full text-xs font-medium text-white/80"
+              style={{
+                '--genre-bg': GENRE_COLOR[g] ?? '#2a2a3a',
+                '--genre-light-bg': GENRE_LIGHT_COLOR[g] ?? '#374151',
+              } as CSSProperties}
             >
               {GENRE_LABEL[g] ?? g}
             </span>
@@ -148,9 +162,9 @@ export function RoomCard({ room, communityRating, communityMetricStats, onRated 
                   </p>
                 ) : null}
                 {officialScore !== null && officialScore !== undefined ? (
-                  <p className="text-xs text-amber-300">공식 {formatScore(officialScore)}/10</p>
+                  <p className="official-label text-xs text-amber-300">공식 {formatScore(officialScore)}/10</p>
                 ) : officialLabel ? (
-                  <p className="text-xs text-amber-300">공식 {officialLabel}</p>
+                  <p className="official-label text-xs text-amber-300">공식 {officialLabel}</p>
                 ) : null}
               </div>
             )

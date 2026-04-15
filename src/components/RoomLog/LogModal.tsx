@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { addLog } from '../../lib/roomLog'
 import type { Room } from '../../lib/recommend'
@@ -152,11 +153,15 @@ export function LogModal({ room, onClose, onSaved }: Props) {
                       setRating(rating === r.value ? null : r.value)
                       setRatingTouched(true)
                     }}
-                    className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border transition-all"
-                    style={isSelected
-                      ? { backgroundColor: r.bg, borderColor: r.border, boxShadow: `0 0 8px ${r.border}40` }
-                      : { backgroundColor: '#0e0e16', borderColor: 'rgba(255,255,255,0.08)' }
-                    }
+                    className={[
+                      'path-rating-option flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border transition-all',
+                      isSelected ? 'is-selected' : '',
+                    ].join(' ')}
+                    style={{
+                      '--rating-bg': isSelected ? r.bg : '#0e0e16',
+                      '--rating-border': isSelected ? r.border : 'rgba(255,255,255,0.08)',
+                      '--rating-shadow': isSelected ? `0 0 8px ${r.border}40` : 'none',
+                    } as CSSProperties}
                   >
                     <RatingIcon value={r.value} size={28} />
                     <span
@@ -193,7 +198,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
                       <div>
                         <p className="text-sm text-gray-200">{metric.label}</p>
                         {officialText && (
-                          <p className="text-[11px] text-amber-300 mt-0.5">공식 {officialText}</p>
+                          <p className="official-label text-[11px] text-amber-300 mt-0.5">공식 {officialText}</p>
                         )}
                       </div>
                       <button
@@ -245,7 +250,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
           <button
             onClick={save}
             disabled={saving}
-            className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-semibold
+            className="app-primary-action w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-semibold
                        py-3 rounded-2xl transition-all active:scale-95"
           >
             {saving ? '저장 중…' : '기록 저장'}
