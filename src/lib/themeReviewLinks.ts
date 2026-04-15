@@ -11,6 +11,9 @@ export interface ThemeReviewLink {
   author: string | null
   published_at: string | null
   thumbnail_url: string | null
+  confidence_score?: number | null
+  match_reason?: string[] | null
+  collected_by?: string | null
 }
 
 export const REVIEW_SOURCE_LABEL: Record<ReviewSourceType, string> = {

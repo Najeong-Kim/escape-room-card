@@ -5,6 +5,7 @@ import { ReviewLinkFormFields } from './ReviewLinkForm'
 interface ReviewLinkRecord {
   source_type?: ReviewSourceType
   status?: string
+  match_reason?: string[] | null
   themes?: {
     name?: string
     cafes?: {
@@ -37,6 +38,13 @@ function themeLabel(record: ReviewLinkRecord) {
   return cafeName ? `${cafeName} · ${theme?.name ?? ''}` : theme?.name ?? '-'
 }
 
+const STATUS_LABEL: Record<string, string> = {
+  active: '노출',
+  pending: '검수 대기',
+  hidden: '숨김',
+  rejected: '거절',
+}
+
 export const ReviewLinkList = () => (
   <List
     perPage={50}
@@ -55,9 +63,15 @@ export const ReviewLinkList = () => (
       <TextField source="title" label="제목" />
       <TextField source="author" label="작성자" />
       <DateField source="published_at" label="게시일" />
+      <NumberField source="confidence_score" label="점수" />
+      <TextField source="collected_by" label="수집 방식" />
+      <FunctionField
+        label="매칭 근거"
+        render={(record: ReviewLinkRecord) => record.match_reason?.join(', ') ?? '-'}
+      />
       <FunctionField
         label="상태"
-        render={(record: ReviewLinkRecord) => record.status === 'active' ? '노출' : '숨김'}
+        render={(record: ReviewLinkRecord) => record.status ? STATUS_LABEL[record.status] ?? record.status : '-'}
       />
     </Datagrid>
   </List>
@@ -73,7 +87,7 @@ export const ReviewLinkEdit = () => (
 
 export const ReviewLinkCreate = () => (
   <Create>
-    <SimpleForm defaultValues={{ source_type: 'blog', status: 'active', sort_order: 0 }}>
+    <SimpleForm defaultValues={{ source_type: 'blog', status: 'active', sort_order: 0, collected_by: 'manual' }}>
       <ReviewLinkFormFields />
     </SimpleForm>
   </Create>
