@@ -5,6 +5,7 @@ import { getLogs, deleteLog } from '../../lib/roomLog'
 import type { RoomLog } from '../../lib/roomLog'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import { Footer } from '../Footer'
+import { EditLogModal } from './EditLogModal'
 
 function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
   if (rating === null || rating === undefined) {
@@ -24,6 +25,7 @@ export default function MyRooms() {
   const navigate = useNavigate()
   const [logs, setLogs] = useState<RoomLog[]>(() => getLogs())
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingLog, setEditingLog] = useState<RoomLog | null>(null)
 
   const handleDelete = useCallback((id: string) => {
     deleteLog(id)
@@ -117,7 +119,7 @@ export default function MyRooms() {
                 </p>
               )}
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-3">
                 {deletingId === log.id ? (
                   <div className="flex gap-2">
                     <button
@@ -134,12 +136,20 @@ export default function MyRooms() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setDeletingId(log.id)}
-                    className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
-                  >
-                    삭제
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setEditingLog(log)}
+                      className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => setDeletingId(log.id)}
+                      className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+                    >
+                      삭제
+                    </button>
+                  </>
                 )}
               </div>
             </motion.div>
@@ -147,6 +157,17 @@ export default function MyRooms() {
         </AnimatePresence>
       </div>
       <Footer />
+
+      {editingLog && (
+        <EditLogModal
+          log={editingLog}
+          onClose={() => setEditingLog(null)}
+          onSaved={() => {
+            setLogs(getLogs())
+            setEditingLog(null)
+          }}
+        />
+      )}
     </div>
   )
 }
