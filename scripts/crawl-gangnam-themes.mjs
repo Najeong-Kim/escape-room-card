@@ -64,6 +64,14 @@ function score10OrNull(value) {
   return number ? clampScore10(Number(number)) : null
 }
 
+function difficultyScore10OrNull(value) {
+  const text = String(value ?? '')
+  const score = score10OrNull(text)
+  if (score === null) return null
+  if (text.match(/\/|score%22%3A/)) return score
+  return score > 5 ? score : clampScore10(score * 2)
+}
+
 function compactText(value) {
   return decodeHtml(String(value ?? ''))
     .replace(/\r/g, '\n')
@@ -198,7 +206,7 @@ function parseZamfitDetail(html, sourceUrl, target) {
       booking_url: homepageUrl || sourceUrl,
       source_url: sourceUrl,
       difficulty_label: difficulty && difficulty !== '?' ? difficulty : null,
-      difficulty_score: score10OrNull(difficulty),
+      difficulty_score: difficultyScore10OrNull(difficulty),
       fear_label: null,
       fear_score: null,
       activity_label: activity && activity !== '?' ? activity : null,
@@ -270,7 +278,7 @@ function parsePlayTheWorldTheme(theme, sourceUrl, target) {
     booking_url: theme.booking_url ?? sourceUrl,
     source_url: sourceUrl,
     difficulty_label: description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]?.trim() ?? null,
-    difficulty_score: score10OrNull(description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]),
+    difficulty_score: difficultyScore10OrNull(description.match(/난이도\s*[-:]\s*([^\n\r]+)/)?.[1]),
     fear_label: null,
     fear_score: null,
   }
@@ -292,7 +300,7 @@ function parseKeyescapeTheme(theme, sourceUrl, target) {
     booking_url: sourceUrl,
     source_url: sourceUrl,
     difficulty_label: theme.level ? String(theme.level) : null,
-    difficulty_score: score10OrNull(theme.level),
+    difficulty_score: difficultyScore10OrNull(theme.level),
     fear_label: null,
     fear_score: null,
   }
@@ -351,7 +359,7 @@ function addTheme(cafesByKey, cafeInput, themeInput, sourceName) {
     status: 'active',
     difficulty_label: themeInput.difficulty_label ?? null,
     fear_label: themeInput.fear_label ?? null,
-    difficulty_score: score10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label),
+    difficulty_score: difficultyScore10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label),
     fear_score: score10OrNull(themeInput.fear_score ?? themeInput.fear_label),
     activity_label: themeInput.activity_label ?? null,
     activity_score: score10OrNull(themeInput.activity_score ?? themeInput.activity_label),
@@ -408,7 +416,7 @@ function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName, opti
       writePresent(theme, 'image_url', themeInput.image_url),
       writePresent(theme, 'booking_url', themeInput.booking_url, { overwrite }),
       writePresent(theme, 'difficulty_label', themeInput.difficulty_label, { overwrite }),
-      writePresent(theme, 'difficulty_score', score10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label), { overwrite }),
+      writePresent(theme, 'difficulty_score', difficultyScore10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label), { overwrite }),
       writePresent(theme, 'fear_label', themeInput.fear_label, { overwrite }),
       writePresent(theme, 'fear_score', score10OrNull(themeInput.fear_score ?? themeInput.fear_label), { overwrite }),
       writePresent(theme, 'activity_label', themeInput.activity_label, { overwrite }),
@@ -591,7 +599,7 @@ async function main() {
       source_url: card.detail_url,
       difficulty_label: detail.difficulty_label,
       fear_label: detail.fear_label,
-      difficulty_score: score10OrNull(detail.difficulty_label),
+      difficulty_score: difficultyScore10OrNull(detail.difficulty_label),
       fear_score: score10OrNull(detail.fear_label),
     }, 'ㅂㅌㅊ 전체 테마')
     matched.push({ target, crawled_name: card.name, cafe: card.cafe_name, source_url: card.detail_url })
