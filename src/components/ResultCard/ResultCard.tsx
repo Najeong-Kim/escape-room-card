@@ -406,18 +406,46 @@ async function composeShareCanvas(
   ctx.stroke()
 
   const animalImage = await loadCanvasImage(getCharacterImage(profile.characterId, profile.playCount))
-  ctx.drawImage(animalImage, SIZE / 2 - 280, 120, 560, 560)
+
+  // Draw character as a circle with object-cover (aspect ratio preserved)
+  const CIRCLE_CX = SIZE / 2
+  const CIRCLE_CY = 400
+  const CIRCLE_R  = 260
+
+  // object-cover: scale to fill the circle, then center-crop
+  const naturalW = animalImage.naturalWidth  || animalImage.width
+  const naturalH = animalImage.naturalHeight || animalImage.height
+  const diameter  = CIRCLE_R * 2
+  const scale     = Math.max(diameter / naturalW, diameter / naturalH)
+  const drawW     = naturalW * scale
+  const drawH     = naturalH * scale
+  const drawX     = CIRCLE_CX - drawW / 2
+  const drawY     = CIRCLE_CY - drawH / 2
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI * 2)
+  ctx.clip()
+  ctx.drawImage(animalImage, drawX, drawY, drawW, drawH)
+  ctx.restore()
+
+  // Ring around circle
+  ctx.strokeStyle = 'rgba(139, 92, 246, 0.35)'
+  ctx.lineWidth = 8
+  ctx.beginPath()
+  ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R + 4, 0, Math.PI * 2)
+  ctx.stroke()
 
   // Nickname
   ctx.fillStyle = 'rgba(167, 139, 250, 0.8)'
   ctx.font = '500 36px system-ui, sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(profile.nickname.toUpperCase(), SIZE / 2, 660)
+  ctx.fillText(profile.nickname.toUpperCase(), SIZE / 2, 700)
 
   // Tagline (translated)
   ctx.fillStyle = '#ffffff'
   ctx.font = 'bold 64px system-ui, sans-serif'
-  ctx.fillText(tagline, SIZE / 2, 740)
+  ctx.fillText(tagline, SIZE / 2, 778)
 
   // Trait icons row
   const icons = [
@@ -430,24 +458,24 @@ async function composeShareCanvas(
   const iconSpacing = 120
   const iconStart = SIZE / 2 - ((icons.length - 1) * iconSpacing) / 2
   icons.forEach((icon, i) => {
-    ctx.fillText(icon, iconStart + i * iconSpacing, 830)
+    ctx.fillText(icon, iconStart + i * iconSpacing, 870)
   })
 
   // Play count tier badge (translated)
   ctx.fillStyle = 'rgba(139, 92, 246, 0.2)'
-  roundRect(ctx, SIZE / 2 - 200, 870, 400, 70, 20)
+  roundRect(ctx, SIZE / 2 - 200, 910, 400, 70, 20)
   ctx.fill()
   ctx.fillStyle = '#c4b5fd'
   ctx.font = '500 32px system-ui, sans-serif'
   ctx.fillText(
     `${tierLabel}  ${PLAY_COUNT_STARS[profile.playCount]}`,
-    SIZE / 2, 915
+    SIZE / 2, 955
   )
 
   // Watermark
   ctx.fillStyle = 'rgba(255,255,255,0.15)'
   ctx.font = '24px system-ui, sans-serif'
-  ctx.fillText('🔒 Escape Room Card', SIZE / 2, SIZE - 40)
+  ctx.fillText('🔒 Escape Room Card', SIZE / 2, SIZE - 28)
 
   return new Promise(resolve => {
     canvas.toBlob(blob => resolve(blob), 'image/png', 0.92)
