@@ -45,6 +45,24 @@ const GENRE_LIGHT_COLOR: Record<string, string> = {
   SF: '#21749a',
 }
 
+const TAG_CATEGORY_LABEL: Record<string, string> = {
+  award: '수상',
+  community: '커뮤니티',
+  feature: '특성',
+  operation: '운영',
+  audience: '추천',
+  warning: '주의',
+}
+
+const TAG_CATEGORY_CLASS: Record<string, string> = {
+  award: 'bg-amber-500/12 border-amber-400/25 text-amber-200',
+  community: 'bg-sky-500/12 border-sky-400/25 text-sky-200',
+  feature: 'bg-emerald-500/12 border-emerald-400/25 text-emerald-200',
+  operation: 'bg-violet-500/12 border-violet-400/25 text-violet-200',
+  audience: 'bg-rose-500/12 border-rose-400/25 text-rose-200',
+  warning: 'bg-red-500/12 border-red-400/25 text-red-200',
+}
+
 const METRICS: { key: MetricKey; label: string }[] = [
   { key: 'difficulty', label: '난이도' },
   { key: 'fear', label: '공포도' },
@@ -205,6 +223,22 @@ export default function RoomDetail() {
                 </span>
               ))}
             </div>
+            {room.theme_tags && room.theme_tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {room.theme_tags.map(tag => (
+                  <span
+                    key={tag.code}
+                    className={[
+                      'theme-tag inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold',
+                      TAG_CATEGORY_CLASS[tag.category] ?? 'bg-white/[0.06] border-white/10 text-gray-300',
+                    ].join(' ')}
+                  >
+                    <span className="opacity-70">{TAG_CATEGORY_LABEL[tag.category] ?? '태그'}</span>
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

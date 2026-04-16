@@ -24,6 +24,7 @@ export interface Room {
   max_players: number
   rating_avg: number
   tags: string[]
+  theme_tags?: ThemeTag[]
   official_scores?: {
     difficulty?: number | null
     fear?: number | null
@@ -44,6 +45,12 @@ export interface Room {
   image_url?: string
   naver_place_id?: string
   naver_place_url?: string
+}
+
+export interface ThemeTag {
+  code: string
+  name: string
+  category: string
 }
 
 // Map profile fearLevel to numeric fear score (1-5 scale)
@@ -87,6 +94,7 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
       'image_status',
       'booking_url',
       'theme_genres(genres(code))',
+      'theme_taggings(status,theme_tags(code,name,category,is_active))',
       'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,naver_place_id,naver_place_url,areas(name))',
     ].join(','),
     status: 'eq.active',

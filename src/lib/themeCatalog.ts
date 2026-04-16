@@ -46,6 +46,20 @@ export interface ThemeCatalogRow {
       code: string
     }[] | null
   }[]
+  theme_taggings?: {
+    status: string
+    theme_tags: {
+      code: string
+      name: string
+      category: string
+      is_active: boolean
+    } | {
+      code: string
+      name: string
+      category: string
+      is_active: boolean
+    }[] | null
+  }[]
   cafes: ThemeCafe | ThemeCafe[] | null
 }
 
@@ -66,12 +80,25 @@ function firstGenre(genre: NonNullable<ThemeCatalogRow['theme_genres']>[number][
   return Array.isArray(genre) ? (genre[0] ?? null) : genre
 }
 
+function firstTag(tag: NonNullable<ThemeCatalogRow['theme_taggings']>[number]['theme_tags']) {
+  return Array.isArray(tag) ? (tag[0] ?? null) : tag
+}
+
 export function themeToRoom(theme: ThemeCatalogRow): Room {
   const cafe = firstCafe(theme.cafes)
   const genres = theme.theme_genres
     ?.map(themeGenre => firstGenre(themeGenre.genres)?.code)
     .filter((code): code is string => Boolean(code))
   const area = cafe ? firstArea(cafe.areas)?.name : null
+  const themeTags = theme.theme_taggings
+    ?.filter(tagging => tagging.status === 'active')
+    .map(tagging => firstTag(tagging.theme_tags))
+    .filter((tag): tag is NonNullable<ReturnType<typeof firstTag>> => Boolean(tag?.is_active))
+    .map(tag => ({
+      code: tag.code,
+      name: tag.name,
+      category: tag.category,
+    }))
   const brand = cafe
     ? `${cafe.name}${cafe.branch_name ? ` ${cafe.branch_name}` : ''}`
     : '방탈출 카페'
@@ -95,6 +122,7 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
     max_players: theme.max_players ?? 1,
     rating_avg: 0,
     tags: [],
+    theme_tags: themeTags ?? [],
     official_scores: {
       difficulty: theme.difficulty_score,
       fear: theme.fear_score,

@@ -88,6 +88,7 @@ export function useRooms() {
         'image_status',
         'booking_url',
         'theme_genres(genres(code))',
+        'theme_taggings(status,theme_tags(code,name,category,is_active))',
         'cafes!inner(name,branch_name,area_label,address,booking_url,website_url,naver_place_id,naver_place_url,areas(name))',
       ].join(','),
       status: 'eq.active',
