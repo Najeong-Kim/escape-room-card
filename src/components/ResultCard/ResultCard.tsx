@@ -2,11 +2,16 @@ import { useState, useEffect, useRef, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
+import { Link } from 'react-router-dom'
 import {
   getCharacterImage,
   FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
 import { getRecommendations, type Room } from '../../lib/recommend'
+import {
+  fetchSimilarProfileFavoriteThemes,
+  type SimilarProfileFavoriteTheme,
+} from '../../lib/userCardProfile'
 
 interface Props {
   profile: QuizProfile
@@ -21,8 +26,10 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
   const { t, i18n } = useTranslation()
 
   const [recommendations, setRecommendations] = useState<Room[]>([])
+  const [similarFavorites, setSimilarFavorites] = useState<SimilarProfileFavoriteTheme[]>([])
   useEffect(() => {
     getRecommendations(profile).then(setRecommendations).catch(() => {})
+    fetchSimilarProfileFavoriteThemes(profile, 3).then(setSimilarFavorites).catch(() => {})
   }, [profile])
 
   const tagline = t(`tagline_${profile.characterId}`)
@@ -124,6 +131,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
       </div>
 
       {/* Recommended rooms */}
+      <SimilarProfileFavorites themes={similarFavorites} />
       <RecommendedRooms rooms={recommendations} t={t} />
 
       {/* Hidden canvas for share */}
@@ -295,6 +303,65 @@ function ShareButton({
     >
       <span>{shareBlob ? t('save_card') : t('preparing')}</span>
     </button>
+  )
+}
+
+function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteTheme[] }) {
+  if (themes.length === 0) return null
+
+  return (
+    <div className="w-full">
+      <div className="mb-3">
+        <p className="text-gray-500 text-xs uppercase tracking-widest">취향이 비슷한 사람들</p>
+        <h2 className="text-white font-bold text-lg">같은 카드 사람들이 좋아한 테마</h2>
+      </div>
+      <div className="flex flex-col gap-3">
+        {themes.map(theme => (
+          <Link
+            key={theme.theme_id}
+            to={`/rooms/${theme.theme_id}`}
+            className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex gap-3 hover:border-violet-500/40 hover:bg-[#16161f] transition-all"
+          >
+            {theme.image_url ? (
+              <img
+                src={theme.image_url}
+                alt={theme.name}
+                className="w-24 min-h-28 object-cover"
+                onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }}
+              />
+            ) : (
+              <div className="w-24 min-h-28 bg-violet-950/20 flex items-center justify-center text-2xl opacity-40">
+                🔐
+              </div>
+            )}
+            <div className="min-w-0 flex-1 py-3 pr-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500 truncate">{theme.brand}</p>
+                  <h3 className="text-white text-sm font-semibold leading-snug mt-0.5">{theme.name}</h3>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-violet-300 text-sm font-black">{theme.score_10}</p>
+                  <p className="text-gray-600 text-[11px]">/ 10</p>
+                </div>
+              </div>
+              <p className="text-gray-500 text-xs mt-2">
+                {theme.location} · {theme.liked_count}명이 길 이상으로 평가했어요
+              </p>
+              {theme.genre_labels.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {theme.genre_labels.slice(0, 3).map(genre => (
+                    <span key={genre} className="text-[11px] px-2 py-0.5 rounded-full bg-white/[0.06] text-gray-400">
+                      {GENRE_LABELS[genre] ?? genre}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   )
 }
 

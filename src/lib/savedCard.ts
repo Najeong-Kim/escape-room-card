@@ -1,6 +1,13 @@
 import type { QuizProfile } from './traitMap'
 
 const SAVED_CARD_KEY = 'escape-room-card-profile'
+export const SAVED_CARD_CHANGED = 'escape-room-card-profile-changed'
+
+function notifySavedCardChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(SAVED_CARD_CHANGED))
+  }
+}
 
 export function loadSavedCard(): QuizProfile | null {
   try {
@@ -14,8 +21,10 @@ export function loadSavedCard(): QuizProfile | null {
 
 export function saveCard(profile: QuizProfile) {
   localStorage.setItem(SAVED_CARD_KEY, JSON.stringify(profile))
+  notifySavedCardChanged()
 }
 
 export function clearSavedCard() {
   localStorage.removeItem(SAVED_CARD_KEY)
+  notifySavedCardChanged()
 }

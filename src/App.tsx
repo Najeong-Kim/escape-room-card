@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -9,7 +9,8 @@ import { Footer } from './components/Footer'
 import { AppTopActions } from './components/AppTopActions'
 import type { RoomLog } from './lib/roomLog'
 import { useRoomLogs } from './lib/useRoomLogs'
-import { clearSavedCard, loadSavedCard, saveCard } from './lib/savedCard'
+import { clearSavedCard, loadSavedCard, saveCard, SAVED_CARD_CHANGED } from './lib/savedCard'
+import { saveUserCardProfile } from './lib/userCardProfile'
 import { useRooms } from './lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
 import { RatingIcon } from './lib/ratings'
@@ -24,6 +25,15 @@ export default function App() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    function refreshSavedProfile() {
+      setSavedProfile(loadSavedCard())
+    }
+
+    window.addEventListener(SAVED_CARD_CHANGED, refreshSavedProfile)
+    return () => window.removeEventListener(SAVED_CARD_CHANGED, refreshSavedProfile)
+  }, [])
+
   function toggleLang() {
     const next = i18n.language === 'ko' ? 'en' : 'ko'
     i18n.changeLanguage(next)
@@ -32,6 +42,7 @@ export default function App() {
 
   function completeQuiz(profile: QuizProfile) {
     saveCard(profile)
+    saveUserCardProfile(profile)
     setSavedProfile(profile)
     setActiveProfile(profile)
     setMode('result')

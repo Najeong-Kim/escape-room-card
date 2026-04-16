@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabaseClient'
 import { syncLocalRoomLogsToUser } from '../lib/userRoomLogs'
+import { syncSavedCardProfileToUser } from '../lib/userCardProfile'
 
 type AuthStatus = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -29,13 +30,17 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
-      if (data.session) syncLocalRoomLogsToUser()
+      if (data.session) {
+        syncLocalRoomLogsToUser()
+        syncSavedCardProfileToUser()
+      }
     })
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
       if (nextSession) {
         setOpen(false)
         syncLocalRoomLogsToUser()
+        syncSavedCardProfileToUser()
       }
     })
 
