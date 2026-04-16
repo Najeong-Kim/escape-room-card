@@ -262,6 +262,29 @@ async function main() {
 
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true })
   fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2))
+
+  if (apply) {
+    const candidateRows = report.rows.map(row => ({
+      cafe_id: row.cafe_id,
+      provider: 'naver-local',
+      query: row.query,
+      status: row.applied ? 'applied' : 'pending',
+      confidence: row.high_confidence ? 'high' : 'manual',
+      score: row.best?.score ?? null,
+      best_candidate: row.best ?? null,
+      candidates: row.candidates ?? [],
+      suggested_changes: row.suggested_changes ?? {},
+      generated_at: report.generated_at,
+      applied_at: row.applied ? new Date().toISOString() : null,
+    }))
+
+    const { error: candidateError } = await supabase
+      .from('cafe_verification_candidates')
+      .upsert(candidateRows, { onConflict: 'cafe_id,provider' })
+
+    if (candidateError) throw candidateError
+  }
+
   console.log(JSON.stringify({
     report_path: REPORT_PATH,
     total_cafes: report.total_cafes,

@@ -27,6 +27,31 @@ interface ApprovalCafe {
   created_at: string
 }
 
+interface NaverCandidate {
+  title: string
+  link: string | null
+  category: string
+  telephone: string | null
+  address: string
+  roadAddress: string
+  score?: number
+  reasons?: string[]
+}
+
+interface CafeVerificationCandidate {
+  id: string
+  cafe_id: number
+  provider: string
+  query: string
+  status: 'pending' | 'applied' | 'dismissed'
+  confidence: 'high' | 'manual'
+  score: number | null
+  best_candidate: NaverCandidate | null
+  candidates: NaverCandidate[]
+  suggested_changes: Partial<Record<'address' | 'phone' | 'website_url', string>>
+  generated_at: string
+}
+
 type CafeForm = Pick<
   ApprovalCafe,
   | 'name'
@@ -69,6 +94,13 @@ const inputStyle = {
   padding: '8px 10px',
   font: 'inherit',
 }
+const candidateBoxStyle = {
+  border: '1px solid rgba(25, 118, 210, 0.24)',
+  borderRadius: 8,
+  padding: 12,
+  margin: '12px 0',
+  background: 'rgba(25, 118, 210, 0.06)',
+}
 
 function cafeToForm(cafe: ApprovalCafe): CafeForm {
   return {
@@ -94,10 +126,25 @@ function emptyToNull(value: string | null) {
   return value?.trim() || null
 }
 
+function isUsefulWebsite(url: string | null | undefined) {
+  if (!url) return false
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, '')
+    return !hostname.includes('map.naver.com') && !hostname.includes('naver.com/maps')
+  } catch {
+    return false
+  }
+}
+
+function candidateAddress(candidate: NaverCandidate) {
+  return candidate.roadAddress || candidate.address || ''
+}
+
 export function CafeApprovalList() {
   const notify = useNotify()
   const { areas } = useCatalogOptions()
   const [cafes, setCafes] = useState<ApprovalCafe[]>([])
+  const [candidatesByCafeId, setCandidatesByCafeId] = useState<Record<number, CafeVerificationCandidate>>({})
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -118,7 +165,28 @@ export function CafeApprovalList() {
       return
     }
 
-    setCafes((data ?? []) as ApprovalCafe[])
+    const cafeRows = (data ?? []) as ApprovalCafe[]
+    setCafes(cafeRows)
+
+    if (cafeRows.length === 0) {
+      setCandidatesByCafeId({})
+      return
+    }
+
+    const { data: candidateData, error: candidateError } = await supabase
+      .from('cafe_verification_candidates')
+      .select('*')
+      .in('cafe_id', cafeRows.map(cafe => cafe.id))
+
+    if (candidateError) {
+      notify(`네이버 후보를 불러오지 못했습니다: ${candidateError.message}`, { type: 'warning' })
+      setCandidatesByCafeId({})
+      return
+    }
+
+    setCandidatesByCafeId(Object.fromEntries(
+      ((candidateData ?? []) as CafeVerificationCandidate[]).map(candidate => [candidate.cafe_id, candidate]),
+    ))
   }, [notify])
 
   useEffect(() => {
@@ -201,6 +269,83 @@ export function CafeApprovalList() {
     notify(status === 'active' ? '매장을 승인했습니다.' : '매장과 연결 테마를 거절했습니다.', { type: 'success' })
   }
 
+  async function markCafeClosed(cafe: ApprovalCafe) {
+    setProcessingId(cafe.id)
+
+    const { error: cafeError } = await supabase
+      .from('cafes')
+      .update({ status: 'closed', needs_review: false })
+      .eq('id', cafe.id)
+
+    if (!cafeError) {
+      const { error: themeError } = await supabase
+        .from('themes')
+        .update({ status: 'closed', needs_review: false })
+        .eq('cafe_id', cafe.id)
+
+      if (themeError) {
+        setProcessingId(null)
+        notify(`연결 테마 폐점 처리에 실패했습니다: ${themeError.message}`, { type: 'error' })
+        return
+      }
+    }
+
+    setProcessingId(null)
+
+    if (cafeError) {
+      notify(`폐점 처리에 실패했습니다: ${cafeError.message}`, { type: 'error' })
+      return
+    }
+
+    setCafes(current => current.filter(item => item.id !== cafe.id))
+    notify('매장과 연결 테마를 폐점 처리했습니다.', { type: 'success' })
+  }
+
+  async function applyNaverCandidate(cafe: ApprovalCafe, verification: CafeVerificationCandidate) {
+    const candidate = verification.best_candidate
+    if (!candidate) return
+
+    setProcessingId(cafe.id)
+
+    const address = candidateAddress(candidate)
+    const payload = {
+      address: address || cafe.address,
+      phone: candidate.telephone || cafe.phone,
+      website_url: isUsefulWebsite(candidate.link) ? candidate.link : cafe.website_url,
+      naver_place_name: candidate.title,
+      naver_place_address: address || null,
+      naver_place_checked_at: new Date().toISOString(),
+    }
+
+    const { error: cafeError } = await supabase
+      .from('cafes')
+      .update(payload)
+      .eq('id', cafe.id)
+
+    if (!cafeError) {
+      const { error: candidateError } = await supabase
+        .from('cafe_verification_candidates')
+        .update({ status: 'applied', applied_at: new Date().toISOString() })
+        .eq('id', verification.id)
+
+      if (candidateError) {
+        setProcessingId(null)
+        notify(`후보 적용 상태 저장에 실패했습니다: ${candidateError.message}`, { type: 'error' })
+        return
+      }
+    }
+
+    setProcessingId(null)
+
+    if (cafeError) {
+      notify(`네이버 후보 적용에 실패했습니다: ${cafeError.message}`, { type: 'error' })
+      return
+    }
+
+    notify('네이버 후보를 매장 정보에 적용했습니다.', { type: 'success' })
+    await loadCafes()
+  }
+
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>
@@ -223,6 +368,8 @@ export function CafeApprovalList() {
         <div style={{ display: 'grid', gap: 12 }}>
           {cafes.map(cafe => {
             const isEditing = editingId === cafe.id && form
+            const verification = candidatesByCafeId[cafe.id]
+            const bestCandidate = verification?.best_candidate
 
             return (
               <article key={cafe.id} style={cardStyle}>
@@ -243,11 +390,64 @@ export function CafeApprovalList() {
                       <>
                         <Button variant="contained" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'active')}>승인</Button>
                         <Button color="error" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'rejected')}>거절</Button>
+                        <Button color="warning" disabled={processingId === cafe.id} onClick={() => markCafeClosed(cafe)}>폐점</Button>
                         <Button disabled={processingId === cafe.id} onClick={() => startEdit(cafe)}>수정</Button>
                       </>
                     )}
                   </div>
                 </div>
+
+                {!isEditing && verification && (
+                  <div style={candidateBoxStyle}>
+                    <div className="approval-card-header" style={{ marginBottom: 10 }}>
+                      <div>
+                        <p style={{ ...mutedStyle, margin: '0 0 4px' }}>네이버 Local 후보 · {verification.confidence === 'high' ? '확신 높음' : '수동 확인 필요'} · {verification.score ?? '-'}점</p>
+                        <h3 style={{ margin: 0, fontSize: 16 }}>
+                          {bestCandidate?.title ?? '검색 결과 없음'}
+                        </h3>
+                      </div>
+                      {bestCandidate && (
+                        <Button
+                          variant="contained"
+                          disabled={processingId === cafe.id}
+                          onClick={() => applyNaverCandidate(cafe, verification)}
+                        >
+                          후보 적용
+                        </Button>
+                      )}
+                    </div>
+                    {bestCandidate ? (
+                      <dl className="approval-detail-list">
+                        <dt style={mutedStyle}>검색어</dt>
+                        <dd style={{ margin: 0 }}>{verification.query}</dd>
+                        <dt style={mutedStyle}>카테고리</dt>
+                        <dd style={{ margin: 0 }}>{bestCandidate.category || '-'}</dd>
+                        <dt style={mutedStyle}>주소</dt>
+                        <dd style={{ margin: 0 }}>{candidateAddress(bestCandidate) || '주소 없음'}</dd>
+                        <dt style={mutedStyle}>전화번호</dt>
+                        <dd style={{ margin: 0 }}>{bestCandidate.telephone || '전화번호 없음'}</dd>
+                        <dt style={mutedStyle}>링크</dt>
+                        <dd style={{ margin: 0 }}>
+                          {bestCandidate.link ? <a href={bestCandidate.link} target="_blank" rel="noreferrer">{bestCandidate.link}</a> : '링크 없음'}
+                        </dd>
+                        {verification.candidates.length > 1 && (
+                          <>
+                            <dt style={mutedStyle}>다른 후보</dt>
+                            <dd style={{ margin: 0 }}>
+                              {verification.candidates.slice(1, 4).map(candidate => (
+                                <div key={`${candidate.title}-${candidate.roadAddress}`}>
+                                  {candidate.title} · {candidate.roadAddress || candidate.address || '주소 없음'} · {candidate.score ?? '-'}점
+                                </div>
+                              ))}
+                            </dd>
+                          </>
+                        )}
+                      </dl>
+                    ) : (
+                      <p style={{ ...mutedStyle, margin: 0 }}>네이버 Local 검색 결과가 없습니다. 폐점, 이름 변경, 오타 가능성이 있습니다.</p>
+                    )}
+                  </div>
+                )}
 
                 {isEditing ? (
                   <div className="approval-edit-grid">
