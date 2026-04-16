@@ -145,6 +145,7 @@ export function CafeApprovalList() {
   const { areas } = useCatalogOptions()
   const [cafes, setCafes] = useState<ApprovalCafe[]>([])
   const [candidatesByCafeId, setCandidatesByCafeId] = useState<Record<number, CafeVerificationCandidate>>({})
+  const [candidateLoadError, setCandidateLoadError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -171,6 +172,7 @@ export function CafeApprovalList() {
 
     if (cafeRows.length === 0) {
       setCandidatesByCafeId({})
+      setCandidateLoadError(null)
       return
     }
 
@@ -180,11 +182,13 @@ export function CafeApprovalList() {
       .in('cafe_id', cafeRows.map(cafe => cafe.id))
 
     if (candidateError) {
+      setCandidateLoadError(candidateError.message)
       notify(`네이버 후보를 불러오지 못했습니다: ${candidateError.message}`, { type: 'warning' })
       setCandidatesByCafeId({})
       return
     }
 
+    setCandidateLoadError(null)
     setCandidatesByCafeId(Object.fromEntries(
       ((candidateData ?? []) as CafeVerificationCandidate[]).map(candidate => [candidate.cafe_id, candidate]),
     ))
@@ -273,44 +277,25 @@ export function CafeApprovalList() {
   async function markCafeClosed(cafe: ApprovalCafe) {
     setProcessingId(cafe.id)
 
-    const { error: cafeError } = await supabase
-      .from('cafes')
-      .update({ status: 'closed', needs_review: false })
-      .eq('id', cafe.id)
+    const { data, error } = await supabase
+      .rpc('close_cafe_for_review', { p_cafe_id: cafe.id })
 
-    if (!cafeError) {
-      const { error: themeError } = await supabase
-        .from('themes')
-        .update({ status: 'closed', needs_review: false })
-        .eq('cafe_id', cafe.id)
-
-      if (themeError) {
-        setProcessingId(null)
-        notify(`연결 테마 폐점 처리에 실패했습니다: ${themeError.message}`, { type: 'error' })
-        return
-      }
-
-      const { error: candidateError } = await supabase
-        .from('cafe_verification_candidates')
-        .update({ status: 'dismissed' })
-        .eq('cafe_id', cafe.id)
-
-      if (candidateError) {
-        setProcessingId(null)
-        notify(`후보 폐기 처리에 실패했습니다: ${candidateError.message}`, { type: 'error' })
-        return
-      }
-    }
-
-    setProcessingId(null)
-
-    if (cafeError) {
-      notify(`폐점 처리에 실패했습니다: ${cafeError.message}`, { type: 'error' })
+    if (error || !data || data.length === 0) {
+      setProcessingId(null)
+      notify(`폐점 처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 매장이 없습니다.'}`, { type: 'error' })
       return
     }
 
+    const closed = data[0] as { cafe_status?: string; cafe_needs_review?: boolean; closed_theme_count?: number }
+    if (closed.cafe_status !== 'closed' || closed.cafe_needs_review !== false) {
+      setProcessingId(null)
+      notify('폐점 처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
+      return
+    }
+
+    setProcessingId(null)
     setCafes(current => current.filter(item => item.id !== cafe.id))
-    notify('매장과 연결 테마를 폐점 처리했습니다.', { type: 'success' })
+    notify(`매장과 연결 테마 ${closed.closed_theme_count ?? 0}개를 폐점 처리했습니다.`, { type: 'success' })
   }
 
   async function applyNaverCandidate(cafe: ApprovalCafe, verification: CafeVerificationCandidate) {
@@ -378,6 +363,12 @@ export function CafeApprovalList() {
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 12 }}>
+          {candidateLoadError && (
+            <div style={{ ...cardStyle, borderColor: 'rgba(211, 47, 47, 0.45)', background: 'rgba(211, 47, 47, 0.06)' }}>
+              <strong>네이버 후보 정보를 불러오지 못했습니다.</strong>
+              <p style={{ margin: '6px 0 0', ...mutedStyle }}>{candidateLoadError}</p>
+            </div>
+          )}
           {cafes.map(cafe => {
             const isEditing = editingId === cafe.id && form
             const verification = candidatesByCafeId[cafe.id]
