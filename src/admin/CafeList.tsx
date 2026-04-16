@@ -13,6 +13,8 @@ interface CafeRecord {
   status?: string
   naver_place_url?: string | null
   naver_place_id?: string | null
+  naver_place_name?: string | null
+  naver_place_address?: string | null
   naver_place_checked_at?: string | null
 }
 
@@ -40,6 +42,7 @@ export const CafeList = () => (
         render={(record: CafeRecord) => {
           if (record.naver_place_url) return '링크 있음'
           if (record.naver_place_id) return 'ID 있음'
+          if (record.naver_place_checked_at || record.naver_place_name || record.naver_place_address) return '정보 확인됨'
           return '-'
         }}
       />

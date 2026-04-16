@@ -293,7 +293,21 @@ export function CafeApprovalList() {
                     <dt style={mutedStyle}>예약</dt>
                     <dd style={{ margin: 0 }}>{cafe.booking_url ? <a href={cafe.booking_url} target="_blank" rel="noreferrer">{cafe.booking_url}</a> : '예약 URL 미확인'}</dd>
                     <dt style={mutedStyle}>네이버 지도</dt>
-                    <dd style={{ margin: 0 }}>{cafe.naver_place_url ? <a href={cafe.naver_place_url} target="_blank" rel="noreferrer">{cafe.naver_place_url}</a> : cafe.naver_place_id ?? '네이버 플레이스 미확인'}</dd>
+                    <dd style={{ margin: 0 }}>
+                      {cafe.naver_place_url ? (
+                        <a href={cafe.naver_place_url} target="_blank" rel="noreferrer">{cafe.naver_place_url}</a>
+                      ) : cafe.naver_place_id ? (
+                        cafe.naver_place_id
+                      ) : cafe.naver_place_checked_at || cafe.naver_place_name || cafe.naver_place_address ? (
+                        <span>
+                          네이버 정보 확인됨
+                          {cafe.naver_place_name ? ` · ${cafe.naver_place_name}` : ''}
+                          {cafe.naver_place_address ? ` · ${cafe.naver_place_address}` : ''}
+                        </span>
+                      ) : (
+                        '네이버 플레이스 미확인'
+                      )}
+                    </dd>
                     <dt style={mutedStyle}>출처</dt>
                     <dd style={{ margin: 0 }}>{cafe.source_url ? <a href={cafe.source_url} target="_blank" rel="noreferrer">{cafe.source_url}</a> : '출처 URL 미확인'}</dd>
                   </dl>
