@@ -245,33 +245,30 @@ export function CafeApprovalList() {
   async function reviewCafe(cafe: ApprovalCafe, status: 'active' | 'rejected') {
     setProcessingId(cafe.id)
 
-    const { error: cafeError } = await supabase
-      .from('cafes')
-      .update({ status, needs_review: false })
-      .eq('id', cafe.id)
+    const { data, error } = await supabase
+      .rpc('review_cafe_for_review', { p_cafe_id: cafe.id, p_status: status })
 
-    if (!cafeError && status === 'rejected') {
-      const { error: themeError } = await supabase
-        .from('themes')
-        .update({ status: 'rejected', needs_review: false })
-        .eq('cafe_id', cafe.id)
-
-      if (themeError) {
-        setProcessingId(null)
-        notify(`연결 테마 거절 처리에 실패했습니다: ${themeError.message}`, { type: 'error' })
-        return
-      }
-    }
-
-    setProcessingId(null)
-
-    if (cafeError) {
-      notify(`처리에 실패했습니다: ${cafeError.message}`, { type: 'error' })
+    if (error || !data || data.length === 0) {
+      setProcessingId(null)
+      notify(`처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 매장이 없습니다.'}`, { type: 'error' })
       return
     }
 
+    const reviewed = data[0] as { cafe_status?: string; cafe_needs_review?: boolean; affected_theme_count?: number }
+    if (reviewed.cafe_status !== status || reviewed.cafe_needs_review !== false) {
+      setProcessingId(null)
+      notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
+      return
+    }
+
+    setProcessingId(null)
     setCafes(current => current.filter(item => item.id !== cafe.id))
-    notify(status === 'active' ? '매장을 승인했습니다.' : '매장과 연결 테마를 거절했습니다.', { type: 'success' })
+    notify(
+      status === 'active'
+        ? '매장을 승인했습니다.'
+        : `매장과 연결 테마 ${reviewed.affected_theme_count ?? 0}개를 거절했습니다.`,
+      { type: 'success' },
+    )
   }
 
   async function markCafeClosed(cafe: ApprovalCafe) {
