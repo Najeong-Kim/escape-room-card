@@ -73,6 +73,7 @@ async function main() {
     themesInserted: 0,
     themeSuggestions: 0,
     themesUnchanged: 0,
+    skippedInactiveCafes: 0,
     themeGenres: 0,
     sources: 0,
   }
@@ -87,6 +88,11 @@ async function main() {
       savedCafe = await insertCafeOnly(supabase, cafeInput, areaId)
       cafeIndex.push(savedCafe)
       results.cafesInserted += 1
+    }
+
+    if (savedCafe.status === 'closed' || savedCafe.status === 'rejected') {
+      results.skippedInactiveCafes += 1
+      continue
     }
 
     for (const theme of themes ?? []) {

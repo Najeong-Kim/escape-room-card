@@ -156,6 +156,7 @@ export function CafeApprovalList() {
       .from('cafes')
       .select('*')
       .eq('needs_review', true)
+      .in('status', ['active', 'unknown'])
       .order('created_at', { ascending: false })
 
     setLoading(false)
@@ -286,6 +287,17 @@ export function CafeApprovalList() {
       if (themeError) {
         setProcessingId(null)
         notify(`연결 테마 폐점 처리에 실패했습니다: ${themeError.message}`, { type: 'error' })
+        return
+      }
+
+      const { error: candidateError } = await supabase
+        .from('cafe_verification_candidates')
+        .update({ status: 'dismissed' })
+        .eq('cafe_id', cafe.id)
+
+      if (candidateError) {
+        setProcessingId(null)
+        notify(`후보 폐기 처리에 실패했습니다: ${candidateError.message}`, { type: 'error' })
         return
       }
     }

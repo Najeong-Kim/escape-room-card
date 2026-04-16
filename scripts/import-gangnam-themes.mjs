@@ -76,6 +76,7 @@ async function main() {
   let themeCount = 0
   let suggestionCount = 0
   let unchangedCount = 0
+  let skippedInactiveCafeCount = 0
   let themeGenreCount = 0
   let sourceCount = 0
 
@@ -89,6 +90,11 @@ async function main() {
       savedCafe = await insertCafeOnly(supabase, cafeInput, areaId)
       cafeIndex.push(savedCafe)
       cafeInsertCount += 1
+    }
+
+    if (savedCafe.status === 'closed' || savedCafe.status === 'rejected') {
+      skippedInactiveCafeCount += 1
+      continue
     }
 
     for (const theme of themes) {
@@ -148,7 +154,7 @@ async function main() {
     }
   }
 
-  console.log(`Imported ${cafeInsertCount} new cafes (${cafeMatchedCount} matched existing), processed ${themeCount} themes (${themeInsertCount} inserts, ${suggestionCount} suggestions, ${unchangedCount} unchanged), ${themeGenreCount} theme genres, ${sourceCount} source rows.`)
+  console.log(`Imported ${cafeInsertCount} new cafes (${cafeMatchedCount} matched existing, ${skippedInactiveCafeCount} inactive skipped), processed ${themeCount} themes (${themeInsertCount} inserts, ${suggestionCount} suggestions, ${unchangedCount} unchanged), ${themeGenreCount} theme genres, ${sourceCount} source rows.`)
 }
 
 main().catch(error => {
