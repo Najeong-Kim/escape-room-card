@@ -8,7 +8,7 @@ interface Props {
 
 export function AppTopActions({ languageLabel, onLanguageToggle }: Props) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex max-w-[calc(100%-2rem)] flex-wrap justify-end gap-2">
+    <div className="app-top-actions fixed top-4 right-4 z-50 flex max-w-[calc(100%-2rem)] flex-wrap justify-end gap-2 max-[480px]:top-3 max-[480px]:right-3 max-[480px]:max-w-[8rem] max-[480px]:gap-1">
       <AppThemeToggle floating={false} />
       <UserAuthButton floating={false} className="" />
       {languageLabel && onLanguageToggle && (

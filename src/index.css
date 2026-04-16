@@ -51,6 +51,23 @@
   border-color: rgb(75 85 99);
 }
 
+.app-top-actions .app-theme-toggle,
+.app-top-actions .app-auth-button {
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .app-top-actions .app-theme-toggle,
+  .app-top-actions .app-auth-button {
+    max-width: 5.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
 .genre-tag {
   background-color: var(--genre-bg);
 }

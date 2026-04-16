@@ -11,11 +11,35 @@ import { useRoomLogs } from '../../lib/useRoomLogs'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { RatingIcon } from '../../lib/ratings'
 
+const PAGE_SIZE = 30
+
+function normalizeSearch(value: string) {
+  return value.toLowerCase().replace(/\s+/g, '')
+}
+
+function matchesSearch(room: ReturnType<typeof filterRooms>[number], searchTerm: string) {
+  const query = normalizeSearch(searchTerm)
+  if (!query) return true
+
+  const haystack = normalizeSearch([
+    room.name,
+    room.brand,
+    room.location,
+    room.address ?? '',
+    ...room.genres,
+    ...(room.theme_tags?.map(tag => tag.name) ?? []),
+  ].join(' '))
+
+  return haystack.includes(query)
+}
+
 export default function RoomBrowse() {
   const navigate = useNavigate()
   const { rooms, loading, error } = useRooms()
   const { locations, genres } = useRoomFilterOptions()
   const [filters, setFilters] = useState<RoomFilters>(INITIAL_FILTERS)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [logs] = useRoomLogs()
   const [communityRatings, setCommunityRatings] = useState<Record<number, CommunityRating>>({})
   const [communityMetricStats, setCommunityMetricStats] = useState<Record<number, CommunityMetricStats>>({})
@@ -36,14 +60,24 @@ export default function RoomBrowse() {
     () => buildPersonalRecommendationModel(rooms, logs, communityMetricStats, communityRatings),
     [rooms, logs, communityMetricStats, communityRatings],
   )
+  const loggedRoomIds = useMemo(() => new Set(logs.map(log => log.room_id)), [logs])
 
   const filtered = useMemo(() => {
-    return [...filterRooms(rooms, filters)].sort((a, b) => {
+    return [...filterRooms(rooms, filters, loggedRoomIds)]
+      .filter(room => matchesSearch(room, searchTerm))
+      .sort((a, b) => {
       const aHasRating = communityRatings[a.id] ? 1 : 0
       const bHasRating = communityRatings[b.id] ? 1 : 0
       return bHasRating - aHasRating
     })
-  }, [rooms, filters, communityRatings])
+  }, [rooms, filters, loggedRoomIds, searchTerm, communityRatings])
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [filters, searchTerm])
+
+  const visibleRooms = filtered.slice(0, visibleCount)
+  const hasMore = visibleCount < filtered.length
 
   function selectTheme(id: string) {
     setFilters(f => ({
@@ -60,18 +94,23 @@ export default function RoomBrowse() {
     setFilters(f => ({ ...f, genre }))
   }
 
+  function toggleOnlyUnlogged() {
+    setFilters(f => ({ ...f, onlyUnlogged: !f.onlyUnlogged }))
+  }
+
   function resetFilters() {
     setFilters(INITIAL_FILTERS)
+    setSearchTerm('')
   }
 
   const hasActiveFilters =
-    filters.themeId || filters.location || filters.genre || filters.players || filters.fearMax
+    filters.themeId || filters.location || filters.genre || filters.players || filters.fearMax || filters.onlyUnlogged || searchTerm.trim()
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <AppTopActions />
       {/* Top bar */}
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 pr-36 sm:pr-4 flex items-center gap-3 min-w-0">
         <button
           onClick={() => navigate(-1)}
           className="text-gray-400 hover:text-white transition-colors p-1"
@@ -79,8 +118,8 @@ export default function RoomBrowse() {
         >
           ←
         </button>
-        <h1 className="font-semibold text-base">방 둘러보기</h1>
-        <span className="ml-auto text-xs text-gray-500">
+        <h1 className="font-semibold text-base truncate">방 둘러보기</h1>
+        <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
           {loading ? '로딩 중…' : `${filtered.length}개`}
         </span>
       </div>
@@ -136,7 +175,15 @@ export default function RoomBrowse() {
         </section>
 
         {/* Filters */}
-        <section className="flex flex-wrap gap-2 items-center">
+        <section className="space-y-3">
+          <input
+            type="search"
+            value={searchTerm}
+            onChange={event => setSearchTerm(event.target.value)}
+            placeholder="테마명, 매장명, 지역, 태그 검색"
+            className="w-full rounded-xl border border-white/10 bg-[#13131a] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-violet-500/60"
+          />
+          <div className="flex flex-wrap gap-2 items-center">
           {/* Location */}
           <select
             value={filters.location ?? ''}
@@ -163,6 +210,19 @@ export default function RoomBrowse() {
             ))}
           </select>
 
+          <button
+            type="button"
+            onClick={toggleOnlyUnlogged}
+            className={[
+              'rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
+              filters.onlyUnlogged
+                ? 'border-violet-500 bg-violet-600 text-white'
+                : 'border-white/10 bg-[#13131a] text-gray-300 hover:border-violet-500/50 hover:text-white',
+            ].join(' ')}
+          >
+            기록 안 한 테마만
+          </button>
+
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
@@ -171,6 +231,7 @@ export default function RoomBrowse() {
               필터 초기화
             </button>
           )}
+          </div>
         </section>
 
         {/* Results */}
@@ -194,18 +255,29 @@ export default function RoomBrowse() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filtered.map(room => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                communityRating={communityRatings[room.id]}
-                communityMetricStats={communityMetricStats[room.id]}
-                personalPrediction={personalModel?.predictions[room.id]}
-                onRated={refetchRatings}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {visibleRooms.map(room => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  communityRating={communityRatings[room.id]}
+                  communityMetricStats={communityMetricStats[room.id]}
+                  personalPrediction={personalModel?.predictions[room.id]}
+                  onRated={refetchRatings}
+                />
+              ))}
+            </div>
+            {hasMore && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(count => count + PAGE_SIZE)}
+                className="app-secondary-action w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-semibold text-gray-100 transition-colors hover:bg-white/10"
+              >
+                더 보기 ({visibleRooms.length}/{filtered.length})
+              </button>
+            )}
+          </>
         )}
       </div>
       <Footer />

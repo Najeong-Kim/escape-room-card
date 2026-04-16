@@ -88,9 +88,19 @@ function score10OrNull(value) {
 
 function difficultyScore10OrNull(value) {
   const text = String(value ?? '')
+  const fraction = text.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)/)
+  if (fraction) {
+    const score = Number(fraction[1])
+    const max = Number(fraction[2])
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      if (max === 10 && score <= 5) return clampScore10(score * 2)
+      return clampScore10((score / max) * 10)
+    }
+  }
+
   const score = score10OrNull(text)
   if (score === null) return null
-  if (text.match(/\/|score%22%3A/)) return score
+  if (text.match(/score%22%3A/)) return score
   return score > 5 ? score : clampScore10(score * 2)
 }
 

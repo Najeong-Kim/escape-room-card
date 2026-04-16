@@ -29,6 +29,7 @@ export interface RoomFilters {
   genre: string | null
   players: number | null
   fearMax: number | null
+  onlyUnlogged: boolean
 }
 
 export interface FilterOption {
@@ -42,9 +43,10 @@ export const INITIAL_FILTERS: RoomFilters = {
   genre: null,
   players: null,
   fearMax: null,
+  onlyUnlogged: false,
 }
 
-export function filterRooms(rooms: Room[], filters: RoomFilters): Room[] {
+export function filterRooms(rooms: Room[], filters: RoomFilters, loggedRoomIds = new Set<number>()): Room[] {
   const theme = filters.themeId ? THEMES.find(t => t.id === filters.themeId) : null
 
   return rooms.filter(room => {
@@ -53,6 +55,7 @@ export function filterRooms(rooms: Room[], filters: RoomFilters): Room[] {
     if (filters.genre && !room.genres.includes(filters.genre)) return false
     if (filters.players !== null && room.max_players < filters.players) return false
     if (filters.fearMax !== null && room.fear_level > filters.fearMax) return false
+    if (filters.onlyUnlogged && loggedRoomIds.has(room.id)) return false
     return true
   })
 }
