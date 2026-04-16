@@ -13,6 +13,7 @@ import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
 import { AppTopActions } from '../AppTopActions'
 import type { Room } from '../../lib/recommend'
+import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -277,7 +278,10 @@ export default function RoomDetail() {
                 <span className="text-lg font-bold" style={{ color: ratingDef.color }}>
                   {formatScore(communityRating.score10)}/10
                 </span>
-                <span className="text-sm text-gray-500">{ratingDef.label} · {communityRating.count}명</span>
+                <span className="text-sm text-gray-500">
+                  {ratingDef.label}
+                  {SHOW_COMMUNITY_RATING_COUNTS && ` · ${communityRating.count}명`}
+                </span>
               </div>
             ) : (
               <p className="text-sm text-gray-500">아직 유저 평가가 없습니다.</p>
@@ -305,9 +309,11 @@ export default function RoomDetail() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">탈출 성공률</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {escapeStats.clearedCount}/{escapeStats.totalCount}명 성공
-                  </p>
+                  {SHOW_COMMUNITY_RATING_COUNTS && (
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {escapeStats.clearedCount}/{escapeStats.totalCount}명 성공
+                    </p>
+                  )}
                 </div>
               </div>
               {(escapeStats.avgHintsCleared !== null || escapeStats.avgRemainingMinutes !== null) && (
@@ -359,7 +365,9 @@ export default function RoomDetail() {
                     {community ? (
                       <p className="text-sm text-gray-200 mt-1">
                         유저 {formatScore(community.score10)}/10
-                        <span className="text-gray-600"> · {community.count}명</span>
+                        {SHOW_COMMUNITY_RATING_COUNTS && (
+                          <span className="text-gray-600"> · {community.count}명</span>
+                        )}
                       </p>
                     ) : (
                       <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>

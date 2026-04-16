@@ -12,6 +12,7 @@ import {
   fetchSimilarProfileFavoriteThemes,
   type SimilarProfileFavoriteTheme,
 } from '../../lib/userCardProfile'
+import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 
 interface Props {
   profile: QuizProfile
@@ -346,7 +347,10 @@ function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteThe
                 </div>
               </div>
               <p className="text-gray-500 text-xs mt-2">
-                {theme.location} · {theme.liked_count}명이 길 이상으로 평가했어요
+                {theme.location}
+                {SHOW_COMMUNITY_RATING_COUNTS
+                  ? ` · ${theme.liked_count}명이 길 이상으로 평가했어요`
+                  : ' · 비슷한 취향이 좋아한 테마예요'}
               </p>
               {theme.genre_labels.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">

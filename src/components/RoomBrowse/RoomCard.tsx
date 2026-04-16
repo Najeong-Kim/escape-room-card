@@ -8,6 +8,7 @@ import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
 import { predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -162,7 +163,9 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
                 <span className="text-xs font-medium" style={{ color: ratingDef.color }}>
                   {ratingDef.label}
                 </span>
-                <span className="text-xs text-gray-600">{communityRating.count}명</span>
+                {SHOW_COMMUNITY_RATING_COUNTS && (
+                  <span className="text-xs text-gray-600">{communityRating.count}명</span>
+                )}
               </div>
             ) : (
               <span className="text-xs text-gray-600 mt-1 block">평가 없음</span>
