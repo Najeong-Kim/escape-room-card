@@ -400,6 +400,16 @@ export function CafeApprovalList() {
                       </>
                     ) : (
                       <>
+                        {bestCandidate && verification && (
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            disabled={processingId === cafe.id}
+                            onClick={() => applyNaverCandidate(cafe, verification)}
+                          >
+                            후보 적용
+                          </Button>
+                        )}
                         <Button variant="contained" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'active')}>승인</Button>
                         <Button color="error" disabled={processingId === cafe.id} onClick={() => reviewCafe(cafe, 'rejected')}>거절</Button>
                         <Button color="warning" disabled={processingId === cafe.id} onClick={() => markCafeClosed(cafe)}>폐점</Button>
@@ -418,15 +428,6 @@ export function CafeApprovalList() {
                           {bestCandidate?.title ?? '검색 결과 없음'}
                         </h3>
                       </div>
-                      {bestCandidate && (
-                        <Button
-                          variant="contained"
-                          disabled={processingId === cafe.id}
-                          onClick={() => applyNaverCandidate(cafe, verification)}
-                        >
-                          후보 적용
-                        </Button>
-                      )}
                     </div>
                     {bestCandidate ? (
                       <dl className="approval-detail-list">
@@ -458,6 +459,14 @@ export function CafeApprovalList() {
                     ) : (
                       <p style={{ ...mutedStyle, margin: 0 }}>네이버 Local 검색 결과가 없습니다. 폐점, 이름 변경, 오타 가능성이 있습니다.</p>
                     )}
+                  </div>
+                )}
+
+                {!isEditing && !verification && (
+                  <div style={candidateBoxStyle}>
+                    <p style={{ ...mutedStyle, margin: 0 }}>
+                      네이버 후보 정보가 없습니다. 새로고침 후에도 계속 없으면 네이버 검증 스크립트를 다시 실행해야 합니다.
+                    </p>
                   </div>
                 )}
 
