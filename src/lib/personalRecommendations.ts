@@ -2,7 +2,7 @@ import type { CommunityMetricStats, CommunityRating, MetricKey } from './communi
 import type { Room } from './recommend'
 import type { RoomLog } from './roomLog'
 import type { PathRating } from './ratings'
-import { getRatingDef } from './ratings'
+import { getRatingDef, pathRatingToScore10, score10ToPathRating } from './ratings'
 
 const METRICS: MetricKey[] = ['difficulty', 'fear', 'activity', 'story', 'interior', 'aging']
 
@@ -25,12 +25,6 @@ export interface PersonalRecommendationModel {
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value))
-}
-
-function pathRatingToScore10(rating: RoomLog['rating']) {
-  if (rating === null || rating === undefined) return null
-  if (rating === 0) return 1
-  return rating * 2
 }
 
 function formatScore(score: number) {
@@ -180,7 +174,7 @@ export function predictionLabel(prediction: PersonalPrediction) {
 }
 
 export function predictionPathRating(prediction: PersonalPrediction): PathRating {
-  return Math.max(0, Math.min(5, Math.round(prediction.score10 / 2))) as PathRating
+  return score10ToPathRating(prediction.score10) ?? 0
 }
 
 export function predictionPathLabel(prediction: PersonalPrediction) {

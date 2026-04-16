@@ -82,6 +82,24 @@ function difficultyScore10OrNull(value) {
   return score > 5 ? score : clampScore10(score * 2)
 }
 
+function fearScore10OrNull(value) {
+  const text = String(value ?? '')
+  const fraction = text.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)/)
+  if (fraction) {
+    const score = Number(fraction[1])
+    const max = Number(fraction[2])
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      if (max === 10 && score <= 5) return clampScore10(score * 2)
+      return clampScore10((score / max) * 10)
+    }
+  }
+
+  const score = score10OrNull(text)
+  if (score === null) return null
+  if (text.match(/score%22%3A/)) return score
+  return score > 5 ? score : clampScore10(score * 2)
+}
+
 function pricePerPersonForTwo(prices) {
   if (!prices.length) return null
   return prices.find(price => price.peopleCount === 2)?.pricePerPerson ?? prices[0].pricePerPerson
@@ -381,7 +399,7 @@ function addTheme(cafesByKey, cafeInput, themeInput, sourceName) {
     difficulty_label: themeInput.difficulty_label ?? null,
     fear_label: themeInput.fear_label ?? null,
     difficulty_score: difficultyScore10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label),
-    fear_score: score10OrNull(themeInput.fear_score ?? themeInput.fear_label),
+    fear_score: fearScore10OrNull(themeInput.fear_score ?? themeInput.fear_label),
     activity_label: themeInput.activity_label ?? null,
     activity_score: score10OrNull(themeInput.activity_score ?? themeInput.activity_label),
     story_label: themeInput.story_label ?? null,
@@ -439,7 +457,7 @@ function enrichTheme(cafesByKey, target, cafeInput, themeInput, sourceName, opti
       writePresent(theme, 'difficulty_label', themeInput.difficulty_label, { overwrite }),
       writePresent(theme, 'difficulty_score', difficultyScore10OrNull(themeInput.difficulty_score ?? themeInput.difficulty_label), { overwrite }),
       writePresent(theme, 'fear_label', themeInput.fear_label, { overwrite }),
-      writePresent(theme, 'fear_score', score10OrNull(themeInput.fear_score ?? themeInput.fear_label), { overwrite }),
+      writePresent(theme, 'fear_score', fearScore10OrNull(themeInput.fear_score ?? themeInput.fear_label), { overwrite }),
       writePresent(theme, 'activity_label', themeInput.activity_label, { overwrite }),
       writePresent(theme, 'activity_score', score10OrNull(themeInput.activity_score ?? themeInput.activity_label), { overwrite }),
       writePresent(theme, 'story_label', themeInput.story_label, { overwrite }),
@@ -621,7 +639,7 @@ async function main() {
       difficulty_label: detail.difficulty_label,
       fear_label: detail.fear_label,
       difficulty_score: difficultyScore10OrNull(detail.difficulty_label),
-      fear_score: score10OrNull(detail.fear_label),
+      fear_score: fearScore10OrNull(detail.fear_label),
     }, 'ㅂㅌㅊ 전체 테마')
     matched.push({ target, crawled_name: card.name, cafe: card.cafe_name, source_url: card.detail_url })
   }

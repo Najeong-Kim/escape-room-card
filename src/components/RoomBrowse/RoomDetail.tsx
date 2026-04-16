@@ -3,8 +3,7 @@ import type { CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchAllCommunityEscapeStats, fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
-import { getRatingDef, RatingIcon } from '../../lib/ratings'
-import type { PathRating } from '../../lib/ratings'
+import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { useRooms } from '../../lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
@@ -138,7 +137,7 @@ export default function RoomDetail() {
   }, [roomId])
 
   const ratingLevel = communityRating
-    ? (Math.round(communityRating.score10 / 2) as PathRating)
+    ? score10ToPathRating(communityRating.score10)
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
   const personalModel = useMemo(

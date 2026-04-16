@@ -17,6 +17,30 @@ export const PATH_RATINGS: PathRatingDef[] = [
   { value: 5, label: '인생테마', color: '#FFD700', bg: '#2a2200', border: '#FFC107' },
 ]
 
+export const PATH_RATING_SCORE10: Record<PathRating, number> = {
+  0: 3,
+  1: 5,
+  2: 6.3,
+  3: 7.4,
+  4: 8.6,
+  5: 9.7,
+}
+
+export function pathRatingToScore10(rating: PathRating | null | undefined) {
+  if (rating === null || rating === undefined) return null
+  return PATH_RATING_SCORE10[rating] ?? null
+}
+
+export function score10ToPathRating(score10: number | null | undefined): PathRating | null {
+  if (score10 === null || score10 === undefined || !Number.isFinite(score10)) return null
+  if (score10 < 4) return 0
+  if (score10 < 5.7) return 1
+  if (score10 < 6.9) return 2
+  if (score10 < 8) return 3
+  if (score10 < 9.2) return 4
+  return 5
+}
+
 export function getRatingDef(rating: PathRating | null): PathRatingDef | null {
   if (rating === null || rating === undefined) return null
   return PATH_RATINGS[rating] ?? null

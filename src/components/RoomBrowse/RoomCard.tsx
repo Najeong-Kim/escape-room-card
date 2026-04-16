@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom'
 import type { Room } from '../../lib/recommend'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { LogModal } from '../RoomLog/LogModal'
-import { getRatingDef, RatingIcon } from '../../lib/ratings'
-import type { PathRating } from '../../lib/ratings'
+import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
 import { predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
@@ -105,9 +104,8 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
   const [logs] = useRoomLogs()
   const logged = logs.some(log => log.room_id === room.id)
 
-  // 커뮤니티 평점을 PathRating 레벨로 변환 (소수 → 반올림)
   const ratingLevel = communityRating
-    ? (Math.round(communityRating.score10 / 2) as PathRating)
+    ? score10ToPathRating(communityRating.score10)
     : null
   const ratingDef = ratingLevel !== null ? getRatingDef(ratingLevel) : null
   const difficultyRawScore =

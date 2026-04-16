@@ -104,6 +104,24 @@ function difficultyScore10OrNull(value) {
   return score > 5 ? score : clampScore10(score * 2)
 }
 
+function fearScore10OrNull(value) {
+  const text = String(value ?? '')
+  const fraction = text.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)/)
+  if (fraction) {
+    const score = Number(fraction[1])
+    const max = Number(fraction[2])
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      if (max === 10 && score <= 5) return clampScore10(score * 2)
+      return clampScore10((score / max) * 10)
+    }
+  }
+
+  const score = score10OrNull(text)
+  if (score === null) return null
+  if (text.match(/score%22%3A/)) return score
+  return score > 5 ? score : clampScore10(score * 2)
+}
+
 function splitCafeName(cafeName) {
   const normalized = decodeHtml(cafeName)
   const branchMatch = normalized.match(/(.+?)\s+([^ ]*점)$/)
@@ -190,7 +208,7 @@ function parseDetail(html) {
     difficulty_label: scores['난이도'] ?? null,
     fear_label: scores['공포도'] ?? null,
     difficulty_score: difficultyScore10OrNull(scores['난이도']),
-    fear_score: score10OrNull(scores['공포도']),
+    fear_score: fearScore10OrNull(scores['공포도']),
   }
 }
 
