@@ -11,7 +11,7 @@ import {
 } from './lib/catalog-import-safety.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
-const SEED_PATH = resolve(ROOT, 'data/gangnam-gu-themes.seed.json')
+const SEED_PATH = resolve(ROOT, 'data/seoul-themes.seed.json')
 const ENV_PATH = resolve(ROOT, '.env.local')
 
 function parseEnv(content) {
@@ -39,7 +39,7 @@ function genreCodesForLabels(labels = []) {
     if (label.includes('코믹') || label.includes('개그')) codes.add('Comic')
     if (label.includes('판타지') || label.includes('모험') || label.includes('어드벤처')) codes.add('FantasyAdventure')
     if (label.includes('범죄') || label.includes('살인') || label.includes('잠입')) codes.add('Crime')
-    if (label.includes('sf') || label.includes('SF')) codes.add('SF')
+    if (normalized.includes('sf') || label.includes('SF')) codes.add('SF')
   }
 
   return [...codes]
@@ -56,45 +56,42 @@ async function main() {
 
   const seed = JSON.parse(await readFile(SEED_PATH, 'utf8'))
   const supabase = createClient(supabaseUrl, serviceKey)
-  const { data: areas, error: areasError } = await supabase
-    .from('areas')
-    .select('id, name')
+
+  const { data: areas, error: areasError } = await supabase.from('areas').select('id,name')
   if (areasError) throw areasError
 
-  const { data: genres, error: genresError } = await supabase
-    .from('genres')
-    .select('id, code')
+  const { data: genres, error: genresError } = await supabase.from('genres').select('id,code')
   if (genresError) throw genresError
 
   const areaIdByName = new Map((areas ?? []).map(area => [area.name, area.id]))
   const genreIdByCode = new Map((genres ?? []).map(genre => [genre.code, genre.id]))
   const cafeIndex = await loadCafeIndex(supabase)
 
-  let cafeInsertCount = 0
-  let cafeMatchedCount = 0
-  let themeInsertCount = 0
-  let themeCount = 0
-  let suggestionCount = 0
-  let unchangedCount = 0
-  let themeGenreCount = 0
-  let sourceCount = 0
+  const results = {
+    cafesInserted: 0,
+    cafesMatchedExisting: 0,
+    themesInserted: 0,
+    themeSuggestions: 0,
+    themesUnchanged: 0,
+    themeGenres: 0,
+    sources: 0,
+  }
 
-  for (const cafe of seed.cafes) {
+  for (const cafe of seed.cafes ?? []) {
     const { themes, ...cafeInput } = cafe
     const areaId = areaIdByName.get(cafe.area_label) ?? areaIdByName.get('기타') ?? null
     let savedCafe = findMatchingCafe(cafeIndex, cafeInput)
     if (savedCafe) {
-      cafeMatchedCount += 1
+      results.cafesMatchedExisting += 1
     } else {
       savedCafe = await insertCafeOnly(supabase, cafeInput, areaId)
       cafeIndex.push(savedCafe)
-      cafeInsertCount += 1
+      results.cafesInserted += 1
     }
 
-    for (const theme of themes) {
-      const { source_name: sourceName, ...themeInput } = theme
-      const sourceUrl = theme.source_url ?? cafe.source_url ?? 'local://data/gangnam-gu-themes.seed.json'
-
+    for (const theme of themes ?? []) {
+      const { source_name: sourceName, genre_codes: genreCodes, ...themeInput } = theme
+      const sourceUrl = theme.source_url ?? cafe.source_url ?? 'local://data/seoul-themes.seed.json'
       const patch = omitUndefined({
         ...themeInput,
         cafe_id: savedCafe.id,
@@ -103,38 +100,34 @@ async function main() {
 
       const existingTheme = findMatchingTheme(savedCafe.themes ?? [], { ...themeInput, source_url: sourceUrl })
       const result = await insertOrSuggestTheme(supabase, existingTheme, patch, {
-        sourceName: sourceName ?? seed.source_note ?? 'manual seed',
+        sourceName: sourceName ?? seed.source_note ?? '서울 전체 테마 크롤링',
         sourceUrl,
       })
       const savedTheme = result.theme
       if (result.action === 'inserted') {
         savedCafe.themes.push({ ...savedTheme, source_urls: [sourceUrl].filter(Boolean) })
-        themeInsertCount += 1
+        results.themesInserted += 1
       }
-      if (result.action === 'suggested' || result.action === 'suggested_existing') suggestionCount += 1
-      if (result.action === 'unchanged') unchangedCount += 1
+      if (result.action === 'suggested' || result.action === 'suggested_existing') results.themeSuggestions += 1
+      if (result.action === 'unchanged') results.themesUnchanged += 1
 
-      themeCount += 1
-
-      const genreRows = genreCodesForLabels(theme.genre_labels)
+      const genreRows = (genreCodes?.length ? genreCodes : genreCodesForLabels(theme.genre_labels))
         .map(code => genreIdByCode.get(code))
         .filter(Boolean)
         .map(genreId => ({ theme_id: savedTheme.id, genre_id: genreId }))
 
       if (result.action === 'inserted' && genreRows.length) {
         await supabase.from('theme_genres').delete().eq('theme_id', savedTheme.id)
-        const { error: themeGenreError } = await supabase
-          .from('theme_genres')
-          .insert(genreRows)
+        const { error: themeGenreError } = await supabase.from('theme_genres').insert(genreRows)
         if (themeGenreError) throw themeGenreError
-        themeGenreCount += genreRows.length
+        results.themeGenres += genreRows.length
       }
 
       const { error: sourceError } = await supabase
         .from('theme_sources')
         .upsert({
           theme_id: savedTheme.id,
-          source_name: sourceName ?? seed.source_note ?? 'manual seed',
+          source_name: sourceName ?? seed.source_note ?? '서울 전체 테마 크롤링',
           source_url: sourceUrl,
           raw_payload: {
             region: seed.region,
@@ -144,11 +137,11 @@ async function main() {
         }, { onConflict: 'theme_id,source_url' })
 
       if (sourceError) throw sourceError
-      sourceCount += 1
+      results.sources += 1
     }
   }
 
-  console.log(`Imported ${cafeInsertCount} new cafes (${cafeMatchedCount} matched existing), processed ${themeCount} themes (${themeInsertCount} inserts, ${suggestionCount} suggestions, ${unchangedCount} unchanged), ${themeGenreCount} theme genres, ${sourceCount} source rows.`)
+  console.log(results)
 }
 
 main().catch(error => {

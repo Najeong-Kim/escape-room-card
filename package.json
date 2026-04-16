@@ -12,6 +12,8 @@
     "test": "vitest run",
     "crawl:gangnam-themes": "node scripts/crawl-gangnam-themes.mjs",
     "import:gangnam-themes": "node scripts/import-gangnam-themes.mjs",
+    "crawl:seoul-themes": "node scripts/crawl-seoul-themes.mjs",
+    "import:seoul-themes": "node scripts/import-seoul-themes.mjs",
     "import:theme-posters": "node scripts/import-theme-posters.mjs",
     "collect:theme-reviews": "node scripts/collect-theme-reviews.mjs",
     "test:watch": "vitest"
