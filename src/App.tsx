@@ -14,10 +14,12 @@ import { saveUserCardProfile } from './lib/userCardProfile'
 import { useRooms } from './lib/useRooms'
 import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
 import { RatingIcon } from './lib/ratings'
+import { usePageMeta } from './lib/seo'
 
 type HomeMode = 'home' | 'quiz' | 'result'
 
 export default function App() {
+  usePageMeta({})
   const [savedProfile, setSavedProfile] = useState<QuizProfile | null>(() => loadSavedCard())
   const [logs] = useRoomLogs()
   const [activeProfile, setActiveProfile] = useState<QuizProfile | null>(null)

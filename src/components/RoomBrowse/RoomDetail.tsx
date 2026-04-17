@@ -14,6 +14,7 @@ import { LogModal } from '../RoomLog/LogModal'
 import { AppTopActions } from '../AppTopActions'
 import type { Room } from '../../lib/recommend'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
+import { usePageMeta } from '../../lib/seo'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -181,6 +182,15 @@ export default function RoomDetail() {
     counts[review.source_type] = (counts[review.source_type] ?? 0) + 1
     return counts
   }, {})
+
+  usePageMeta({
+    title: room ? `${room.name} - ${room.brand}` : '방 상세',
+    description: room
+      ? `${room.location} ${room.brand} ${room.name}. ${room.duration_minutes}분, ${room.min_players}-${room.max_players}명, ${room.price_per_person > 0 ? `${room.price_per_person.toLocaleString()}원` : '가격 미확인'}`
+      : '방탈출 테마 상세 정보를 확인해 보세요.',
+    image: room?.image_url ?? '/og-image.png',
+    url: Number.isFinite(roomId) ? `/rooms/${roomId}` : '/rooms',
+  })
 
   if (!Number.isFinite(roomId)) {
     return (

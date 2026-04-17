@@ -17,6 +17,7 @@
     "import:theme-posters": "node scripts/import-theme-posters.mjs",
     "collect:theme-reviews": "node scripts/collect-theme-reviews.mjs",
     "verify:cafe-naver-local": "node scripts/verify-cafe-naver-local.mjs",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {
