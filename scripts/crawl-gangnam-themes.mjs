@@ -323,7 +323,18 @@ function parsePlayTheWorldTheme(theme, sourceUrl, target) {
   }
 }
 
-function parseKeyescapeTheme(theme, sourceUrl, target) {
+function keyescapeThemeBookingUrl(sourceUrl, listItem) {
+  const url = new URL(sourceUrl)
+  const themeNum = listItem.theme_num ?? listItem.themeNum ?? listItem.theme_no ?? listItem.themeNo
+  const themeInfoNum = listItem.info_num ?? listItem.infoNum ?? listItem.theme_info_num ?? listItem.themeInfoNum
+
+  if (themeNum != null && themeNum !== '') url.searchParams.set('theme_num', String(themeNum))
+  if (themeInfoNum != null && themeInfoNum !== '') url.searchParams.set('theme_info_num', String(themeInfoNum))
+
+  return url.toString()
+}
+
+function parseKeyescapeTheme(theme, sourceUrl, target, bookingUrl = sourceUrl) {
   const parsedMemo = parseThemeDescription(theme.memo ?? '')
 
   return {
@@ -336,7 +347,7 @@ function parseKeyescapeTheme(theme, sourceUrl, target) {
     price_text: parsedMemo.price_text,
     price_per_person: parsedMemo.price_per_person,
     image_url: theme.image_url ?? null,
-    booking_url: sourceUrl,
+    booking_url: bookingUrl,
     source_url: sourceUrl,
     difficulty_label: theme.level ? String(theme.level) : null,
     difficulty_score: difficultyScore10OrNull(theme.level),
@@ -577,7 +588,12 @@ async function parseOfficialCandidate(candidate) {
         area_label: candidate.cafe?.area_label ?? areaFromAddress(data.zizum?.addr ?? '', '강남'),
         district: candidate.cafe?.district ?? districtFromAddress(data.zizum?.addr ?? '', '강남'),
       },
-      theme: parseKeyescapeTheme(themeJson.data, candidate.source_url, candidate.target),
+      theme: parseKeyescapeTheme(
+        themeJson.data,
+        candidate.source_url,
+        candidate.target,
+        keyescapeThemeBookingUrl(candidate.source_url, listItem),
+      ),
     }
   }
 
