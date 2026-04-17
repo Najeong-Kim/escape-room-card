@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 
-const SITE_URL = (process.env.SITE_URL || process.env.VITE_PUBLIC_SITE_URL || 'https://escape-room-card.vercel.app').replace(/\/$/, '')
+const SITE_URL = (process.env.SITE_URL || process.env.VITE_PUBLIC_SITE_URL || 'https://bang-tang.com').replace(/\/$/, '')
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY
 
