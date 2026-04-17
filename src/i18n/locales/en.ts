@@ -63,7 +63,7 @@ const en = {
   opt_Observer: 'Observer',
 
   // Result card UI
-  result_subtitle: 'Your escape room card',
+  result_subtitle: 'Your Bangtang card',
   tap_to_flip: 'Tap card to flip',
   try_again: 'Try again',
   save_card: '💾 Save Card',
@@ -75,7 +75,7 @@ const en = {
   label_play_style: 'Play style',
   label_experience: 'Experience',
   rooms_count: '{{count}} rooms',
-  watermark: '🔒 Escape Room Card',
+  watermark: '🔒 Bangtang',
 
   // Recommendations
   rec_title: 'Top 3 Picks For You',

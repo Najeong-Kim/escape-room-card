@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
-const DEFAULT_TITLE = '방탈출 카드'
-const DEFAULT_DESCRIPTION = '방탈출 테마를 한눈에 탐색하고, 내 기록을 남겨보세요.'
+const DEFAULT_TITLE = '방탕'
+const DEFAULT_DESCRIPTION = '방탈출로 탕진하기. 내 취향 카드를 만들고, 플레이 기록을 남기고, 다음 테마를 찾아보세요.'
 const DEFAULT_IMAGE = '/og-image.png'
 
 function absoluteUrl(path: string) {
@@ -28,7 +28,7 @@ export function usePageMeta({
   url?: string
 }) {
   useEffect(() => {
-    const pageTitle = title === DEFAULT_TITLE ? title : `${title} | 방탈출 카드`
+    const pageTitle = title === DEFAULT_TITLE ? title : `${title} | 방탕`
     const pageUrl = absoluteUrl(url ?? window.location.pathname)
     const imageUrl = absoluteUrl(image)
 

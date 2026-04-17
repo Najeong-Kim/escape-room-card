@@ -273,12 +273,12 @@ function ShareButton({
 }) {
   async function handleShare() {
     if (!shareBlob) return
-    const file = new File([shareBlob], `${nickname}-escape-room-card.png`, { type: 'image/png' })
+    const file = new File([shareBlob], `${nickname}-bangtang-card.png`, { type: 'image/png' })
 
     // iOS: use Web Share API
     if (navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: 'My Escape Room Card' })
+        await navigator.share({ files: [file], title: '방탕' })
         return
       } catch {
         // User cancelled or share failed — fall through to download
@@ -289,7 +289,7 @@ function ShareButton({
     const url = URL.createObjectURL(shareBlob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${nickname}-escape-room-card.png`
+    a.download = `${nickname}-bangtang-card.png`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -547,7 +547,7 @@ async function composeShareCanvas(
   // Watermark
   ctx.fillStyle = 'rgba(255,255,255,0.15)'
   ctx.font = '24px system-ui, sans-serif'
-  ctx.fillText('🔒 Escape Room Card', SIZE / 2, SIZE - 28)
+  ctx.fillText('🔒 방탕', SIZE / 2, SIZE - 28)
 
   return new Promise(resolve => {
     canvas.toBlob(blob => resolve(blob), 'image/png', 0.92)

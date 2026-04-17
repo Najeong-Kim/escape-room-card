@@ -9,7 +9,7 @@ const ko = {
 
   // Nickname step
   nickname_title: '닉네임이 뭔가요?',
-  nickname_subtitle: '방탈출 카드에 표시됩니다',
+  nickname_subtitle: '방탕 카드에 표시됩니다',
   nickname_placeholder: '닉네임을 입력하세요',
 
   // Questions
@@ -63,7 +63,7 @@ const ko = {
   opt_Observer: '옵저버',
 
   // Result card UI
-  result_subtitle: '나의 방탈출 카드',
+  result_subtitle: '나의 방탕 카드',
   tap_to_flip: '탭해서 뒤집기',
   try_again: '다시 하기',
   save_card: '💾 카드 저장',
@@ -75,7 +75,7 @@ const ko = {
   label_play_style: '플레이 스타일',
   label_experience: '경험',
   rooms_count: '{{count}}번',
-  watermark: '🔒 방탈출 카드',
+  watermark: '🔒 방탕',
 
   // Recommendations
   rec_title: '추천 방 3개',

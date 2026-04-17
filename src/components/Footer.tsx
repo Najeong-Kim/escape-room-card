@@ -6,7 +6,7 @@ export function Footer() {
         <span aria-hidden="true">·</span>
         <a href="/terms" className="hover:text-gray-400 transition-colors">이용 안내</a>
       </div>
-      <p>© 2026 방탈출 카드. All rights reserved.</p>
+      <p>© 2026 방탕. All rights reserved.</p>
     </footer>
   )
 }

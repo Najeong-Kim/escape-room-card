@@ -14,8 +14,8 @@ export function LegalPage({ kind }: { kind: LegalPageKind }) {
   const isPrivacy = kind === 'privacy'
   const title = isPrivacy ? '개인정보처리방침' : '이용 안내'
   const description = isPrivacy
-    ? '방탈출 카드의 개인정보 처리와 기록 저장 방식을 안내합니다.'
-    : '방탈출 카드의 정보 제공 범위, 외부 링크, 제보와 삭제 요청 방법을 안내합니다.'
+    ? '방탕의 개인정보 처리와 기록 저장 방식을 안내합니다.'
+    : '방탕의 정보 제공 범위, 외부 링크, 제보와 삭제 요청 방법을 안내합니다.'
 
   usePageMeta({ title, description, url: isPrivacy ? '/privacy' : '/terms' })
 
@@ -53,7 +53,7 @@ function PrivacyContent() {
       <section className={SECTION_CLASS}>
         <h3 className="font-semibold">수집하는 정보</h3>
         <p className="text-sm text-gray-400 leading-relaxed">
-          방탈출 카드는 서비스 이용에 필요한 범위에서 닉네임, 방탈출 카드 결과, 플레이 기록, 테마 평가, 제보 내용을 저장할 수 있습니다.
+          방탕은 서비스 이용에 필요한 범위에서 닉네임, 방탕 카드 결과, 플레이 기록, 테마 평가, 제보 내용을 저장할 수 있습니다.
           로그인하지 않은 상태의 카드와 기록은 브라우저 localStorage에 저장됩니다.
         </p>
       </section>
@@ -61,7 +61,7 @@ function PrivacyContent() {
       <section className={SECTION_CLASS}>
         <h3 className="font-semibold">로그인 시 저장되는 정보</h3>
         <p className="text-sm text-gray-400 leading-relaxed">
-          로그인하면 방탈출 카드 결과와 플레이 기록을 Supabase DB에 동기화할 수 있습니다. 저장 항목에는 테마명, 플레이 날짜, 성공 여부,
+          로그인하면 방탕 카드 결과와 플레이 기록을 Supabase DB에 동기화할 수 있습니다. 저장 항목에는 테마명, 플레이 날짜, 성공 여부,
           길 평가, 세부 평가, 한마디가 포함될 수 있습니다.
         </p>
       </section>
@@ -99,7 +99,7 @@ function TermsContent() {
       <section className={SECTION_CLASS}>
         <h3 className="font-semibold">정보 제공 범위</h3>
         <p className="text-sm text-gray-400 leading-relaxed">
-          방탈출 카드는 테마 탐색, 기록, 추천을 돕기 위한 서비스입니다. 운영 여부, 가격, 예약 가능 시간, 인원 제한은 변경될 수 있으니
+          방탕은 방탈출로 탕진하기 위한 테마 탐색, 기록, 추천 서비스입니다. 운영 여부, 가격, 예약 가능 시간, 인원 제한은 변경될 수 있으니
           방문 전 공식 홈페이지 또는 예약 페이지에서 다시 확인해 주세요.
         </p>
       </section>

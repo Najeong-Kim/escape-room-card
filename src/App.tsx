@@ -163,13 +163,13 @@ function SavedCardHome({
           <div className="relative z-10 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-2">
-                내 방탈출 카드
+                방탕
               </p>
               <h1 className="text-white text-3xl font-black leading-tight break-keep">
                 {profile.nickname}님은<br />{tagline}
               </h1>
               <p className="text-gray-300 text-sm mt-3 leading-relaxed">
-                {fearLabel} 성향에 {styleLabel} 플레이를 좋아해요.
+                방탈출로 탕진하기 좋은 {fearLabel} · {styleLabel} 취향이에요.
               </p>
             </div>
             <div className="w-28 h-28 flex-shrink-0 rounded-2xl bg-white/8 border border-white/10 flex items-end justify-center overflow-hidden">
