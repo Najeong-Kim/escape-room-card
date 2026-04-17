@@ -17,6 +17,7 @@ import { buildPersonalRecommendationModel, predictionConfidenceLabel, prediction
 import { getRatingDef, RatingIcon, type PathRating } from './lib/ratings'
 import { usePageMeta } from './lib/seo'
 import { getCharacterImage } from './components/ResultCard/characterAssets'
+import { BrandLogo } from './components/BrandLogo'
 
 type HomeMode = 'home' | 'quiz' | 'result'
 
@@ -162,9 +163,7 @@ function SavedCardHome({
         <div className="relative px-5 pt-6 pb-5 bg-[linear-gradient(135deg,rgba(20,184,166,0.22),rgba(124,58,237,0.16),rgba(245,158,11,0.14))]">
           <div className="relative z-10 flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-2">
-                방탕
-              </p>
+              <BrandLogo className="mb-2 h-9 w-9 drop-shadow-[0_0_18px_rgba(20,184,166,0.38)]" />
               <h1 className="text-white text-3xl font-black leading-tight break-keep">
                 {profile.nickname}님은<br />{tagline}
               </h1>

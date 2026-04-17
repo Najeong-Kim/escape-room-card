@@ -13,6 +13,7 @@ import {
   type SimilarProfileFavoriteTheme,
 } from '../../lib/userCardProfile'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
+import { BrandLogo } from '../BrandLogo'
 
 interface Props {
   profile: QuizProfile
@@ -60,6 +61,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
       className="flex flex-col items-center min-h-dvh max-w-md mx-auto px-6 py-8 gap-6"
     >
       <div className="text-center">
+        <BrandLogo className="mx-auto mb-2 h-10 w-10 drop-shadow-[0_0_18px_rgba(20,184,166,0.38)]" />
         <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">{t('result_subtitle')}</p>
         <h1 className="text-3xl font-black text-white">{tagline}</h1>
       </div>
@@ -238,7 +240,7 @@ function CardBack({
       </div>
 
       <p className="text-center text-gray-700 text-xs mt-auto">
-        {t('watermark')}
+        <BrandLogo className="mx-auto h-7 w-7 opacity-45" />
       </p>
     </div>
   )
@@ -478,6 +480,7 @@ async function composeShareCanvas(
   ctx.stroke()
 
   const animalImage = await loadCanvasImage(getCharacterImage(profile.characterId, profile.playCount))
+  const brandLogo = await loadCanvasImage('/brand-logo.png')
 
   // Draw character as a circle with object-cover (aspect ratio preserved)
   const CIRCLE_CX = SIZE / 2
@@ -545,9 +548,9 @@ async function composeShareCanvas(
   )
 
   // Watermark
-  ctx.fillStyle = 'rgba(255,255,255,0.15)'
-  ctx.font = '24px system-ui, sans-serif'
-  ctx.fillText('🔒 방탕', SIZE / 2, SIZE - 28)
+  ctx.globalAlpha = 0.22
+  ctx.drawImage(brandLogo, SIZE / 2 - 26, SIZE - 68, 52, 52)
+  ctx.globalAlpha = 1
 
   return new Promise(resolve => {
     canvas.toBlob(blob => resolve(blob), 'image/png', 0.92)
