@@ -504,6 +504,7 @@ export default function RoomDetail() {
                     .map(([type, count]) => `${REVIEW_SOURCE_LABEL[type as keyof typeof REVIEW_SOURCE_LABEL] ?? '기타'} ${count}`)
                     .join(' · ')}
                 </p>
+                <p className="text-xs text-gray-600 mt-1">외부 후기는 원문 출처로 이동합니다.</p>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {visibleReviewLinks.map(review => (
