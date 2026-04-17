@@ -135,10 +135,10 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           src={room.image_url}
           alt={room.name}
           className="w-full h-36 object-cover"
-          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
         />
       ) : (
-        <div className="w-full h-24 bg-gradient-to-br from-violet-900/30 to-[#0a0a0f] flex items-center justify-center">
+        <div className="w-full h-36 bg-gradient-to-br from-violet-900/30 to-[#0a0a0f] flex items-center justify-center">
           <span className="text-3xl opacity-30">🔐</span>
         </div>
       )}
