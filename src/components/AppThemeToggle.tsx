@@ -29,14 +29,42 @@ export function AppThemeToggle({ className = '', floating = true }: { className?
       type="button"
       onClick={() => setTheme(nextTheme)}
       className={[
-        'app-theme-toggle text-xs px-3 py-1.5 rounded-full',
+        'app-theme-toggle app-icon-button rounded-full',
         floating ? 'fixed top-4 right-4 z-50' : '',
         'border transition-colors backdrop-blur-sm',
         className,
       ].join(' ')}
       aria-label={theme === 'dark' ? '라이트 모드로 변경' : '다크 모드로 변경'}
+      title={theme === 'dark' ? '라이트 모드로 변경' : '다크 모드로 변경'}
     >
-      {theme === 'dark' ? '라이트 모드' : '다크 모드'}
+      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
     </button>
+  )
+}
+
+function SunIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  )
+}
+
+function MoonIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+      <path
+        d="M20.2 14.7A7.8 7.8 0 0 1 9.3 3.8 8.5 8.5 0 1 0 20.2 14.7Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
   )
 }

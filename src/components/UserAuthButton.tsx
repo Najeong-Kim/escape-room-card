@@ -7,14 +7,6 @@ import { syncSavedCardProfileToUser } from '../lib/userCardProfile'
 
 type AuthStatus = 'idle' | 'sending' | 'sent' | 'error'
 
-function displayEmail(session: Session | null) {
-  const email = session?.user.email
-  if (!email) return ''
-  const [name, domain] = email.split('@')
-  if (!domain) return email
-  return `${name.slice(0, 10)}@${domain}`
-}
-
 function authRedirectUrl() {
   const configuredUrl = import.meta.env.VITE_AUTH_REDIRECT_URL as string | undefined
   return configuredUrl?.replace(/\/$/, '') || window.location.origin
@@ -84,13 +76,15 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
         type="button"
         onClick={() => setOpen(true)}
         className={[
-          'app-auth-button text-xs px-3 py-1.5 rounded-full',
+          'app-auth-button app-icon-button rounded-full',
           floating ? 'fixed right-4 z-50' : '',
           'border transition-colors backdrop-blur-sm',
           className,
         ].join(' ')}
+        aria-label={session ? '계정 보기' : '로그인'}
+        title={session ? '계정 보기' : '로그인'}
       >
-        {session ? displayEmail(session) : '로그인'}
+        <UserIcon signedIn={Boolean(session)} />
       </button>
 
       {open && (
@@ -168,5 +162,20 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
         </div>
       )}
     </>
+  )
+}
+
+function UserIcon({ signedIn }: { signedIn: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M5 20c.7-3.7 3.2-6 7-6s6.3 2.3 7 6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      {signedIn && <circle cx="18.2" cy="5.8" r="2.2" fill="#22c55e" stroke="currentColor" strokeWidth="1" />}
+    </svg>
   )
 }

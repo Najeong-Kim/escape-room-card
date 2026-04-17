@@ -51,20 +51,26 @@
   border-color: rgb(75 85 99);
 }
 
+.app-icon-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
 .app-top-actions .app-theme-toggle,
 .app-top-actions .app-auth-button {
-  max-width: 8rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: none;
 }
 
 @media (max-width: 480px) {
   .app-top-actions .app-theme-toggle,
   .app-top-actions .app-auth-button {
-    max-width: 5.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
   }
 }
 
