@@ -253,6 +253,7 @@ export function ThemeApprovalList() {
         )
       `)
       .eq('needs_review', true)
+      .in('status', ['active', 'unknown'])
       .order('created_at', { ascending: false })
 
     setLoading(false)
@@ -328,12 +329,21 @@ export function ThemeApprovalList() {
       aging_score: form.aging_score,
     }
 
-    const { error } = await supabase.from('themes').update(payload).eq('id', themeId)
+    const { data: updatedTheme, error } = await supabase
+      .from('themes')
+      .update(payload)
+      .eq('id', themeId)
+      .select('id')
+      .single()
 
     setProcessingId(null)
 
     if (error) {
       notify(`테마 수정에 실패했습니다: ${error.message}`, { type: 'error' })
+      return
+    }
+    if (!updatedTheme) {
+      notify('테마 수정 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
       return
     }
 
@@ -372,18 +382,23 @@ export function ThemeApprovalList() {
 
     setProcessingId(theme.id)
 
-    const { error } = await supabase
-      .from('themes')
-      .update({ status, needs_review: false })
-      .eq('id', theme.id)
+    const { data, error } = await supabase
+      .rpc('review_theme_for_review', { p_theme_id: theme.id, p_status: status })
 
-    setProcessingId(null)
-
-    if (error) {
-      notify(`처리에 실패했습니다: ${error.message}`, { type: 'error' })
+    if (error || !data || data.length === 0) {
+      setProcessingId(null)
+      notify(`처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 테마가 없습니다.'}`, { type: 'error' })
       return
     }
 
+    const reviewed = data[0] as { theme_status?: string; theme_needs_review?: boolean }
+    if (reviewed.theme_status !== status || reviewed.theme_needs_review !== false) {
+      setProcessingId(null)
+      notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
+      return
+    }
+
+    setProcessingId(null)
     setThemes(current => current.filter(item => item.id !== theme.id))
     notify(status === 'active' ? '테마를 승인했습니다.' : '테마를 거절했습니다.', { type: 'success' })
   }
