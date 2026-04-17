@@ -38,13 +38,13 @@ export function NicknameStep({ onAnswer }: Props) {
         autoFocus
         className="w-full max-w-xs bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3
                    text-white text-center text-lg placeholder-gray-600 outline-none
-                   focus:border-violet-500 transition-colors"
+                   focus:border-teal-500 transition-colors"
       />
 
       <button
         onClick={handleSubmit}
         disabled={!value.trim()}
-        className="w-full max-w-xs bg-violet-600 hover:bg-violet-500 disabled:bg-gray-800
+        className="w-full max-w-xs bg-teal-600 hover:bg-teal-500 disabled:bg-gray-800
                    disabled:text-gray-600 text-white font-semibold py-3 rounded-2xl
                    transition-all active:scale-95"
       >

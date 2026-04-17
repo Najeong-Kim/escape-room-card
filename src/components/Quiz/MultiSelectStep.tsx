@@ -55,7 +55,7 @@ export function MultiSelectStep({
                 'w-full text-left px-5 py-4 rounded-2xl border transition-all duration-150',
                 'flex items-center gap-3',
                 isSelected
-                  ? 'bg-violet-900/50 border-violet-500 text-white'
+                  ? 'bg-teal-900/50 border-teal-500 text-white'
                   : isDisabled
                   ? 'bg-gray-900/50 border-gray-800 text-gray-600 cursor-not-allowed'
                   : 'bg-gray-900 border-gray-700 hover:border-gray-500 text-white',
@@ -64,7 +64,7 @@ export function MultiSelectStep({
               {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
               <span className="font-medium flex-1">{t(`opt_${opt.value}`, opt.label)}</span>
               {isSelected && (
-                <span className="text-violet-400 text-sm">✓</span>
+                <span className="text-teal-400 text-sm">✓</span>
               )}
               {isDisabled && (
                 <span className="text-gray-700 text-xs">max</span>
@@ -81,7 +81,7 @@ export function MultiSelectStep({
         className={[
           'w-full font-semibold py-3 rounded-2xl transition-all active:scale-95',
           selected.length > 0
-            ? 'bg-violet-600 hover:bg-violet-500 text-white'
+            ? 'bg-teal-600 hover:bg-teal-500 text-white'
             : 'bg-transparent border border-gray-700 hover:border-gray-500 text-gray-400',
         ].join(' ')}
       >

@@ -4,8 +4,8 @@ import { deepmerge } from '@mui/utils'
 export const darkTheme = deepmerge(defaultTheme, {
   palette: {
     mode: 'dark',
-    primary: { main: '#7c3aed', light: '#a78bfa', dark: '#5b21b6' },
-    secondary: { main: '#a78bfa' },
+    primary: { main: '#14b8a6', light: '#5eead4', dark: '#115e59' },
+    secondary: { main: '#5eead4' },
     background: { default: '#0a0a0f', paper: '#13131a' },
     text: { primary: '#ffffff', secondary: '#9ca3af' },
     divider: '#374151',
@@ -50,9 +50,9 @@ export const darkTheme = deepmerge(defaultTheme, {
       styleOverrides: {
         root: { borderRadius: 8, textTransform: 'none', fontWeight: 600 },
         containedPrimary: {
-          background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-          boxShadow: '0 4px 14px rgba(124, 58, 237, 0.4)',
-          '&:hover': { background: 'linear-gradient(135deg, #6d28d9, #5b21b6)' },
+          background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+          boxShadow: '0 4px 14px rgba(20, 184, 166, 0.4)',
+          '&:hover': { background: 'linear-gradient(135deg, #0d9488, #115e59)' },
         },
       },
     },
@@ -60,14 +60,14 @@ export const darkTheme = deepmerge(defaultTheme, {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7c3aed' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#14b8a6' },
         },
         notchedOutline: { borderColor: '#374151' },
       },
     },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 6, backgroundColor: '#1f1b3a', color: '#a78bfa', border: '1px solid #4c1d95' },
+        root: { borderRadius: 6, backgroundColor: '#0f2f2c', color: '#5eead4', border: '1px solid #134e4a' },
       },
     },
     RaMenuItemLink: {
@@ -75,7 +75,7 @@ export const darkTheme = deepmerge(defaultTheme, {
         root: {
           borderRadius: 8,
           margin: '2px 8px',
-          '&.RaMenuItemLink-active': { backgroundColor: '#2d1b69', color: '#a78bfa' },
+          '&.RaMenuItemLink-active': { backgroundColor: '#134e4a', color: '#5eead4' },
         },
       },
     },
@@ -85,9 +85,9 @@ export const darkTheme = deepmerge(defaultTheme, {
 export const lightTheme = deepmerge(defaultTheme, {
   palette: {
     mode: 'light',
-    primary: { main: '#7c3aed', light: '#a78bfa', dark: '#5b21b6' },
-    secondary: { main: '#6d28d9' },
-    background: { default: '#f5f3ff', paper: '#ffffff' },
+    primary: { main: '#14b8a6', light: '#5eead4', dark: '#115e59' },
+    secondary: { main: '#0d9488' },
+    background: { default: '#f0fdfa', paper: '#ffffff' },
     text: { primary: '#1f2937', secondary: '#6b7280' },
     divider: '#e5e7eb',
   },
@@ -106,7 +106,7 @@ export const lightTheme = deepmerge(defaultTheme, {
     },
     MuiDrawer: {
       styleOverrides: {
-        paper: { backgroundColor: '#faf9ff', borderRight: '1px solid #e5e7eb' },
+        paper: { backgroundColor: '#f8fafc', borderRight: '1px solid #e5e7eb' },
       },
     },
     MuiCard: {
@@ -117,7 +117,7 @@ export const lightTheme = deepmerge(defaultTheme, {
     MuiTableCell: {
       styleOverrides: {
         head: {
-          backgroundColor: '#f9f7ff',
+          backgroundColor: '#f0fdfa',
           color: '#6b7280',
           fontWeight: 600,
           fontSize: '0.75rem',
@@ -128,17 +128,17 @@ export const lightTheme = deepmerge(defaultTheme, {
     },
     MuiTableRow: {
       styleOverrides: {
-        root: { '&:hover': { backgroundColor: '#f5f3ff !important' } },
+        root: { '&:hover': { backgroundColor: '#f0fdfa !important' } },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: { borderRadius: 8, textTransform: 'none', fontWeight: 600 },
         containedPrimary: {
-          background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-          boxShadow: '0 4px 14px rgba(124, 58, 237, 0.3)',
+          background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+          boxShadow: '0 4px 14px rgba(20, 184, 166, 0.3)',
           color: '#ffffff',
-          '&:hover': { background: 'linear-gradient(135deg, #6d28d9, #5b21b6)' },
+          '&:hover': { background: 'linear-gradient(135deg, #0d9488, #115e59)' },
         },
       },
     },
@@ -146,13 +146,13 @@ export const lightTheme = deepmerge(defaultTheme, {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7c3aed' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#14b8a6' },
         },
       },
     },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 6, backgroundColor: '#ede9fe', color: '#6d28d9', border: '1px solid #ddd6fe' },
+        root: { borderRadius: 6, backgroundColor: '#ccfbf1', color: '#0d9488', border: '1px solid #99f6e4' },
       },
     },
     RaMenuItemLink: {
@@ -160,7 +160,7 @@ export const lightTheme = deepmerge(defaultTheme, {
         root: {
           borderRadius: 8,
           margin: '2px 8px',
-          '&.RaMenuItemLink-active': { backgroundColor: '#ede9fe', color: '#7c3aed' },
+          '&.RaMenuItemLink-active': { backgroundColor: '#ccfbf1', color: '#14b8a6' },
         },
       },
     },

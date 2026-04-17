@@ -58,7 +58,7 @@ export default function MyRooms() {
         {total > 0 && (
           <div className="flex gap-3">
             <div className="flex-1 bg-[#13131a] border border-white/8 rounded-2xl p-4 text-center">
-              <p className="text-3xl font-bold text-violet-400">{total}</p>
+              <p className="text-3xl font-bold text-teal-400">{total}</p>
               <p className="text-xs text-gray-500 mt-1">총 플레이</p>
             </div>
             <div className="flex-1 bg-[#13131a] border border-white/8 rounded-2xl p-4 text-center">
@@ -79,7 +79,7 @@ export default function MyRooms() {
             <p className="text-gray-400">아직 기록된 방이 없어요</p>
             <button
               onClick={() => navigate('/rooms')}
-              className="text-sm text-violet-400 border border-violet-500/40 px-4 py-2 rounded-xl hover:bg-violet-900/20 transition-all"
+              className="text-sm text-teal-400 border border-teal-500/40 px-4 py-2 rounded-xl hover:bg-teal-900/20 transition-all"
             >
               방 둘러보기 →
             </button>
@@ -143,7 +143,7 @@ export default function MyRooms() {
                   <>
                     <button
                       onClick={() => setEditingLog(log)}
-                      className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                      className="text-xs text-teal-400 hover:text-teal-300 transition-colors"
                     >
                       수정
                     </button>

@@ -35,8 +35,8 @@ export function ChoiceStep({ emoji, question, options, onAnswer }: Props) {
             key={opt.value}
             whileTap={{ scale: 0.97 }}
             onClick={() => onAnswer(opt.value)}
-            className="w-full bg-gray-900 hover:bg-gray-800 active:bg-violet-900/40
-                       border border-gray-700 hover:border-violet-500
+            className="w-full bg-gray-900 hover:bg-gray-800 active:bg-teal-900/40
+                       border border-gray-700 hover:border-teal-500
                        text-white text-left px-5 py-4 rounded-2xl
                        transition-all duration-150 flex items-center gap-3"
           >

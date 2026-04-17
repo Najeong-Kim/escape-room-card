@@ -127,13 +127,13 @@ export default function RoomBrowse() {
       <div className="px-4 pt-5 pb-24 max-w-2xl mx-auto space-y-5">
         {/* Theme chips */}
         {personalModel?.lifeTheme && (
-          <section className="personal-score rounded-2xl border border-violet-500/30 bg-violet-950/20 px-4 py-4">
-            <p className="text-xs text-violet-300 font-semibold mb-1">나의 인생테마 후보</p>
+          <section className="personal-score rounded-2xl border border-teal-500/30 bg-teal-950/20 px-4 py-4">
+            <p className="text-xs text-teal-300 font-semibold mb-1">나의 인생테마 후보</p>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-white font-bold text-lg truncate">{personalModel.lifeTheme.room.name}</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{personalModel.lifeTheme.room.brand}</p>
-                <p className="text-xs text-violet-300 font-semibold mt-2">
+                <p className="text-xs text-teal-300 font-semibold mt-2">
                   {predictionConfidenceLabel(personalModel.lifeTheme.prediction)}
                 </p>
                 <p className="text-xs text-gray-500 mt-2">
@@ -141,7 +141,7 @@ export default function RoomBrowse() {
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="flex items-center gap-1 text-violet-300 text-xl font-black">
+                <div className="flex items-center gap-1 text-teal-300 text-xl font-black">
                   <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />
                   {predictionPathLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
                 </div>
@@ -166,8 +166,8 @@ export default function RoomBrowse() {
                 onClick={() => selectTheme(theme.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150
                   ${filters.themeId === theme.id
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-gray-300 hover:border-violet-500/50 hover:text-white'
+                    ? 'bg-teal-600 border-teal-500 text-white'
+                    : 'bg-white/5 border-white/10 text-gray-300 hover:border-teal-500/50 hover:text-white'
                   }`}
               >
                 <span>{theme.emoji}</span>
@@ -184,7 +184,7 @@ export default function RoomBrowse() {
             value={searchTerm}
             onChange={event => setSearchTerm(event.target.value)}
             placeholder="테마명, 매장명, 지역, 태그 검색"
-            className="w-full rounded-xl border border-white/10 bg-[#13131a] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-violet-500/60"
+            className="w-full rounded-xl border border-white/10 bg-[#13131a] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-teal-500/60"
           />
           <div className="flex flex-wrap gap-2 items-center">
           {/* Location */}
@@ -192,7 +192,7 @@ export default function RoomBrowse() {
             value={filters.location ?? ''}
             onChange={e => setLocation(e.target.value || null)}
             className="bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5
-                       focus:outline-none focus:border-violet-500/50 cursor-pointer"
+                       focus:outline-none focus:border-teal-500/50 cursor-pointer"
           >
             <option value="">전체 지역</option>
             {locations.map(loc => (
@@ -205,7 +205,7 @@ export default function RoomBrowse() {
             value={filters.genre ?? ''}
             onChange={e => setGenre(e.target.value || null)}
             className="bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5
-                       focus:outline-none focus:border-violet-500/50 cursor-pointer"
+                       focus:outline-none focus:border-teal-500/50 cursor-pointer"
           >
             <option value="">전체 장르</option>
             {genres.map(g => (
@@ -219,8 +219,8 @@ export default function RoomBrowse() {
             className={[
               'rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
               filters.onlyUnlogged
-                ? 'border-violet-500 bg-violet-600 text-white'
-                : 'border-white/10 bg-[#13131a] text-gray-300 hover:border-violet-500/50 hover:text-white',
+                ? 'border-teal-500 bg-teal-600 text-white'
+                : 'border-white/10 bg-[#13131a] text-gray-300 hover:border-teal-500/50 hover:text-white',
             ].join(' ')}
           >
             기록 안 한 테마만
@@ -229,7 +229,7 @@ export default function RoomBrowse() {
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="text-xs text-violet-400 hover:text-violet-300 px-2 py-1.5 transition-colors"
+              className="text-xs text-teal-400 hover:text-teal-300 px-2 py-1.5 transition-colors"
             >
               필터 초기화
             </button>
@@ -253,7 +253,7 @@ export default function RoomBrowse() {
           <div className="text-center py-20 text-gray-500">
             <p className="text-4xl mb-3">🔍</p>
             <p>조건에 맞는 방이 없어요.</p>
-            <button onClick={resetFilters} className="mt-3 text-violet-400 text-sm hover:text-violet-300">
+            <button onClick={resetFilters} className="mt-3 text-teal-400 text-sm hover:text-teal-300">
               필터 초기화
             </button>
           </div>

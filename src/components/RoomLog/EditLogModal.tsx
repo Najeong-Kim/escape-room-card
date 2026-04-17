@@ -116,7 +116,7 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
               max={today}
               onChange={e => setPlayedAt(e.target.value)}
               className="bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5
-                         text-white text-sm focus:outline-none focus:border-violet-500/60
+                         text-white text-sm focus:outline-none focus:border-teal-500/60
                          [color-scheme:dark]"
             />
           </div>
@@ -135,7 +135,7 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
                   className={[
                     'flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all',
                     cleared === opt.value
-                      ? 'bg-violet-900/50 border-violet-500 text-white'
+                      ? 'bg-teal-900/50 border-teal-500 text-white'
                       : 'bg-[#0e0e16] border-white/10 text-gray-400 hover:border-gray-600',
                   ].join(' ')}
                 >
@@ -213,7 +213,7 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
                         step={1}
                         value={value ?? 5}
                         onChange={e => updateMetric(metric.key, e.target.value)}
-                        className="min-w-0 flex-1 accent-violet-500"
+                        className="min-w-0 flex-1 accent-teal-500"
                       />
                       <span className="text-[11px] text-gray-600 w-12 text-right">{metric.high}</span>
                       <span className="text-sm text-white tabular-nums w-10 text-right">
@@ -237,14 +237,14 @@ export function EditLogModal({ log, onClose, onSaved }: Props) {
               rows={3}
               className="bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-3
                          text-white text-sm placeholder-gray-600 resize-none
-                         focus:outline-none focus:border-violet-500/60"
+                         focus:outline-none focus:border-teal-500/60"
             />
           </div>
 
           {/* Save */}
           <button
             onClick={save}
-            className="app-primary-action w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold
+            className="app-primary-action w-full bg-teal-600 hover:bg-teal-500 text-white font-semibold
                        py-3 rounded-2xl transition-all active:scale-95"
           >
             수정 저장

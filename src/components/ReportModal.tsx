@@ -71,13 +71,13 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
           {sent ? (
             <div className="space-y-5">
               <div>
-                <p className="text-xs text-violet-300">제보 완료</p>
+                <p className="text-xs text-teal-300">제보 완료</p>
                 <h2 className="text-white font-bold text-lg mt-1">제보가 접수되었습니다.</h2>
                 <p className="text-sm text-gray-400 mt-2">확인 후 필요한 내용을 반영하겠습니다.</p>
               </div>
               <button
                 onClick={onClose}
-                className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-3 rounded-2xl transition-colors"
+                className="w-full bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 rounded-2xl transition-colors"
               >
                 닫기
               </button>
@@ -86,7 +86,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
             <div className="space-y-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs text-violet-300">제보하기</p>
+                  <p className="text-xs text-teal-300">제보하기</p>
                   <h2 className="text-white font-bold text-lg mt-1">어떤 내용을 알려주실까요?</h2>
                 </div>
                 <button
@@ -103,7 +103,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
                 <select
                   value={reportType}
                   onChange={e => setReportType(e.target.value as ReportType)}
-                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-violet-500/60"
+                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-teal-500/60"
                 >
                   {REPORT_TYPES.map(type => (
                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -117,7 +117,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   maxLength={80}
-                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500/60"
+                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-500/60"
                   placeholder="어떤 문제가 있나요?"
                 />
               </label>
@@ -129,7 +129,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
                   onChange={e => setMessage(e.target.value)}
                   maxLength={1000}
                   rows={5}
-                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 resize-none focus:outline-none focus:border-violet-500/60"
+                  className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 resize-none focus:outline-none focus:border-teal-500/60"
                   placeholder="틀린 정보, 확인한 링크, 요청사항 등을 적어 주세요."
                 />
               </label>
@@ -141,7 +141,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
                     value={reporterName}
                     onChange={e => setReporterName(e.target.value)}
                     maxLength={80}
-                    className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500/60"
+                    className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-500/60"
                     placeholder="닉네임"
                   />
                 </label>
@@ -152,7 +152,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
                     onChange={e => setReporterEmail(e.target.value)}
                     maxLength={120}
                     type="email"
-                    className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500/60"
+                    className="mt-1.5 w-full bg-[#0e0e16] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-500/60"
                     placeholder="답변이 필요한 경우"
                   />
                 </label>
@@ -163,7 +163,7 @@ export function ReportModal({ themeId, defaultTitle = '', onClose }: Props) {
               <button
                 onClick={send}
                 disabled={submitting}
-                className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-semibold py-3 rounded-2xl transition-colors"
+                className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white font-semibold py-3 rounded-2xl transition-colors"
               >
                 {submitting ? '제보 전송 중...' : '제보 보내기'}
               </button>

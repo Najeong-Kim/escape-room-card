@@ -95,7 +95,7 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
           <div className="auth-modal w-full max-w-sm rounded-2xl border border-white/10 bg-[#16161f] p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs text-violet-300 font-semibold">계정</p>
+                <p className="text-xs text-teal-300 font-semibold">계정</p>
                 <h2 className="mt-1 text-lg font-bold text-white">
                   {session ? '로그인됨' : '이메일로 로그인'}
                 </h2>
@@ -137,14 +137,14 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
                       setMessage('')
                     }}
                     placeholder="you@example.com"
-                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0e0e16] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-violet-500/60"
+                    className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0e0e16] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-teal-500/60"
                     required
                   />
                 </label>
                 <button
                   type="submit"
                   disabled={status === 'sending'}
-                  className="app-primary-action w-full rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-500 disabled:opacity-60"
+                  className="app-primary-action w-full rounded-xl bg-teal-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-500 disabled:opacity-60"
                 >
                   {status === 'sending' ? '메일 보내는 중...' : '로그인 링크 받기'}
                 </button>

@@ -17,7 +17,7 @@ export function ProgressBar({ fraction, step, total }: Props) {
       </div>
       <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
         <div
-          className="h-full bg-violet-500 rounded-full transition-all duration-400 ease-out"
+          className="h-full bg-teal-500 rounded-full transition-all duration-400 ease-out"
           style={{ width: `${fraction * 100}%` }}
         />
       </div>

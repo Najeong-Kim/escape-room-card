@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+:root {
+  --color-brand-primary: #14b8a6;
+  --color-brand-primary-hover: #0d9488;
+  --color-brand-primary-soft: #ccfbf1;
+  --color-brand-primary-dark: #115e59;
+  --color-brand-accent: #fbbf24;
+  --color-brand-accent-hover: #f59e0b;
+  --color-brand-accent-soft: #fef3c7;
+  --color-brand-accent-dark: #92400e;
+  --color-bg: #0a0a0f;
+  --color-surface: #13131a;
+  --color-surface-raised: #16161f;
+  --color-surface-muted: #0e0e16;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-border: rgb(255 255 255 / 0.1);
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #38bdf8;
+}
+
+:root[data-app-theme='light'] {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f1f5f9;
+  --color-surface-muted: #f3f4f8;
+  --color-text: #111827;
+  --color-text-muted: #64748b;
+  --color-border: rgb(17 24 39 / 0.1);
+}
+
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
@@ -8,8 +40,8 @@
 
   body {
     margin: 0;
-    background: #0a0a0f;
-    color: white;
+    background: var(--color-bg);
+    color: var(--color-text);
     font-family: system-ui, -apple-system, sans-serif;
     min-height: 100dvh;
   }
@@ -25,8 +57,8 @@
 }
 
 :root[data-app-theme='light'] body {
-  background: #f7f7fb;
-  color: #171720;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .app-theme-toggle {
@@ -86,6 +118,28 @@
 
 .personal-score {
   box-shadow: 0 12px 30px rgb(0 0 0 / 0.12);
+}
+
+.app-primary-action {
+  background-color: var(--color-brand-primary) !important;
+  color: #ffffff !important;
+}
+
+.app-primary-action:hover {
+  background-color: var(--color-brand-primary-hover) !important;
+  color: #ffffff !important;
+}
+
+.app-secondary-action {
+  background-color: transparent !important;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, transparent) !important;
+  color: var(--color-brand-primary-soft) !important;
+}
+
+.app-secondary-action:hover {
+  background-color: color-mix(in srgb, var(--color-brand-primary) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 62%, transparent) !important;
+  color: #ffffff !important;
 }
 
 :root[data-app-theme='light'] .app-theme-toggle {
@@ -170,25 +224,25 @@
 }
 
 :root[data-app-theme='light'] .app-primary-action {
-  background-color: #7c3aed !important;
+  background-color: var(--color-brand-primary) !important;
   color: #ffffff !important;
 }
 
 :root[data-app-theme='light'] .app-primary-action:hover {
-  background-color: #6d28d9 !important;
+  background-color: var(--color-brand-primary-hover) !important;
   color: #ffffff !important;
 }
 
 :root[data-app-theme='light'] .app-secondary-action {
   background-color: #ffffff !important;
-  border-color: rgb(124 58 237 / 0.35) !important;
-  color: #5b21b6 !important;
+  border-color: rgb(20 184 166 / 0.35) !important;
+  color: var(--color-brand-primary-dark) !important;
 }
 
 :root[data-app-theme='light'] .app-secondary-action:hover {
-  background-color: rgb(245 243 255) !important;
-  border-color: rgb(124 58 237 / 0.55) !important;
-  color: #4c1d95 !important;
+  background-color: rgb(240 253 250) !important;
+  border-color: rgb(20 184 166 / 0.55) !important;
+  color: #0f766e !important;
 }
 
 :root[data-app-theme='light'] .path-rating-option {
@@ -219,13 +273,13 @@
 
 :root[data-app-theme='light'] .personal-score {
   background-color: #ffffff !important;
-  border-color: rgb(124 58 237 / 0.28) !important;
+  border-color: rgb(20 184 166 / 0.28) !important;
   box-shadow: 0 10px 24px rgb(15 23 42 / 0.08);
 }
 
 .review-source-badge {
-  background: rgb(124 58 237 / 0.18);
-  color: rgb(196 181 253);
+  background: rgb(20 184 166 / 0.18);
+  color: rgb(153 246 228);
 }
 
 :root[data-app-theme='light'] .review-link-card {
@@ -234,13 +288,13 @@
 }
 
 :root[data-app-theme='light'] .review-link-card:hover {
-  background-color: rgb(245 243 255) !important;
-  border-color: rgb(124 58 237 / 0.35) !important;
+  background-color: rgb(240 253 250) !important;
+  border-color: rgb(20 184 166 / 0.35) !important;
 }
 
 :root[data-app-theme='light'] .review-source-badge {
-  background: rgb(124 58 237 / 0.12);
-  color: #5b21b6;
+  background: rgb(20 184 166 / 0.12);
+  color: #0f766e;
 }
 
 :root[data-app-theme='light'] .auth-modal {

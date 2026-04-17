@@ -53,7 +53,7 @@ const TAG_CATEGORY_CLASS: Record<string, string> = {
   award: 'bg-amber-500/12 border-amber-400/25 text-amber-200',
   community: 'bg-sky-500/12 border-sky-400/25 text-sky-200',
   feature: 'bg-emerald-500/12 border-emerald-400/25 text-emerald-200',
-  operation: 'bg-violet-500/12 border-violet-400/25 text-violet-200',
+  operation: 'bg-teal-500/12 border-teal-400/25 text-teal-200',
   audience: 'bg-rose-500/12 border-rose-400/25 text-rose-200',
   warning: 'bg-red-500/12 border-red-400/25 text-red-200',
 }
@@ -128,7 +128,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
 
   const inner = (
     <div className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex flex-col
-                    hover:border-violet-500/40 hover:bg-[#16161f] transition-all duration-200">
+                    hover:border-teal-500/40 hover:bg-[#16161f] transition-all duration-200">
       {/* Image */}
       {room.image_url ? (
         <img
@@ -138,7 +138,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
         />
       ) : (
-        <div className="w-full h-36 bg-gradient-to-br from-violet-900/30 to-[#0a0a0f] flex items-center justify-center">
+        <div className="w-full h-36 bg-gradient-to-br from-teal-900/30 to-[#0a0a0f] flex items-center justify-center">
           <span className="text-3xl opacity-30">🔐</span>
         </div>
       )}
@@ -217,9 +217,9 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
         )}
 
         {personalPrediction && !logged && (
-          <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-3 py-2">
+          <div className="personal-score rounded-xl border border-teal-500/25 bg-teal-950/20 px-3 py-2">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-violet-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</span>
+              <span className="text-xs text-teal-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</span>
               <span className="inline-flex items-center gap-1 text-sm text-white font-black">
                 <RatingIcon value={predictionPathRating(personalPrediction)} size={18} />
                 {predictionPathLabel(personalPrediction)}
@@ -262,7 +262,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
 
         {/* Detail link */}
         <div className="pt-1 border-t border-white/5">
-          <span className="text-xs text-violet-400">상세 보기 →</span>
+          <span className="text-xs text-teal-400">상세 보기 →</span>
         </div>
 
         {/* Website link */}
@@ -279,8 +279,8 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           ) : (
             <button
               onClick={e => { e.preventDefault(); e.stopPropagation(); setShowLog(true) }}
-              className="text-xs text-violet-400 hover:text-violet-300 border border-violet-500/30
-                         hover:bg-violet-900/20 px-3 py-1 rounded-lg transition-all"
+              className="text-xs text-teal-400 hover:text-teal-300 border border-teal-500/30
+                         hover:bg-teal-900/20 px-3 py-1 rounded-lg transition-all"
             >
               + 기록하기
             </button>

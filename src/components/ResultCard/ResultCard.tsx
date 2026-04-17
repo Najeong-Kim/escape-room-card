@@ -163,7 +163,7 @@ function CardFront({
         <img
           src={displayImg}
           alt={profile.characterId}
-          className="w-40 h-40 rounded-full object-cover ring-4 ring-violet-500/30"
+          className="w-40 h-40 rounded-full object-cover ring-4 ring-teal-500/30"
           onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3' }}
         />
       </div>
@@ -184,9 +184,9 @@ function CardFront({
       </div>
 
       {/* Play count badge */}
-      <div className="mx-6 mb-5 bg-violet-900/30 border border-violet-700/40 rounded-xl px-4 py-2
+      <div className="mx-6 mb-5 bg-teal-900/30 border border-teal-700/40 rounded-xl px-4 py-2
                       flex items-center justify-between">
-        <span className="text-violet-300 text-xs font-semibold uppercase tracking-wider">
+        <span className="text-teal-300 text-xs font-semibold uppercase tracking-wider">
           {tierLabel}
         </span>
         <span className="text-yellow-400 text-sm tracking-tight">{stars}</span>
@@ -298,7 +298,7 @@ function ShareButton({
     <button
       onClick={handleShare}
       disabled={!shareBlob}
-      className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-gray-800
+      className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-gray-800
                  disabled:text-gray-600 text-white font-semibold py-3 rounded-2xl
                  transition-all active:scale-95 flex items-center justify-center gap-2"
     >
@@ -322,7 +322,7 @@ function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteThe
           <Link
             key={theme.theme_id}
             to={`/rooms/${theme.theme_id}`}
-            className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex gap-3 hover:border-violet-500/40 hover:bg-[#16161f] transition-all"
+            className="bg-[#13131a] border border-white/8 rounded-2xl overflow-hidden flex gap-3 hover:border-teal-500/40 hover:bg-[#16161f] transition-all"
           >
             {theme.image_url ? (
               <img
@@ -332,7 +332,7 @@ function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteThe
                 onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }}
               />
             ) : (
-              <div className="w-24 min-h-28 bg-violet-950/20 flex items-center justify-center text-2xl opacity-40">
+              <div className="w-24 min-h-28 bg-teal-950/20 flex items-center justify-center text-2xl opacity-40">
                 🔐
               </div>
             )}
@@ -343,7 +343,7 @@ function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteThe
                   <h3 className="text-white text-sm font-semibold leading-snug mt-0.5">{theme.name}</h3>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-violet-300 text-sm font-black">{theme.score_10}</p>
+                  <p className="text-teal-300 text-sm font-black">{theme.score_10}</p>
                   <p className="text-gray-600 text-[11px]">/ 10</p>
                 </div>
               </div>

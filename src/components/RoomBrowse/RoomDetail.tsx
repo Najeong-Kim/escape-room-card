@@ -59,7 +59,7 @@ const TAG_CATEGORY_CLASS: Record<string, string> = {
   award: 'bg-amber-500/12 border-amber-400/25 text-amber-200',
   community: 'bg-sky-500/12 border-sky-400/25 text-sky-200',
   feature: 'bg-emerald-500/12 border-emerald-400/25 text-emerald-200',
-  operation: 'bg-violet-500/12 border-violet-400/25 text-violet-200',
+  operation: 'bg-teal-500/12 border-teal-400/25 text-teal-200',
   audience: 'bg-rose-500/12 border-rose-400/25 text-rose-200',
   warning: 'bg-red-500/12 border-red-400/25 text-red-200',
 }
@@ -241,7 +241,7 @@ export default function RoomDetail() {
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-violet-900/30 to-[#0a0a0f] flex items-center justify-center">
+          <div className="w-full h-48 bg-gradient-to-br from-teal-900/30 to-[#0a0a0f] flex items-center justify-center">
             <span className="text-5xl opacity-30">🔐</span>
           </div>
         )}
@@ -282,10 +282,10 @@ export default function RoomDetail() {
             )}
           </div>
 
-          <div className="rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
+          <div className="rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <p className="text-xs text-violet-300 font-semibold">
+                <p className="text-xs text-teal-300 font-semibold">
                   {logged ? '이미 기록한 테마예요' : personalPrediction ? predictionConfidenceLabel(personalPrediction) : '이 테마가 궁금하신가요?'}
                 </p>
                 <p className="text-sm text-gray-300 mt-1">
@@ -300,7 +300,7 @@ export default function RoomDetail() {
                 {!logged && (
                   <button
                     onClick={() => setShowLog(true)}
-                    className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors"
+                    className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
                   >
                     기록하기
                   </button>
@@ -405,10 +405,10 @@ export default function RoomDetail() {
           </div>
 
           {personalPrediction && !logged && (
-            <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
+            <div className="personal-score rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs text-violet-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</p>
+                  <p className="text-xs text-teal-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</p>
                   <p className="text-sm text-gray-400 mt-1">
                     {personalPrediction.reasons.length
                       ? personalPrediction.reasons.join(' · ')
@@ -478,7 +478,7 @@ export default function RoomDetail() {
             ) : (
               <button
                 onClick={() => setShowLog(true)}
-                className="app-primary-action flex-1 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors"
+                className="app-primary-action flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
               >
                 기록하기
               </button>
@@ -513,7 +513,7 @@ export default function RoomDetail() {
                     href={review.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="review-link-card rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-violet-500/40 hover:bg-[#16161f]"
+                    className="review-link-card rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-teal-500/40 hover:bg-[#16161f]"
                   >
                     <div className="flex gap-3">
                       {review.thumbnail_url && (
@@ -556,7 +556,7 @@ export default function RoomDetail() {
                   <button
                     key={similar.id}
                     onClick={() => navigate(`/rooms/${similar.id}`)}
-                    className="text-left rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-violet-500/40 hover:bg-[#16161f]"
+                    className="text-left rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-teal-500/40 hover:bg-[#16161f]"
                   >
                     <p className="text-xs text-gray-500">{similar.brand} · {similar.location}</p>
                     <p className="text-sm font-semibold text-white mt-1">{similar.name}</p>
