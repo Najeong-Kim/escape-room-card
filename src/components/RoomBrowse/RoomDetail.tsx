@@ -76,6 +76,21 @@ function formatScore(score: number) {
   return Number.isInteger(score) ? String(score) : score.toFixed(1)
 }
 
+function metricDisplay(score: number | null | undefined, label: string | null | undefined) {
+  if (score !== null && score !== undefined) return `${formatScore(score)}/10`
+  if (label) return label
+  return '미확인'
+}
+
+function similarRoomScore(current: Room, candidate: Room) {
+  let score = 0
+  if (candidate.location === current.location) score += 3
+  score += candidate.genres.filter(genre => current.genres.includes(genre)).length * 2
+  score += Math.max(0, 2 - Math.abs(candidate.fear_level - current.fear_level))
+  score += Math.max(0, 2 - Math.abs(candidate.difficulty - current.difficulty))
+  return score
+}
+
 function clampDots(value: number) {
   return Math.max(0, Math.min(5, Math.round(value)))
 }
@@ -150,6 +165,22 @@ export default function RoomDetail() {
     [rooms, logs, roomId, communityMetricStats, communityRating],
   )
   const personalPrediction = personalModel?.predictions[roomId]
+  const similarRooms = useMemo(() => {
+    if (!room) return []
+    const loggedIds = new Set(logs.map(log => log.room_id))
+    return rooms
+      .filter(candidate => candidate.id !== room.id && !loggedIds.has(candidate.id))
+      .map(candidate => ({ room: candidate, score: similarRoomScore(room, candidate) }))
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score || b.room.rating_avg - a.room.rating_avg)
+      .slice(0, 3)
+      .map(item => item.room)
+  }, [logs, room, rooms])
+  const visibleReviewLinks = reviewLinks.slice(0, 4)
+  const reviewCountByType = reviewLinks.reduce<Record<string, number>>((counts, review) => {
+    counts[review.source_type] = (counts[review.source_type] ?? 0) + 1
+    return counts
+  }, {})
 
   if (!Number.isFinite(roomId)) {
     return (
@@ -241,7 +272,46 @@ export default function RoomDetail() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p className="text-xs text-violet-300 font-semibold">
+                  {logged ? '이미 기록한 테마예요' : personalPrediction ? '내 기록 기준 예상' : '이 테마가 궁금하신가요?'}
+                </p>
+                <p className="text-sm text-gray-300 mt-1">
+                  {logged
+                    ? '내 기록에서 결과를 다시 확인할 수 있습니다.'
+                    : personalPrediction
+                      ? `${predictionPathLabel(personalPrediction).replace('예상 ', '')} · ${personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}`
+                      : '플레이 후 길 평가를 남기면 추천이 더 정확해집니다.'}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {!logged && (
+                  <button
+                    onClick={() => setShowLog(true)}
+                    className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors"
+                  >
+                    기록하기
+                  </button>
+                )}
+                {room.website_url && (
+                  <a
+                    href={room.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
+                  >
+                    예약하기
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-semibold">공식 정보</h3>
+            <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 col-span-2">
               <p className="text-xs text-gray-500">위치</p>
               <p className="text-sm text-gray-200 mt-1">{room.address ?? room.location}</p>
@@ -268,25 +338,80 @@ export default function RoomDetail() {
                 {room.price_per_person > 0 ? `${room.price_per_person.toLocaleString()}원` : '미확인'}
               </p>
             </div>
+            {METRICS.map(metric => (
+              <div key={metric.key} className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                <p className="text-xs text-gray-500">{metric.label}</p>
+                <p className="official-label text-sm text-amber-300 mt-1">
+                  {metric.key === 'difficulty' && room.official_scores?.difficulty !== null && room.official_scores?.difficulty !== undefined ? (
+                    <>공식 <DifficultyDots value={room.official_scores.difficulty / 2} /></>
+                  ) : (
+                    <>공식 {metricDisplay(room.official_scores?.[metric.key], room.official_labels?.[metric.key])}</>
+                  )}
+                </p>
+              </div>
+            ))}
+            </div>
           </div>
 
-          <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
-            <p className="text-xs text-gray-500 mb-2">길 평가</p>
-            {communityRating && ratingDef ? (
-              <div className="flex items-center gap-2">
-                <RatingIcon value={ratingDef.value} size={24} />
-                <span className="text-lg font-bold" style={{ color: ratingDef.color }}>
-                  {formatScore(communityRating.score10)}/10
-                </span>
-                <span className="text-sm text-gray-500">
-                  {ratingDef.label}
-                  {SHOW_COMMUNITY_RATING_COUNTS && ` · ${communityRating.count}명`}
-                </span>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">아직 유저 평가가 없습니다.</p>
-            )}
+          <div className="space-y-3">
+            <h3 className="font-semibold">유저 평균 평가</h3>
+            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
+              <p className="text-xs text-gray-500 mb-2">길 평가</p>
+              {communityRating && ratingDef ? (
+                <div className="flex items-center gap-2">
+                  <RatingIcon value={ratingDef.value} size={24} />
+                  <span className="text-lg font-bold" style={{ color: ratingDef.color }}>
+                    {formatScore(communityRating.score10)}/10
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {ratingDef.label}
+                    {SHOW_COMMUNITY_RATING_COUNTS && ` · ${communityRating.count}명`}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">아직 유저 평가가 없습니다.</p>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {METRICS.map(metric => {
+                const community = communityMetricStats[metric.key]
+                return (
+                  <div key={metric.key} className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                    <p className="text-xs text-gray-500">{metric.label}</p>
+                    {community ? (
+                      <p className="text-sm text-gray-200 mt-1">
+                        유저 {formatScore(community.score10)}/10
+                        {SHOW_COMMUNITY_RATING_COUNTS && (
+                          <span className="text-gray-600"> · {community.count}명</span>
+                        )}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
+
+          {personalPrediction && !logged && (
+            <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-violet-300 font-semibold">추천 이유</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    {personalPrediction.reasons.length
+                      ? personalPrediction.reasons.join(' · ')
+                      : '내 기록과 유저 평가를 바탕으로 계산했어요.'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
+                  <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
+                  {predictionPathLabel(personalPrediction).replace('예상 ', '')}
+                </div>
+              </div>
+            </div>
+          )}
 
           {escapeStats && escapeStats.totalCount >= 1 && (
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
@@ -335,61 +460,9 @@ export default function RoomDetail() {
             </div>
           )}
 
-          {personalPrediction && !logged && (
-            <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs text-violet-300 font-semibold">나의 예상 길</p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
-                  <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
-                  {predictionPathLabel(personalPrediction).replace('예상 ', '')}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <h3 className="font-semibold">세부 지표</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {METRICS.map(metric => {
-                const community = communityMetricStats[metric.key]
-                const officialScore = room.official_scores?.[metric.key]
-                const officialLabel = room.official_labels?.[metric.key]
-                return (
-                  <div key={metric.key} className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-                    <p className="text-xs text-gray-500">{metric.label}</p>
-                    {community ? (
-                      <p className="text-sm text-gray-200 mt-1">
-                        유저 {formatScore(community.score10)}/10
-                        {SHOW_COMMUNITY_RATING_COUNTS && (
-                          <span className="text-gray-600"> · {community.count}명</span>
-                        )}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>
-                    )}
-                    {metric.key === 'difficulty' && (officialScore !== null && officialScore !== undefined || officialLabel !== null && !isNaN(Number(officialLabel))) ? (
-                      <p className="official-label text-sm text-amber-300 mt-1">
-                        공식 <DifficultyDots value={officialScore !== null && officialScore !== undefined ? officialScore / 2 : Number(officialLabel)} />
-                      </p>
-                    ) : officialScore !== null && officialScore !== undefined ? (
-                      <p className="official-label text-sm text-amber-300 mt-1">공식 {formatScore(officialScore)}/10</p>
-                    ) : officialLabel ? (
-                      <p className="official-label text-sm text-amber-300 mt-1">공식 {officialLabel}</p>
-                    ) : null}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex gap-3 sticky bottom-4 z-20">
             {logged ? (
-              <span className="flex-1 text-center py-3 rounded-xl bg-green-900/20 border border-green-500/20 text-green-400 text-sm font-medium">
+              <span className="flex-1 text-center py-3 rounded-xl bg-green-900/80 border border-green-500/30 text-green-200 text-sm font-medium backdrop-blur">
                 기록됨
               </span>
             ) : (
@@ -416,10 +489,14 @@ export default function RoomDetail() {
             <div className="space-y-3">
               <div>
                 <h3 className="font-semibold">후기 모아보기</h3>
-                <p className="text-xs text-gray-500 mt-1">블로그, 유튜브, 인스타 후기를 한 곳에서 확인해 보세요.</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {Object.entries(reviewCountByType)
+                    .map(([type, count]) => `${REVIEW_SOURCE_LABEL[type as keyof typeof REVIEW_SOURCE_LABEL] ?? '기타'} ${count}`)
+                    .join(' · ')}
+                </p>
               </div>
               <div className="grid grid-cols-1 gap-3">
-                {reviewLinks.map(review => (
+                {visibleReviewLinks.map(review => (
                   <a
                     key={review.id}
                     href={review.url}
@@ -452,6 +529,30 @@ export default function RoomDetail() {
                       </div>
                     </div>
                   </a>
+                ))}
+              </div>
+              {reviewLinks.length > visibleReviewLinks.length && (
+                <p className="text-xs text-gray-500">후기 {reviewLinks.length - visibleReviewLinks.length}개가 더 있습니다.</p>
+              )}
+            </div>
+          )}
+
+          {similarRooms.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold">비슷한 테마</h3>
+              <div className="grid grid-cols-1 gap-3">
+                {similarRooms.map(similar => (
+                  <button
+                    key={similar.id}
+                    onClick={() => navigate(`/rooms/${similar.id}`)}
+                    className="text-left rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-violet-500/40 hover:bg-[#16161f]"
+                  >
+                    <p className="text-xs text-gray-500">{similar.brand} · {similar.location}</p>
+                    <p className="text-sm font-semibold text-white mt-1">{similar.name}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {similar.genres.map(genre => GENRE_LABEL[genre] ?? genre).slice(0, 3).join(' · ')}
+                    </p>
+                  </button>
                 ))}
               </div>
             </div>
