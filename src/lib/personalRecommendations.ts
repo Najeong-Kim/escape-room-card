@@ -6,6 +6,25 @@ import { getRatingDef, pathRatingToScore10, score10ToPathRating } from './rating
 
 const METRICS: MetricKey[] = ['difficulty', 'fear', 'activity', 'story', 'interior', 'aging']
 
+const GENRE_LABEL: Record<string, string> = {
+  Horror: '공포',
+  MysteryThriller: '미스터리/스릴러',
+  Emotional: '감성/드라마',
+  Comic: '코믹',
+  FantasyAdventure: '판타지/모험',
+  Crime: '범죄/잠입',
+  SF: 'SF',
+}
+
+const METRIC_LABEL: Record<MetricKey, string> = {
+  difficulty: '난이도',
+  fear: '공포도',
+  activity: '활동성',
+  story: '스토리',
+  interior: '인테리어',
+  aging: '노후화',
+}
+
 export interface PersonalPrediction {
   roomId: number
   score10: number
@@ -104,11 +123,19 @@ export function buildPersonalRecommendationModel(
     if (matchedGenres.length > 0) {
       const genreScore = matchedGenres.reduce((sum, item) => sum + item.value, 0) / matchedGenres.length
       score += clamp(genreScore * 1.2, -1.2, 1.2)
-      if (genreScore > 0.25) reasons.push('좋게 평가한 장르와 가까워요')
+      if (genreScore > 0.25) {
+        const bestGenre = matchedGenres
+          .filter(item => item.value > 0)
+          .sort((a, b) => b.value - a.value)[0]?.genre
+        reasons.push(bestGenre
+          ? `좋게 평가한 ${GENRE_LABEL[bestGenre] ?? bestGenre} 장르와 가까워요`
+          : '좋게 평가한 장르와 가까워요')
+      }
     }
 
     let metricMatches = 0
     let metricAdjustment = 0
+    const closeMetrics: MetricKey[] = []
     for (const metric of METRICS) {
       const target = metricTargets.get(metric)
       if (!target) continue
@@ -119,24 +146,34 @@ export function buildPersonalRecommendationModel(
       const distance = Math.abs(preferred - roomScore)
       metricAdjustment += (1 - distance / 5) * 0.28
       metricMatches += 1
+      if (distance <= 1.4) closeMetrics.push(metric)
     }
 
     if (metricMatches > 0) {
       score += clamp(metricAdjustment, -1.3, 1.3)
-      if (metricAdjustment > 0.35) reasons.push('난이도와 분위기가 취향에 맞아요')
+      if (metricAdjustment > 0.35) {
+        const firstMetric = closeMetrics[0]
+        reasons.push(firstMetric
+          ? `선호한 ${METRIC_LABEL[firstMetric]}와 비슷해요`
+          : '난이도와 분위기가 취향에 맞아요')
+      }
     }
 
     const communityRating = communityRatings[room.id]
     if (communityRating && communityRating.count >= 3) {
       const communityAdj = clamp((communityRating.score10 - 5) * 0.3, -1.5, 1.5)
       score += communityAdj
-      if (communityRating.score10 >= 7.5) reasons.push('많은 사람들이 재밌다고 평가했어요')
-      else if (communityRating.score10 <= 4) reasons.push('사람들의 평가가 낮은 편이에요')
+      if (communityRating.score10 >= 7.5) reasons.push(`유저 평균 ${formatScore(communityRating.score10)}/10으로 평가가 좋아요`)
+      else if (communityRating.score10 <= 4) reasons.push('유저 평가가 낮은 편이에요')
     }
 
-    if (playedIds.has(room.id)) {
-      score -= 0.4
-      reasons.push('이미 기록한 테마예요')
+    if (!playedIds.has(room.id)) {
+      const averageFear = metricTargets.get('fear')
+      const preferredFear = averageFear ? averageFear.total / averageFear.weight : null
+      if (preferredFear !== null && roomMetricScore(room, 'fear') !== null && Math.abs((roomMetricScore(room, 'fear') ?? 0) - preferredFear) <= 1.2) {
+        reasons.push('공포도 취향이 잘 맞아요')
+      }
+      if (!reasons.length && room.location) reasons.push(`${room.location}에서 취향과 가까운 테마예요`)
     }
 
     const confidence = ratedLogs.length >= 5 && metricMatches >= 3
@@ -149,7 +186,7 @@ export function buildPersonalRecommendationModel(
       roomId: room.id,
       score10: Number(clamp(score, 1, 10).toFixed(1)),
       confidence,
-      reasons: reasons.slice(0, 2),
+      reasons: reasons.filter((reason, index, all) => all.indexOf(reason) === index).slice(0, 2),
       played: playedIds.has(room.id),
     }
 
@@ -180,4 +217,10 @@ export function predictionPathRating(prediction: PersonalPrediction): PathRating
 export function predictionPathLabel(prediction: PersonalPrediction) {
   const def = getRatingDef(predictionPathRating(prediction))
   return def ? `예상 ${def.label}` : '예상 길'
+}
+
+export function predictionConfidenceLabel(prediction: PersonalPrediction) {
+  if (prediction.confidence === 'high') return '내 기록 기반'
+  if (prediction.confidence === 'medium') return '취향 반영'
+  return '초기 추천'
 }

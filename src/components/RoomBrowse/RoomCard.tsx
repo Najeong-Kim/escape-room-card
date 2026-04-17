@@ -7,7 +7,7 @@ import { LogModal } from '../RoomLog/LogModal'
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
-import { predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 
 const GENRE_LABEL: Record<string, string> = {
@@ -219,7 +219,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
         {personalPrediction && !logged && (
           <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-3 py-2">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-violet-300 font-semibold">나의 예상 길</span>
+              <span className="text-xs text-violet-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</span>
               <span className="inline-flex items-center gap-1 text-sm text-white font-black">
                 <RatingIcon value={predictionPathRating(personalPrediction)} size={18} />
                 {predictionPathLabel(personalPrediction)}

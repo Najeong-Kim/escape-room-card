@@ -84,10 +84,12 @@ export async function syncSavedCardProfileToUser(): Promise<QuizProfile | null> 
 export async function fetchSimilarProfileFavoriteThemes(
   profile: QuizProfile,
   limit = 3,
+  minLikedCount = 2,
 ): Promise<SimilarProfileFavoriteTheme[]> {
   const { data, error } = await supabase.rpc('get_similar_profile_favorite_themes', {
     p_character_id: profile.characterId,
     p_limit: limit,
+    p_min_liked_count: minLikedCount,
   })
 
   if (error) {

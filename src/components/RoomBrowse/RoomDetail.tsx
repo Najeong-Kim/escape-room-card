@@ -6,7 +6,7 @@ import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, Metri
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { useRooms } from '../../lib/useRooms'
-import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { fetchThemeReviewLinks, REVIEW_SOURCE_LABEL, type ThemeReviewLink } from '../../lib/themeReviewLinks'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
@@ -276,7 +276,7 @@ export default function RoomDetail() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="text-xs text-violet-300 font-semibold">
-                  {logged ? '이미 기록한 테마예요' : personalPrediction ? '내 기록 기준 예상' : '이 테마가 궁금하신가요?'}
+                  {logged ? '이미 기록한 테마예요' : personalPrediction ? predictionConfidenceLabel(personalPrediction) : '이 테마가 궁금하신가요?'}
                 </p>
                 <p className="text-sm text-gray-300 mt-1">
                   {logged
@@ -398,7 +398,7 @@ export default function RoomDetail() {
             <div className="personal-score rounded-xl border border-violet-500/25 bg-violet-950/20 px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs text-violet-300 font-semibold">추천 이유</p>
+                  <p className="text-xs text-violet-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</p>
                   <p className="text-sm text-gray-400 mt-1">
                     {personalPrediction.reasons.length
                       ? personalPrediction.reasons.join(' · ')

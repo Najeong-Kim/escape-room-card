@@ -8,7 +8,7 @@ import type { CommunityMetricStats, CommunityRating } from '../../lib/communityR
 import { Footer } from '../Footer'
 import { AppTopActions } from '../AppTopActions'
 import { useRoomLogs } from '../../lib/useRoomLogs'
-import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { RatingIcon } from '../../lib/ratings'
 
 const PAGE_SIZE = 30
@@ -133,6 +133,9 @@ export default function RoomBrowse() {
               <div className="min-w-0">
                 <h2 className="text-white font-bold text-lg truncate">{personalModel.lifeTheme.room.name}</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{personalModel.lifeTheme.room.brand}</p>
+                <p className="text-xs text-violet-300 font-semibold mt-2">
+                  {predictionConfidenceLabel(personalModel.lifeTheme.prediction)}
+                </p>
                 <p className="text-xs text-gray-500 mt-2">
                   {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
                 </p>

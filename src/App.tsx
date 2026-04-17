@@ -12,7 +12,7 @@ import { useRoomLogs } from './lib/useRoomLogs'
 import { clearSavedCard, loadSavedCard, saveCard, SAVED_CARD_CHANGED } from './lib/savedCard'
 import { saveUserCardProfile } from './lib/userCardProfile'
 import { useRooms } from './lib/useRooms'
-import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from './lib/personalRecommendations'
 import { RatingIcon } from './lib/ratings'
 
 type HomeMode = 'home' | 'quiz' | 'result'
@@ -170,9 +170,14 @@ function SavedCardHome({
           </h2>
           <p className="text-gray-400 text-sm mt-1">{personalModel.lifeTheme.room.brand}</p>
           <div className="mt-4 flex items-end justify-between gap-3">
-            <p className="text-gray-500 text-sm">
-              {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
-            </p>
+            <div>
+              <p className="text-violet-300 text-xs font-semibold mb-1">
+                {predictionConfidenceLabel(personalModel.lifeTheme.prediction)}
+              </p>
+              <p className="text-gray-500 text-sm">
+                {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
+              </p>
+            </div>
             <div className="text-right flex-shrink-0">
               <div className="flex items-center gap-1 text-violet-300 text-xl font-black">
                 <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />

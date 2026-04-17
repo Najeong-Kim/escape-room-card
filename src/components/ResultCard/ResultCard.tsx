@@ -30,7 +30,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
   const [similarFavorites, setSimilarFavorites] = useState<SimilarProfileFavoriteTheme[]>([])
   useEffect(() => {
     getRecommendations(profile).then(setRecommendations).catch(() => {})
-    fetchSimilarProfileFavoriteThemes(profile, 3).then(setSimilarFavorites).catch(() => {})
+    fetchSimilarProfileFavoriteThemes(profile, 3, 2).then(setSimilarFavorites).catch(() => {})
   }, [profile])
 
   const tagline = t(`tagline_${profile.characterId}`)
@@ -315,6 +315,7 @@ function SimilarProfileFavorites({ themes }: { themes: SimilarProfileFavoriteThe
       <div className="mb-3">
         <p className="text-gray-500 text-xs uppercase tracking-widest">취향이 비슷한 사람들</p>
         <h2 className="text-white font-bold text-lg">같은 카드 사람들이 좋아한 테마</h2>
+        <p className="text-gray-600 text-xs mt-1">최소 2명 이상이 좋게 평가한 테마만 보여드려요.</p>
       </div>
       <div className="flex flex-col gap-3">
         {themes.map(theme => (
