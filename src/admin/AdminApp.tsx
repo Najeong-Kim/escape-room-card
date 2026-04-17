@@ -24,9 +24,6 @@ import { authProvider } from './authProvider'
 import { darkTheme, lightTheme } from './theme'
 import './admin.css'
 
-if (!import.meta.env.VITE_ADMIN_PASSWORD) {
-  console.warn('[admin] VITE_ADMIN_PASSWORD not set — anyone can log in')
-}
 
 const dataProvider = createSupabaseDataProvider()
 

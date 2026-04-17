@@ -1,17 +1,32 @@
+import { supabase } from '../lib/supabaseClient'
+
+const TOKEN_KEY = 'admin_token'
+
 export const authProvider = {
-  login: ({ password }: { password: string }) => {
-    if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
-      sessionStorage.setItem('admin_auth', '1')
-      return Promise.resolve()
+  login: async ({ password }: { password: string }) => {
+    const { data, error } = await supabase.functions.invoke('admin-proxy', {
+      body: { operation: 'auth' },
+      headers: { 'x-admin-token': password },
+    })
+    if (error || !data?.ok) {
+      throw new Error('Wrong password')
     }
-    return Promise.reject(new Error('Wrong password'))
+    sessionStorage.setItem(TOKEN_KEY, password)
   },
+
   logout: () => {
-    sessionStorage.removeItem('admin_auth')
+    sessionStorage.removeItem(TOKEN_KEY)
     return Promise.resolve()
   },
+
   checkAuth: () =>
-    sessionStorage.getItem('admin_auth') ? Promise.resolve() : Promise.reject(),
+    sessionStorage.getItem(TOKEN_KEY) ? Promise.resolve() : Promise.reject(),
+
   checkError: () => Promise.resolve(),
+
   getPermissions: () => Promise.resolve(),
+}
+
+export function getAdminToken(): string {
+  return sessionStorage.getItem(TOKEN_KEY) ?? ''
 }

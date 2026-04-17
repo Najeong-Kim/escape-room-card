@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
-import { supabase } from './supabaseDataProvider'
+import { supabase } from '../lib/supabaseClient'
+import { adminUpdate, adminRpc } from './adminClient'
 
 interface ApprovalCafe {
   id: number
@@ -227,14 +228,15 @@ export function CafeApprovalList() {
       naver_place_checked_at: emptyToNull(form.naver_place_checked_at),
     }
 
-    const { error } = await supabase.from('cafes').update(payload).eq('id', cafeId)
-
-    setProcessingId(null)
-
-    if (error) {
-      notify(`매장 수정에 실패했습니다: ${error.message}`, { type: 'error' })
+    try {
+      await adminUpdate('cafes', payload, { column: 'id', value: cafeId })
+    } catch (err) {
+      setProcessingId(null)
+      notify(`매장 수정에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
+
+    setProcessingId(null)
 
     setEditingId(null)
     setForm(null)
@@ -245,16 +247,23 @@ export function CafeApprovalList() {
   async function reviewCafe(cafe: ApprovalCafe, status: 'active' | 'rejected') {
     setProcessingId(cafe.id)
 
-    const { data, error } = await supabase
-      .rpc('review_cafe_for_review', { p_cafe_id: cafe.id, p_status: status })
-
-    if (error || !data || data.length === 0) {
+    let rpcResult: { data: { cafe_status?: string; cafe_needs_review?: boolean; affected_theme_count?: number }[] }
+    try {
+      rpcResult = await adminRpc('review_cafe_for_review', { p_cafe_id: cafe.id, p_status: status })
+    } catch (err) {
       setProcessingId(null)
-      notify(`처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 매장이 없습니다.'}`, { type: 'error' })
+      notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
 
-    const reviewed = data[0] as { cafe_status?: string; cafe_needs_review?: boolean; affected_theme_count?: number }
+    const data = rpcResult.data
+    if (!data || data.length === 0) {
+      setProcessingId(null)
+      notify('처리에 실패했습니다: DB에서 변경된 매장이 없습니다.', { type: 'error' })
+      return
+    }
+
+    const reviewed = data[0]
     if (reviewed.cafe_status !== status || reviewed.cafe_needs_review !== false) {
       setProcessingId(null)
       notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
@@ -274,16 +283,23 @@ export function CafeApprovalList() {
   async function markCafeClosed(cafe: ApprovalCafe) {
     setProcessingId(cafe.id)
 
-    const { data, error } = await supabase
-      .rpc('close_cafe_for_review', { p_cafe_id: cafe.id })
-
-    if (error || !data || data.length === 0) {
+    let rpcResult: { data: { cafe_status?: string; cafe_needs_review?: boolean; closed_theme_count?: number }[] }
+    try {
+      rpcResult = await adminRpc('close_cafe_for_review', { p_cafe_id: cafe.id })
+    } catch (err) {
       setProcessingId(null)
-      notify(`폐점 처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 매장이 없습니다.'}`, { type: 'error' })
+      notify(`폐점 처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
 
-    const closed = data[0] as { cafe_status?: string; cafe_needs_review?: boolean; closed_theme_count?: number }
+    const data = rpcResult.data
+    if (!data || data.length === 0) {
+      setProcessingId(null)
+      notify('폐점 처리에 실패했습니다: DB에서 변경된 매장이 없습니다.', { type: 'error' })
+      return
+    }
+
+    const closed = data[0]
     if (closed.cafe_status !== 'closed' || closed.cafe_needs_review !== false) {
       setProcessingId(null)
       notify('폐점 처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
@@ -311,30 +327,16 @@ export function CafeApprovalList() {
       naver_place_checked_at: new Date().toISOString(),
     }
 
-    const { error: cafeError } = await supabase
-      .from('cafes')
-      .update(payload)
-      .eq('id', cafe.id)
-
-    if (!cafeError) {
-      const { error: candidateError } = await supabase
-        .from('cafe_verification_candidates')
-        .update({ status: 'applied', applied_at: new Date().toISOString() })
-        .eq('id', verification.id)
-
-      if (candidateError) {
-        setProcessingId(null)
-        notify(`후보 적용 상태 저장에 실패했습니다: ${candidateError.message}`, { type: 'error' })
-        return
-      }
+    try {
+      await adminUpdate('cafes', payload, { column: 'id', value: cafe.id })
+      await adminUpdate('cafe_verification_candidates', { status: 'applied', applied_at: new Date().toISOString() }, { column: 'id', value: verification.id })
+    } catch (err) {
+      setProcessingId(null)
+      notify(`네이버 후보 적용에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
+      return
     }
 
     setProcessingId(null)
-
-    if (cafeError) {
-      notify(`네이버 후보 적용에 실패했습니다: ${cafeError.message}`, { type: 'error' })
-      return
-    }
 
     notify('네이버 후보를 매장 정보에 적용했습니다.', { type: 'success' })
     await loadCafes()

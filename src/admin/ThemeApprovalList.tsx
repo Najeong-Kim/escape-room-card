@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
-import { supabase } from './supabaseDataProvider'
+import { supabase } from '../lib/supabaseClient'
+import { adminUpdate, adminInsert, adminDelete, adminRpc } from './adminClient'
 
 interface ApprovalCafe {
   id: number
@@ -329,45 +330,19 @@ export function ThemeApprovalList() {
       aging_score: form.aging_score,
     }
 
-    const { data: updatedTheme, error } = await supabase
-      .from('themes')
-      .update(payload)
-      .eq('id', themeId)
-      .select('id')
-      .single()
+    try {
+      await adminUpdate('themes', payload, { column: 'id', value: themeId })
+      await adminDelete('theme_genres', { column: 'theme_id', value: themeId })
+      if (form.genre_ids.length) {
+        await adminInsert('theme_genres', form.genre_ids.map(genreId => ({ theme_id: themeId, genre_id: genreId })))
+      }
+    } catch (err) {
+      setProcessingId(null)
+      notify(`테마 수정에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
+      return
+    }
 
     setProcessingId(null)
-
-    if (error) {
-      notify(`테마 수정에 실패했습니다: ${error.message}`, { type: 'error' })
-      return
-    }
-    if (!updatedTheme) {
-      notify('테마 수정 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
-      return
-    }
-
-    const { error: deleteGenreError } = await supabase
-      .from('theme_genres')
-      .delete()
-      .eq('theme_id', themeId)
-
-    if (deleteGenreError) {
-      notify(`장르 수정에 실패했습니다: ${deleteGenreError.message}`, { type: 'error' })
-      return
-    }
-
-    if (form.genre_ids.length) {
-      const { error: genreError } = await supabase
-        .from('theme_genres')
-        .insert(form.genre_ids.map(genreId => ({ theme_id: themeId, genre_id: genreId })))
-
-      if (genreError) {
-        notify(`장르 수정에 실패했습니다: ${genreError.message}`, { type: 'error' })
-        return
-      }
-    }
-
     setEditingId(null)
     setForm(null)
     notify('테마 정보를 수정했습니다.', { type: 'success' })
@@ -382,16 +357,23 @@ export function ThemeApprovalList() {
 
     setProcessingId(theme.id)
 
-    const { data, error } = await supabase
-      .rpc('review_theme_for_review', { p_theme_id: theme.id, p_status: status })
-
-    if (error || !data || data.length === 0) {
+    let rpcResult: { data: { theme_status?: string; theme_needs_review?: boolean }[] }
+    try {
+      rpcResult = await adminRpc('review_theme_for_review', { p_theme_id: theme.id, p_status: status })
+    } catch (err) {
       setProcessingId(null)
-      notify(`처리에 실패했습니다: ${error?.message ?? 'DB에서 변경된 테마가 없습니다.'}`, { type: 'error' })
+      notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
 
-    const reviewed = data[0] as { theme_status?: string; theme_needs_review?: boolean }
+    const data = rpcResult.data
+    if (!data || data.length === 0) {
+      setProcessingId(null)
+      notify('처리에 실패했습니다: DB에서 변경된 테마가 없습니다.', { type: 'error' })
+      return
+    }
+
+    const reviewed = data[0]
     if (reviewed.theme_status !== status || reviewed.theme_needs_review !== false) {
       setProcessingId(null)
       notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })

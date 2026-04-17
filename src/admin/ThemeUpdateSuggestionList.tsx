@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import { useNotify } from 'react-admin'
-import { supabase } from './supabaseDataProvider'
+import { supabase } from '../lib/supabaseClient'
+import { adminUpdate } from './adminClient'
 
 interface SuggestionTheme {
   id: number
@@ -122,47 +123,32 @@ export function ThemeUpdateSuggestionList() {
       Object.entries(item.suggested_changes).map(([field, change]) => [field, change.to]),
     )
 
-    const { error: updateError } = await supabase
-      .from('themes')
-      .update(patch)
-      .eq('id', item.theme_id)
-
-    if (updateError) {
+    try {
+      await adminUpdate('themes', patch, { column: 'id', value: item.theme_id })
+      await adminUpdate('theme_update_suggestions', { status: 'approved', reviewed_at: new Date().toISOString() }, { column: 'id', value: item.id })
+    } catch (err) {
       setProcessingId(null)
-      notify(`승인 반영에 실패했습니다: ${updateError.message}`, { type: 'error' })
+      notify(`승인 반영에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
-
-    const { error: suggestionError } = await supabase
-      .from('theme_update_suggestions')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-      .eq('id', item.id)
 
     setProcessingId(null)
-
-    if (suggestionError) {
-      notify(`제안 상태 변경에 실패했습니다: ${suggestionError.message}`, { type: 'error' })
-      return
-    }
-
     setItems(current => current.filter(currentItem => currentItem.id !== item.id))
     notify('변경 제안을 승인했습니다.', { type: 'success' })
   }
 
   async function reject(item: ThemeUpdateSuggestion) {
     setProcessingId(item.id)
-    const { error } = await supabase
-      .from('theme_update_suggestions')
-      .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
-      .eq('id', item.id)
 
-    setProcessingId(null)
-
-    if (error) {
-      notify(`거절 처리에 실패했습니다: ${error.message}`, { type: 'error' })
+    try {
+      await adminUpdate('theme_update_suggestions', { status: 'rejected', reviewed_at: new Date().toISOString() }, { column: 'id', value: item.id })
+    } catch (err) {
+      setProcessingId(null)
+      notify(`거절 처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
       return
     }
 
+    setProcessingId(null)
     setItems(current => current.filter(currentItem => currentItem.id !== item.id))
     notify('변경 제안을 거절했습니다.', { type: 'success' })
   }

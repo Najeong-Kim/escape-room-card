@@ -1,137 +1,27 @@
-import { createClient } from '@supabase/supabase-js'
 import type { DataProvider } from 'react-admin'
+import { supabase } from '../lib/supabaseClient'
+import { getAdminToken } from './authProvider'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_KEY as string
-
-export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false,
-  },
-})
-
-function toSupabaseFilters(filter: Record<string, unknown>) {
-  return filter
+async function adminRequest(operation: string, resource: string, params: unknown) {
+  const { data, error } = await supabase.functions.invoke('admin-proxy', {
+    body: { operation, resource, params },
+    headers: { 'x-admin-token': getAdminToken() },
+  })
+  if (error) throw error
+  if (data?.error) throw new Error(data.error)
+  return data
 }
 
 export function createSupabaseDataProvider(): DataProvider {
   return {
-    async getList(resource, params) {
-      const page = params.pagination?.page ?? 1
-      const perPage = params.pagination?.perPage ?? 25
-      const field = params.sort?.field ?? 'id'
-      const order = params.sort?.order ?? 'ASC'
-      const from = (page - 1) * perPage
-      const to = from + perPage - 1
-      const select = typeof params.meta?.select === 'string' ? params.meta.select : '*'
-
-      let query = supabase
-        .from(resource)
-        .select(select, { count: 'exact' })
-        .order(field, { ascending: order === 'ASC' })
-        .range(from, to)
-
-      const filter = toSupabaseFilters(params.filter)
-      for (const [key, value] of Object.entries(filter)) {
-        if (value !== undefined && value !== null && value !== '') {
-          query = query.ilike(key, `%${value}%`)
-        }
-      }
-
-      const { data, error, count } = await query
-      if (error) throw error
-      return { data: (data ?? []) as never[], total: count ?? 0 }
-    },
-
-    async getOne(resource, params) {
-      const select = typeof params.meta?.select === 'string' ? params.meta.select : '*'
-      const { data, error } = await supabase
-        .from(resource)
-        .select(select)
-        .eq('id', params.id)
-        .single()
-      if (error) throw error
-      return { data: data as never }
-    },
-
-    async getMany(resource, params) {
-      const { data, error } = await supabase
-        .from(resource)
-        .select('*')
-        .in('id', params.ids)
-      if (error) throw error
-      return { data: data ?? [] }
-    },
-
-    async getManyReference(resource, params) {
-      const { page, perPage } = params.pagination
-      const { field, order } = params.sort
-      const from = (page - 1) * perPage
-      const to = from + perPage - 1
-
-      const { data, error, count } = await supabase
-        .from(resource)
-        .select('*', { count: 'exact' })
-        .eq(params.target, params.id)
-        .order(field, { ascending: order === 'ASC' })
-        .range(from, to)
-      if (error) throw error
-      return { data: data ?? [], total: count ?? 0 }
-    },
-
-    async create(resource, params) {
-      const { id: _id, ...rest } = params.data
-      const { data, error } = await supabase
-        .from(resource)
-        .insert(rest)
-        .select()
-        .single()
-      if (error) throw error
-      return { data }
-    },
-
-    async update(resource, params) {
-      const { id, ...rest } = params.data
-      const { data, error } = await supabase
-        .from(resource)
-        .update(rest)
-        .eq('id', id)
-        .select()
-        .single()
-      if (error) throw error
-      return { data }
-    },
-
-    async updateMany(resource, params) {
-      const { id: _id, ...rest } = params.data
-      const { error } = await supabase
-        .from(resource)
-        .update(rest)
-        .in('id', params.ids)
-      if (error) throw error
-      return { data: params.ids }
-    },
-
-    async delete(resource, params) {
-      const { data, error } = await supabase
-        .from(resource)
-        .delete()
-        .eq('id', params.id)
-        .select()
-        .single()
-      if (error) throw error
-      return { data }
-    },
-
-    async deleteMany(resource, params) {
-      const { error } = await supabase
-        .from(resource)
-        .delete()
-        .in('id', params.ids)
-      if (error) throw error
-      return { data: params.ids }
-    },
+    getList: (resource, params) => adminRequest('getList', resource, params),
+    getOne: (resource, params) => adminRequest('getOne', resource, params),
+    getMany: (resource, params) => adminRequest('getMany', resource, params),
+    getManyReference: (resource, params) => adminRequest('getManyReference', resource, params),
+    create: (resource, params) => adminRequest('create', resource, params),
+    update: (resource, params) => adminRequest('update', resource, params),
+    updateMany: (resource, params) => adminRequest('updateMany', resource, params),
+    delete: (resource, params) => adminRequest('delete', resource, params),
+    deleteMany: (resource, params) => adminRequest('deleteMany', resource, params),
   }
 }

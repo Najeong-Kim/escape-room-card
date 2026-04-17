@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { supabase } from './supabaseDataProvider'
+import { supabase } from '../lib/supabaseClient'
 
 export interface AreaOption {
   id: number
