@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import './i18n'
 import App from './App.tsx'
+import { LandingPage } from './components/Landing/LandingPage'
 
 const AdminApp = lazy(() => import('./admin/AdminApp'))
 const RoomBrowse = lazy(() => import('./components/RoomBrowse/RoomBrowse'))
@@ -63,6 +64,9 @@ createRoot(document.getElementById('root')!).render(
             </Suspense>
           }
         />
+        <Route path="/my-card" element={<App />} />
+        <Route path="/app" element={<App />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>

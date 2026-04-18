@@ -6,7 +6,7 @@ import { RoomCard } from './RoomCard'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import { Footer } from '../Footer'
-import { AppTopActions } from '../AppTopActions'
+import { GlobalNav } from '../GlobalNav'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { RatingIcon } from '../../lib/ratings'
@@ -108,9 +108,8 @@ export default function RoomBrowse() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
-      <AppTopActions />
-      {/* Top bar */}
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 pr-36 sm:pr-4 flex items-center gap-3 min-w-0">
+      <GlobalNav />
+      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3 min-w-0">
         <button
           onClick={() => navigate(-1)}
           className="text-gray-400 hover:text-white transition-colors p-1"

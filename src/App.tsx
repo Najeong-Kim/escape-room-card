@@ -7,7 +7,7 @@ import type { QuizProfile } from './lib/traitMap'
 import { QuizFlow } from './components/Quiz/QuizFlow'
 import { ResultCard } from './components/ResultCard/ResultCard'
 import { Footer } from './components/Footer'
-import { AppTopActions } from './components/AppTopActions'
+import { GlobalNav } from './components/GlobalNav'
 import type { RoomLog } from './lib/roomLog'
 import { useRoomLogs } from './lib/useRoomLogs'
 import { clearSavedCard, loadSavedCard, saveCard, SAVED_CARD_CHANGED } from './lib/savedCard'
@@ -68,26 +68,7 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f]">
-      <AppTopActions languageLabel={t('lang_toggle')} onLanguageToggle={toggleLang} />
-
-      <div className="fixed top-4 left-4 z-50 flex gap-2">
-        <button
-          onClick={() => navigate('/rooms')}
-          className="text-xs text-gray-500 hover:text-gray-300
-                     border border-gray-800 hover:border-gray-600 px-3 py-1.5 rounded-full
-                     transition-colors bg-[#0a0a0f]/80 backdrop-blur-sm"
-        >
-          🏠 방 둘러보기
-        </button>
-        <button
-          onClick={() => navigate('/my-rooms')}
-          className="text-xs text-gray-500 hover:text-gray-300
-                     border border-gray-800 hover:border-gray-600 px-3 py-1.5 rounded-full
-                     transition-colors bg-[#0a0a0f]/80 backdrop-blur-sm"
-        >
-          📋 내 기록
-        </button>
-      </div>
+      <GlobalNav languageLabel={t('lang_toggle')} onLanguageToggle={toggleLang} />
 
       <AnimatePresence mode="wait">
         {mode === 'home' && savedProfile && (

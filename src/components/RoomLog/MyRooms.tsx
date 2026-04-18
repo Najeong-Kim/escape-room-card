@@ -7,7 +7,7 @@ import { useRoomLogs } from '../../lib/useRoomLogs'
 import { deleteUserRoomLog } from '../../lib/userRoomLogs'
 import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import { Footer } from '../Footer'
-import { AppTopActions } from '../AppTopActions'
+import { GlobalNav } from '../GlobalNav'
 import { EditLogModal } from './EditLogModal'
 
 function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
@@ -41,7 +41,7 @@ export default function MyRooms() {
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
-      <AppTopActions />
+      <GlobalNav />
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3">
         <button
