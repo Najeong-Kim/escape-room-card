@@ -5,9 +5,9 @@ type AppTheme = 'dark' | 'light'
 const STORAGE_KEY = 'escape-room-app-theme'
 
 function initialTheme(): AppTheme {
-  if (typeof window === 'undefined') return 'dark'
+  if (typeof window === 'undefined') return 'light'
   const saved = window.localStorage.getItem(STORAGE_KEY)
-  return saved === 'light' ? 'light' : 'dark'
+  return saved === 'dark' ? 'dark' : 'light'
 }
 
 function applyTheme(theme: AppTheme) {

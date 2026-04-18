@@ -9,20 +9,6 @@
   --color-brand-accent-hover: #f59e0b;
   --color-brand-accent-soft: #fef3c7;
   --color-brand-accent-dark: #92400e;
-  --color-bg: #0a0a0f;
-  --color-surface: #13131a;
-  --color-surface-raised: #16161f;
-  --color-surface-muted: #0e0e16;
-  --color-text: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --color-border: rgb(255 255 255 / 0.1);
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-  --color-info: #38bdf8;
-}
-
-:root[data-app-theme='light'] {
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-raised: #f1f5f9;
@@ -30,6 +16,20 @@
   --color-text: #111827;
   --color-text-muted: #64748b;
   --color-border: rgb(17 24 39 / 0.1);
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #38bdf8;
+}
+
+:root[data-app-theme='dark'] {
+  --color-bg: #0a0a0f;
+  --color-surface: #13131a;
+  --color-surface-raised: #16161f;
+  --color-surface-muted: #0e0e16;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-border: rgb(255 255 255 / 0.1);
 }
 
 @layer base {

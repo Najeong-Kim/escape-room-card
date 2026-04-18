@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabaseClient'
 import { loadSavedCard, SAVED_CARD_CHANGED } from '../../lib/savedCard'
 import type { QuizProfile } from '../../lib/traitMap'
+import { AppThemeToggle } from '../AppThemeToggle'
 import './LandingPage.css'
 
 // ─── Data ────────────────────────────────────────────────────
@@ -18,11 +19,21 @@ const CHARACTERS = [
   { id: 'rabbit', name: '토끼',   tag: '신중한 모험가',  hue: 330, accent: '#EC4899', img: '/characters/rabbit.png' },
 ]
 
+const CHAR_DETAILS: Record<string, { desc: string; stats: string[] }> = {
+  lion:   { desc: '두려움보다 도전이 먼저. 어떤 장르든 정면으로 돌파하는 대담한 퍼즐러예요. 고난이도 방에서 진가가 발휘되고, 팀의 분위기를 이끌어가는 타입이에요.', stats: ['공포 5/5', '퍼즐 5/5', '활동성 4/5', '스토리 3/5'] },
+  tiger:  { desc: '자물쇠와 기믹 앞에서 눈이 반짝이는 장치형 전문가. 손으로 직접 만지고 분해해야 속이 풀려요. 복잡한 메커니즘일수록 더 신나는 타입이에요.', stats: ['공포 4/5', '장치 5/5', '활동성 5/5', '스토리 2/5'] },
+  wolf:   { desc: '숲 속에서 조용히 전체를 보는 균형형 리더. 공포도·퍼즐·장치 어느 쪽도 무너지지 않아요. 탈출 후 가장 많은 걸 기억하는 타입이에요.', stats: ['공포 3/5', '퍼즐 4/5', '장치 4/5', '스토리 4/5'] },
+  fox:    { desc: '침착하고 논리적인 퍼즐러. 단서를 하나씩 엮어가며 정답을 찾는 과정이 즐거워요. 페이크나 함정을 꿰뚫어보는 눈이 있어요.', stats: ['공포 2/5', '퍼즐 5/5', '활동성 2/5', '스토리 4/5'] },
+  cat:    { desc: '조용하지만 장치에 강한 집중형. 혼자 구석에서 기믹을 해체하는 걸 좋아해요. 드라마틱한 연출보다 정교한 설계에 감탄하는 타입이에요.', stats: ['공포 2/5', '장치 5/5', '활동성 3/5', '스토리 3/5'] },
+  eagle:  { desc: '위에서 내려다보는 전략가. 공간 전체의 흐름을 파악하고 팀원을 적재적소에 배치해요. 공포방도 냉정하게 즐길 줄 아는 균형 잡힌 플레이어예요.', stats: ['공포 3/5', '퍼즐 4/5', '장치 3/5', '스토리 4/5'] },
+  rabbit: { desc: '신중하고 꼼꼼한 모험가. 처음엔 조심스럽지만, 공간을 파악하고 나면 누구보다 빠르게 움직여요. 스토리와 분위기에 몰입할 때 가장 빛나요.', stats: ['공포 1/5', '퍼즐 3/5', '활동성 3/5', '스토리 5/5'] },
+}
+
 const FEATURES = [
   {
     kbd: 'Q1',
     title: '12문항, 2분이면 끝',
-    desc: '심리학 전공자가 짠 진짜 질문. 공포도·장치·스토리 취향까지 잡아내요.',
+    desc: '통계데이터학 기반의 진짜 질문. 공포도·장치·스토리 취향까지 잡아내요.',
     icon: (
       <svg viewBox="0 0 40 40" fill="none" style={{ width: 28, height: 28 }}>
         <rect x="6" y="6" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2"/>
@@ -55,10 +66,10 @@ const FEATURES = [
 ]
 
 const STATS = [
-  { num: '2.4만', label: '생성된 카드' },
-  { num: '1,380', label: '등록 테마' },
-  { num: '4.8', label: '사용자 평점' },
-  { num: '92%', label: '추천 만족도' },
+  { num: '715', label: '등록 테마' },
+  { num: '181', label: '등록 매장' },
+  { num: '7', label: '캐릭터 유형' },
+  { num: '12', label: '진단 문항' },
 ]
 
 const REVIEWS = [
@@ -70,17 +81,17 @@ const REVIEWS = [
 ]
 
 const ROOMS = [
-  { brand: '키이스케이프', name: '필사의 탐구',  genre: '추리',    diff: 4.6, match: 97, hue: 195 },
-  { brand: '제로월드',     name: '타임머신',     genre: 'SF/장치', diff: 4.2, match: 94, hue: 42  },
-  { brand: '코드케이',     name: '은밀한 서재',  genre: '잠입',    diff: 3.8, match: 91, hue: 260 },
+  { brand: '룸즈에이',  name: '아이언 게이트 프리즌', genre: '탈옥',      diff: 8.0, match: 97, hue: 195, img: 'https://ayquitjpjqkzhhmxnhge.supabase.co/storage/v1/object/public/theme-posters/172/poster.jpg' },
+  { brand: '제로월드',  name: '제로',                 genre: '호러/공포', diff: 8.0, match: 94, hue: 0,   img: 'https://cdn.zamfit.co.kr/EscapeRoom/a162d45f-31aa-41ae-af32-a2eca4f5a5b8.jpg' },
+  { brand: '상상의문',  name: 'DKDK컴퍼니',           genre: '판타지',    diff: 8.0, match: 91, hue: 260, img: 'https://ayquitjpjqkzhhmxnhge.supabase.co/storage/v1/object/public/theme-posters/176/poster.jpg' },
 ]
 
 const FAQ = [
-  { q: '방탕이 뭐예요?',              a: '"방탈출 탕진하기" 줄임말. 방탈출에 푹 빠진 사람들을 위한 성향 카드 서비스예요. 12문항에 답하면 7가지 동물 중 내 캐릭터가 나와요.' },
-  { q: '무료로 쓸 수 있나요?',        a: '네, 핵심 기능은 전부 무료예요. 카드 생성도, 방 추천도, 플레이 기록도요.' },
-  { q: '개인정보는 어떻게 쓰이나요?', a: '닉네임과 플레이 기록만 저장해요. 카드를 공유할 때만 외부에 공개되고, 언제든 삭제할 수 있어요.' },
-  { q: '기록 없이도 추천받을 수 있나요?', a: '처음엔 12문항 기반으로 추천드려요. 기록이 쌓일수록 훨씬 더 정교해지고요.' },
-  { q: '공유는 어떻게 하나요?',       a: '카드 이미지로 저장하거나 링크로 공유하면 돼요. 인스타 스토리 비율로도 저장돼요.' },
+  { q: '방탕이 뭐예요?', a: '방탈출로 탕진하자의 줄임말이에요 😄 방탈출에 진심인 사람들을 위한 성향 카드 서비스예요. 12문항에 답하면 사자·호랑이·늑대 등 7가지 동물 중 나한테 딱 맞는 캐릭터가 나와요.' },
+  { q: '돈 안 내도 되나요?', a: '네, 완전 무료예요! 카드 만들기, 방 추천, 플레이 기록 전부 무료로 쓸 수 있어요.' },
+  { q: '내 정보 어디에 쓰여요?', a: '닉네임이랑 플레이 기록만 저장해요. 카드를 공유할 때만 외부에 공개되고, 언제든지 삭제할 수 있어요.' },
+  { q: '방탈출 기록이 없어도 추천받을 수 있나요?', a: '물론이죠! 처음엔 12문항 답변 기반으로 추천해드려요. 기록이 쌓일수록 훨씬 더 취향에 딱 맞는 방이 나와요.' },
+  { q: '친구한테 어떻게 공유해요?', a: '카드 이미지로 저장하거나 링크로 공유하면 돼요. 인스타 스토리 사이즈로도 저장되니까 바로 올릴 수 있어요 📲' },
 ]
 
 // ─── Button helpers ──────────────────────────────────────────
@@ -152,6 +163,7 @@ function Nav({ onCta }: { onCta: () => void }) {
           <a href="#features"   style={{ color: 'var(--text-muted)', textDecoration: 'none' }} className="lp-hide-sm">기능</a>
           <a href="#rooms"      style={{ color: 'var(--text-muted)', textDecoration: 'none' }} className="lp-hide-sm">방 추천</a>
           <a href="#faq"        style={{ color: 'var(--text-muted)', textDecoration: 'none' }} className="lp-hide-sm">FAQ</a>
+          <AppThemeToggle floating={false} />
           <button style={btnPrimary(true)} onClick={onCta}>카드 만들기 →</button>
         </div>
       </div>
@@ -317,7 +329,7 @@ function FloatingCardStack({ big = false }: { big?: boolean }) {
 
 // ─── Hero — Balanced / Split ─────────────────────────────────
 
-function HeroBalanced({ parallaxY, onCta, onBrowse, loggedIn = false }: { parallaxY: number; onCta: () => void; onBrowse: () => void; loggedIn?: boolean }) {
+function HeroBalanced({ parallaxY, onCta, onBrowse, loggedIn = false, heroCount = '수천 명' }: { parallaxY: number; onCta: () => void; onBrowse: () => void; loggedIn?: boolean; heroCount?: string }) {
   return (
     <section style={{ position: 'relative', padding: '60px 0 90px', overflow: 'hidden' }}>
       <GridDots />
@@ -371,7 +383,7 @@ function HeroBalanced({ parallaxY, onCta, onBrowse, loggedIn = false }: { parall
             </div>
             <div style={{ marginTop: 28, display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-muted)', fontSize: 13 }}>
               <AvatarStack />
-              <span><b style={{ color: 'var(--text)' }}>2만 4천 명</b>이 이미 카드를 받았어요</span>
+              <span><b style={{ color: 'var(--text)' }}>{heroCount}</b>이 이미 카드를 받았어요</span>
             </div>
           </div>
           <div style={{ position: 'relative', height: 520, transform: `translateY(${parallaxY * 0.15}px)` }}>
@@ -430,9 +442,11 @@ function CharOrbit({ selected, onSelect }: { selected: string; onSelect: (id: st
             <div className="lp-floaty" style={{
               width: 180, height: 180, margin: '0 auto',
               background: `radial-gradient(circle, color-mix(in srgb, ${c.accent} 28%, transparent), transparent 70%)`,
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%', overflow: 'hidden',
+              boxShadow: `0 0 0 3px color-mix(in srgb, ${c.accent} 35%, transparent)`,
             }}>
-              <img src={c.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: `drop-shadow(0 10px 28px ${c.accent}88)` }} />
+              <img src={c.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', filter: `drop-shadow(0 10px 28px ${c.accent}88)` }} />
             </div>
             <div style={{ fontWeight: 900, fontSize: 22, marginTop: 8 }}>{c.name}</div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{c.tag}</div>
@@ -458,7 +472,7 @@ function CharOrbit({ selected, onSelect }: { selected: string; onSelect: (id: st
               border: `1px solid color-mix(in srgb, ${c.accent} 40%, var(--border))`,
               cursor: 'pointer',
               padding: 0, overflow: 'hidden',
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'transform .2s ease, box-shadow .2s ease',
               zIndex: 3,
             }}
@@ -471,7 +485,7 @@ function CharOrbit({ selected, onSelect }: { selected: string; onSelect: (id: st
               e.currentTarget.style.boxShadow = 'none'
             }}
           >
-            <img src={c.img} alt={c.name} style={{ width: '88%', height: '88%', objectFit: 'contain' }} />
+            <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
           </button>
         )
       })}
@@ -482,6 +496,7 @@ function CharOrbit({ selected, onSelect }: { selected: string; onSelect: (id: st
 // ─── Char Detail Panel ───────────────────────────────────────
 
 function CharDetailPanel({ char }: { char: Char }) {
+  const detail = CHAR_DETAILS[char.id]
   return (
     <div style={{
       marginTop: 32,
@@ -495,20 +510,21 @@ function CharDetailPanel({ char }: { char: Char }) {
         <div className="lp-mono" style={{ fontSize: 11, color: char.accent, letterSpacing: '.15em', marginBottom: 6 }}>CHARACTER · {char.id.toUpperCase()}</div>
         <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em' }}>{char.name} — {char.tag}</div>
         <p style={{ color: 'var(--text-muted)', margin: '10px 0 18px', lineHeight: 1.65, maxWidth: 560 }} className="lp-break-keep">
-          방탈출에서 나만의 방식으로 문제를 풀어나가는 타입. 공포도나 난이도와 상관없이 끝까지 밀고 가는 편이에요. 인생테마 후보는 주로 내 성향에 딱 맞는 장르에서 나와요.
+          {detail.desc}
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {['공포 5/5', '퍼즐형 3/5', '활동성 4/5', '스토리 5/5'].map(t => (
+          {detail.stats.map(t => (
             <span key={t} className="lp-sticker" style={{ background: 'var(--surface-muted)' }}>{t}</span>
           ))}
         </div>
       </div>
       <div style={{
-        width: 140, height: 140, borderRadius: 20,
+        width: 140, height: 140, borderRadius: '50%', overflow: 'hidden',
         background: `radial-gradient(circle, color-mix(in srgb, ${char.accent} 26%, transparent), transparent 70%)`,
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: `0 0 0 3px color-mix(in srgb, ${char.accent} 30%, transparent)`,
       }}>
-        <img src={char.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <img src={char.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
       </div>
     </div>
   )
@@ -708,7 +724,7 @@ function RoomPreview({ onBrowse }: { onBrowse: () => void }) {
         <SectionHeader
           eyebrow="ROOM RECOMMENDATIONS"
           title={<>내 취향이면, 이런 <span style={{ color: 'var(--accent)' }}>방</span></>}
-          sub="카드를 받으면 전국 1,380개 테마 중 내 성향과 93% 이상 맞는 방을 골라드려요. 아래는 '늑대 🐺' 카드 기준 예시."
+          sub="카드를 받으면 전국 715개 테마 중 내 성향과 93% 이상 맞는 방을 골라드려요. 아래는 '늑대 🐺' 카드 기준 예시."
         />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginTop: 48 }}>
           {ROOMS.map((r, i) => (
@@ -720,12 +736,15 @@ function RoomPreview({ onBrowse }: { onBrowse: () => void }) {
               <div style={{
                 aspectRatio: '4 / 3',
                 background: `linear-gradient(135deg, hsl(${r.hue}, 50%, 35%), hsl(${r.hue + 40}, 40%, 20%))`,
-                position: 'relative', display: 'flex', alignItems: 'flex-end', padding: 16,
-              }} className="lp-noise">
-                <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(135deg, rgba(0,0,0,0) 0 16px, rgba(0,0,0,.1) 16px 17px)' }} />
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <div className="lp-mono" style={{ fontSize: 10, color: 'rgba(255,255,255,.7)', letterSpacing: '.15em' }}>POSTER · {String(i + 1).padStart(2, '0')}</div>
-                </div>
+                position: 'relative', overflow: 'hidden',
+              }}>
+                <img
+                  src={r.img}
+                  alt={r.name}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                  onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 50%)' }} />
                 <div style={{ position: 'absolute', top: 14, right: 14, padding: '6px 10px', borderRadius: 999, background: 'var(--accent)', color: '#1a1405', fontSize: 12, fontWeight: 900 }}>
                   {r.match}% match
                 </div>
@@ -761,7 +780,7 @@ function FaqSection() {
         <SectionHeader
           eyebrow="FAQ"
           title={<>자주 묻는 <span style={{ color: 'var(--brand)' }}>질문</span></>}
-          sub="더 궁금한 게 있으면 hi@bangtang.kr 로 보내주세요."
+          sub="더 궁금한 게 있으면 atpeoe1023@gmail.com 로 보내주세요."
           align="left"
         />
         <div style={{ marginTop: 40, display: 'grid', gap: 10 }}>
@@ -826,7 +845,7 @@ function LpFooter() {
         <div style={{ display: 'flex', gap: 20, fontSize: 13 }}>
           <Link to="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>개인정보처리방침</Link>
           <Link to="/terms"   style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>이용약관</Link>
-          <a href="mailto:hi@bangtang.kr" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>hi@bangtang.kr</a>
+          <a href="mailto:atpeoe1023@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>atpeoe1023@gmail.com</a>
         </div>
       </div>
     </footer>
@@ -1019,12 +1038,27 @@ export function LandingPage() {
   const [card, setCard] = useState<QuizProfile | null>(loadSavedCard)
   const [session, setSession] = useState<Session | null>(null)
   const [scrollY, setScrollY] = useState(0)
+  const [heroCount, setHeroCount] = useState<string>('수천 명')
 
   // auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const { data: listener } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => listener.subscription.unsubscribe()
+  }, [])
+
+  // dynamic card count
+  useEffect(() => {
+    supabase
+      .from('user_card_profiles')
+      .select('*', { count: 'exact', head: true })
+      .then(({ count }) => {
+        if (count && count > 0) {
+          if (count >= 10000) setHeroCount(`${Math.floor(count / 1000)}천 명`)
+          else if (count >= 1000) setHeroCount(`${(count / 1000).toFixed(1)}천 명`)
+          else setHeroCount(`${count.toLocaleString()}명`)
+        }
+      })
   }, [])
 
   // card changes (e.g. after quiz)
@@ -1053,7 +1087,7 @@ export function LandingPage() {
   return (
     <div className="lp-root">
       <Nav onCta={onCta} />
-      <HeroBalanced parallaxY={scrollY} onCta={onCta} onBrowse={onBrowse} loggedIn={Boolean(session)} />
+      <HeroBalanced parallaxY={scrollY} onCta={onCta} onBrowse={onBrowse} loggedIn={Boolean(session)} heroCount={heroCount} />
       <CharacterShowcase />
       <CardSamplePreview />
       <Features />
