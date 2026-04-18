@@ -366,3 +366,42 @@
 .card-face-back {
   transform: rotateY(180deg);
 }
+
+/* GlobalNav theming */
+.global-nav {
+  background: color-mix(in srgb, #0a0a0f 88%, transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+}
+.global-nav-link {
+  color: #64748b;
+}
+.global-nav-link:hover {
+  color: #cbd5e1;
+}
+.global-nav-link.active {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.06);
+}
+.global-nav-logo-text {
+  color: #f8fafc;
+}
+
+:root[data-app-theme='light'] .global-nav {
+  background: color-mix(in srgb, #f8fafc 90%, transparent);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  color: #111827;
+}
+:root[data-app-theme='light'] .global-nav-link {
+  color: #64748b;
+}
+:root[data-app-theme='light'] .global-nav-link:hover {
+  color: #111827;
+}
+:root[data-app-theme='light'] .global-nav-link.active {
+  color: #111827;
+  background: rgba(17, 24, 39, 0.06);
+}
+:root[data-app-theme='light'] .global-nav-logo-text {
+  color: #111827;
+}
