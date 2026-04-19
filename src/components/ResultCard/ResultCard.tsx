@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type CSSProperties } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { QuizProfile } from '../../lib/traitMap'
@@ -663,10 +663,6 @@ function getGenreStops(genres: string[]): string[] {
   return stops.map(color => darkenColor(color, 0.08))
 }
 
-function getGenreBackground(genres: string[]): CSSProperties['background'] {
-  const stops = getGenreStops(genres)
-  return `linear-gradient(135deg, ${stops.join(', ')})`
-}
 
 function getGenreBorder(genres: string[]): string {
   const first = genres.find(genre => GENRE_COLORS[genre])
