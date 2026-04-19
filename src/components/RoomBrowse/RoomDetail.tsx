@@ -74,14 +74,9 @@ const METRICS: { key: MetricKey; label: string }[] = [
 ]
 
 function formatScore(score: number) {
-  return Number.isInteger(score) ? String(score) : score.toFixed(1)
+  return score.toFixed(1)
 }
 
-function metricDisplay(score: number | null | undefined, label: string | null | undefined) {
-  if (score !== null && score !== undefined) return `${formatScore(score)}/10`
-  if (label) return label
-  return '미확인'
-}
 
 function similarRoomScore(current: Room, candidate: Room) {
   let score = 0
@@ -133,6 +128,7 @@ export default function RoomDetail() {
   const [showReport, setShowReport] = useState(false)
   const [logs] = useRoomLogs()
   const logged = useMemo(() => logs.some(log => log.room_id === roomId), [logs, roomId])
+  const myLog = useMemo(() => logs.find(log => log.room_id === roomId), [logs, roomId])
 
   const refetchRatings = useCallback(() => {
     Promise.all([
@@ -288,32 +284,59 @@ export default function RoomDetail() {
                 <p className="text-xs text-teal-300 font-semibold">
                   {logged ? '이미 기록한 테마예요' : personalPrediction ? predictionConfidenceLabel(personalPrediction) : '이 테마가 궁금하신가요?'}
                 </p>
-                <p className="text-sm text-gray-300 mt-1">
-                  {logged
-                    ? '내 기록에서 결과를 다시 확인할 수 있습니다.'
-                    : personalPrediction
+                {logged && myLog ? (
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className={`text-sm font-semibold ${myLog.cleared ? 'text-green-400' : 'text-red-400'}`}>
+                      {myLog.cleared ? '탈출 성공' : '탈출 실패'}
+                    </span>
+                    {myLog.rating !== null && myLog.rating !== undefined && (() => {
+                      const def = getRatingDef(myLog.rating!)
+                      return def ? (
+                        <>
+                          <span className="text-gray-600">·</span>
+                          <RatingIcon value={def.value} size={16} />
+                          <span className="text-sm font-semibold" style={{ color: def.color }}>{def.label}</span>
+                        </>
+                      ) : null
+                    })()}
+                    <span className="text-gray-600">·</span>
+                    <span className="text-xs text-gray-500">{myLog.played_at}</span>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-300 mt-1">
+                    {personalPrediction
                       ? `${predictionPathLabel(personalPrediction).replace('예상 ', '')} · ${personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}`
                       : '플레이 후 길 평가를 남기면 추천이 더 정확해집니다.'}
-                </p>
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
-                {!logged && (
+                {logged ? (
                   <button
-                    onClick={() => setShowLog(true)}
-                    className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
-                  >
-                    기록하기
-                  </button>
-                )}
-                {room.website_url && (
-                  <a
-                    href={room.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => navigate('/my-rooms')}
                     className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
                   >
-                    예약하기
-                  </a>
+                    내 기록 보기
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowLog(true)}
+                      className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
+                    >
+                      기록하기
+                    </button>
+                    {room.website_url && (
+                      <a
+                        href={room.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
+                      >
+                        예약하기
+                      </a>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -321,8 +344,7 @@ export default function RoomDetail() {
 
           <div className="space-y-3">
             <h3 className="font-semibold">공식 정보</h3>
-            <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 col-span-2">
+            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
               <p className="text-xs text-gray-500">위치</p>
               <p className="text-sm text-gray-200 mt-1">{room.address ?? room.location}</p>
               <a
@@ -334,73 +356,76 @@ export default function RoomDetail() {
                 네이버 지도에서 보기 →
               </a>
             </div>
-            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-              <p className="text-xs text-gray-500">인원</p>
-              <p className="text-sm text-gray-200 mt-1">{room.min_players}-{room.max_players}명</p>
-            </div>
-            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-              <p className="text-xs text-gray-500">제한시간</p>
-              <p className="text-sm text-gray-200 mt-1">{room.duration_minutes}분</p>
-            </div>
-            <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-              <p className="text-xs text-gray-500">가격 (2인 기준)</p>
-              <p className="text-sm text-gray-200 mt-1">
-                {room.price_per_person > 0 ? `${room.price_per_person.toLocaleString()}원` : '미확인'}
-              </p>
-            </div>
-            {METRICS.map(metric => (
-              <div key={metric.key} className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-                <p className="text-xs text-gray-500">{metric.label}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                <p className="text-xs text-gray-500">인원</p>
+                <p className="text-sm text-gray-200 mt-1">{room.min_players}-{room.max_players}명</p>
+              </div>
+              <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                <p className="text-xs text-gray-500">제한시간</p>
+                <p className="text-sm text-gray-200 mt-1">{room.duration_minutes}분</p>
+              </div>
+              <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                <p className="text-xs text-gray-500">가격 (2인 기준)</p>
+                <p className="text-sm text-gray-200 mt-1">
+                  {room.price_per_person > 0 ? `${room.price_per_person.toLocaleString()}원` : '미확인'}
+                </p>
+              </div>
+              <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
+                <p className="text-xs text-gray-500">난이도</p>
                 <p className="official-label text-sm text-amber-300 mt-1">
-                  {metric.key === 'difficulty' && room.official_scores?.difficulty !== null && room.official_scores?.difficulty !== undefined ? (
+                  {room.official_scores?.difficulty !== null && room.official_scores?.difficulty !== undefined ? (
                     <>공식 <DifficultyDots value={room.official_scores.difficulty / 2} /></>
+                  ) : room.official_labels?.difficulty ? (
+                    <>공식 {room.official_labels.difficulty}</>
                   ) : (
-                    <>공식 {metricDisplay(room.official_scores?.[metric.key], room.official_labels?.[metric.key])}</>
+                    '미확인'
                   )}
                 </p>
               </div>
-            ))}
             </div>
           </div>
 
           <div className="space-y-3">
             <h3 className="font-semibold">유저 평균 평가</h3>
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
-              <p className="text-xs text-gray-500 mb-2">길 평가</p>
               {communityRating && ratingDef ? (
-                <div className="flex items-center gap-2">
-                  <RatingIcon value={ratingDef.value} size={24} />
-                  <span className="text-lg font-bold" style={{ color: ratingDef.color }}>
-                    {formatScore(communityRating.score10)}/10
+                <div className="flex items-center gap-2 mb-4">
+                  <RatingIcon value={ratingDef.value} size={22} />
+                  <span className="font-semibold text-sm" style={{ color: ratingDef.color }}>{ratingDef.label}</span>
+                  <span className="text-lg font-black text-white ml-1">
+                    {formatScore(communityRating.score10)}
+                    <span className="text-sm font-normal text-gray-500">/10</span>
                   </span>
-                  <span className="text-sm text-gray-500">
-                    {ratingDef.label}
-                    {SHOW_COMMUNITY_RATING_COUNTS && ` · ${communityRating.count}명`}
-                  </span>
+                  {SHOW_COMMUNITY_RATING_COUNTS && (
+                    <span className="text-xs text-gray-600 ml-auto">· {communityRating.count}명</span>
+                  )}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">아직 유저 평가가 없습니다.</p>
+                <p className="text-sm text-gray-500 mb-4">아직 유저 평가가 없습니다.</p>
               )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {METRICS.map(metric => {
-                const community = communityMetricStats[metric.key]
-                return (
-                  <div key={metric.key} className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
-                    <p className="text-xs text-gray-500">{metric.label}</p>
-                    {community ? (
-                      <p className="text-sm text-gray-200 mt-1">
-                        유저 {formatScore(community.score10)}/10
-                        {SHOW_COMMUNITY_RATING_COUNTS && (
-                          <span className="text-gray-600"> · {community.count}명</span>
+              <div className="border-t border-white/8 mb-4" />
+              <div className="space-y-3">
+                {METRICS.map(metric => {
+                  const community = communityMetricStats[metric.key]
+                  return (
+                    <div key={metric.key} className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-14 shrink-0">{metric.label}</span>
+                      <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                        {community && (
+                          <div
+                            className="h-full rounded-full bg-teal-400"
+                            style={{ width: `${community.score10 * 10}%` }}
+                          />
                         )}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-600 mt-1">유저 평가 없음</p>
-                    )}
-                  </div>
-                )
-              })}
+                      </div>
+                      <span className="text-xs text-gray-400 w-6 text-right shrink-0">
+                        {community ? formatScore(community.score10) : '—'}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
 
