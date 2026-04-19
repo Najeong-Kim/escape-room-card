@@ -5,7 +5,6 @@ import type { QuizProfile } from '../../lib/traitMap'
 import { Link } from 'react-router-dom'
 import {
   getCharacterImage,
-  FEAR_ICONS, PUZZLE_ICONS, PLAY_COUNT_STARS,
 } from './characterAssets'
 import { getRecommendations, type Room } from '../../lib/recommend'
 import {
@@ -64,7 +63,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
 
   // Re-compose share image when card mounts or language changes
   useEffect(() => {
-    composeShareCanvas(profile, tagline, tierLabel).then(blob => {
+    composeShareCanvasBothSides(profile, tagline, tierLabel).then(blob => {
       if (blob) setShareBlob(blob)
     })
   }, [profile, i18n.language, tagline, tierLabel])
@@ -503,113 +502,284 @@ function RoomCard({ room, t }: { room: Room; t: (key: string) => string }) {
   )
 }
 
-// ─── Canvas composition ───────────────────────────────────────────
+// ─── Canvas composition (front + back side-by-side) ───────────────
 
-async function composeShareCanvas(
+const CANVAS_STYLE_LABELS: Record<string, string> = {
+  'Speed runner': '스피드런',
+  'No-hint player': '노힌트',
+  'Cooperative': '협동형',
+  'Observer': '관찰자',
+}
+
+async function composeShareCanvasBothSides(
   profile: QuizProfile,
   tagline: string,
   tierLabel: string,
 ): Promise<Blob | null> {
-  const SIZE = 1080
+  // Card dimensions (scaled up for quality)
+  const CW = 560  // card width  (320 * 1.75)
+  const CH = 800  // card height (460 * 1.74)
+  const PAD = 56  // outer padding
+  const GAP = 40  // gap between front and back
+  const R = 40    // card border radius
+
+  const W = PAD + CW + GAP + CW + PAD
+  const H = PAD + CH + PAD
+
   const canvas = document.createElement('canvas')
-  canvas.width = SIZE
-  canvas.height = SIZE
+  canvas.width  = W   // 1312
+  canvas.height = H   // 912
   const ctx = canvas.getContext('2d')
   if (!ctx) return null
 
-  const genreStops = getGenreStops(profile.genres)
-  // Background gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, SIZE)
-  genreStops.forEach((color, index) => {
-    const stop = genreStops.length === 1 ? index : index / (genreStops.length - 1)
-    grad.addColorStop(stop, color)
-  })
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, SIZE, SIZE)
+  const accent   = CHARACTER_ACCENTS[profile.characterId] ?? '#14b8a6'
+  const charName = CHARACTER_NAMES[profile.characterId]  ?? ''
 
-  const overlay = ctx.createLinearGradient(0, 0, SIZE, SIZE)
-  overlay.addColorStop(0, 'rgba(8, 10, 18, 0.18)')
-  overlay.addColorStop(1, 'rgba(4, 6, 14, 0.48)')
-  ctx.fillStyle = overlay
-  ctx.fillRect(0, 0, SIZE, SIZE)
+  // Overall dark background
+  ctx.fillStyle = '#080810'
+  ctx.fillRect(0, 0, W, H)
 
-  // Subtle border
-  ctx.strokeStyle = `${hexToRgba(getGenreBorder(profile.genres), 0.7)}`
-  ctx.lineWidth = 4
-  roundRect(ctx, 20, 20, SIZE - 40, SIZE - 40, 48)
-  ctx.stroke()
-
+  // Load images
   const animalImage = await loadCanvasImage(getCharacterImage(profile.characterId, profile.playCount))
-  const brandLogo = await loadCanvasImage('/brand-logo.png')
+  const brandLogo   = await loadCanvasImage('/brand-logo.png')
 
-  // Draw character as a circle with object-cover (aspect ratio preserved)
-  const CIRCLE_CX = SIZE / 2
-  const CIRCLE_CY = 400
-  const CIRCLE_R  = 260
+  const filledBars = profile.playCountTier.stars  // 0–4
 
-  // object-cover: scale to fill the circle, then center-crop
-  const naturalW = animalImage.naturalWidth  || animalImage.width
-  const naturalH = animalImage.naturalHeight || animalImage.height
-  const diameter  = CIRCLE_R * 2
-  const scale     = Math.max(diameter / naturalW, diameter / naturalH)
-  const drawW     = naturalW * scale
-  const drawH     = naturalH * scale
-  const drawX     = CIRCLE_CX - drawW / 2
-  const drawY     = CIRCLE_CY - drawH / 2
+  // ── FRONT CARD ─────────────────────────────────────────────────
+  // Matches CardFront layout: header / character image (contain) / bottom info
+  const fx = PAD, fy = PAD
+  const FP = 28  // inner padding (16 × 1.75)
 
+  // Background: dark surface + accent gradient overlay
   ctx.save()
-  ctx.beginPath()
-  ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI * 2)
+  roundRect(ctx, fx, fy, CW, CH, R)
   ctx.clip()
-  ctx.drawImage(animalImage, drawX, drawY, drawW, drawH)
+  ctx.fillStyle = '#13131a'
+  ctx.fillRect(fx, fy, CW, CH)
+  const fGrad = ctx.createLinearGradient(fx, fy, fx + CW * 0.9, fy + CH * 0.7)
+  fGrad.addColorStop(0, hexToRgba(accent, 0.24))
+  fGrad.addColorStop(1, 'rgba(0,0,0,0)')
+  ctx.fillStyle = fGrad
+  ctx.fillRect(fx, fy, CW, CH)
   ctx.restore()
 
-  // Ring around circle
-  ctx.strokeStyle = 'rgba(139, 92, 246, 0.35)'
-  ctx.lineWidth = 8
-  ctx.beginPath()
-  ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R + 4, 0, Math.PI * 2)
+  // Front border
+  ctx.save()
+  roundRect(ctx, fx, fy, CW, CH, R)
+  ctx.strokeStyle = hexToRgba(accent, 0.3)
+  ctx.lineWidth = 2
   ctx.stroke()
+  ctx.restore()
 
-  // Nickname
-  ctx.fillStyle = 'rgba(167, 139, 250, 0.8)'
-  ctx.font = '500 36px system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText(profile.nickname.toUpperCase(), SIZE / 2, 700)
+  // Header: "BANGTANG · 001" (left) + brand logo (right)
+  const fHeaderY = fy + FP + 14
+  ctx.font = '500 17px monospace'
+  ctx.textAlign = 'left'
+  ctx.fillStyle = 'rgba(100,116,139,0.85)'
+  ctx.fillText('BANGTANG · 001', fx + FP, fHeaderY)
 
-  // Tagline (translated)
-  ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 64px system-ui, sans-serif'
-  ctx.fillText(tagline, SIZE / 2, 778)
+  const logoSize = 38  // 22px × 1.75
+  ctx.globalAlpha = 0.9
+  ctx.drawImage(brandLogo, fx + CW - FP - logoSize, fy + FP, logoSize, logoSize)
+  ctx.globalAlpha = 1
 
-  // Trait icons row
-  const icons = [
-    FEAR_ICONS[profile.fearLevel],
-    PUZZLE_ICONS[profile.puzzleStyle],
-    profile.playStyle[0] ? '🎯' : '',
-  ].filter(Boolean)
+  // Bottom section dimensions (computed first, image fills remaining space)
+  const BOTTOM_H = 110  // tagline + nickname + bars + FP
+  const imgAreaX = fx + FP
+  const imgAreaY = fy + FP + 52           // below header
+  const imgAreaW = CW - FP * 2
+  const imgAreaH = CH - FP - 52 - BOTTOM_H  // remaining space for image
 
-  ctx.font = '52px system-ui, sans-serif'
-  const iconSpacing = 120
-  const iconStart = SIZE / 2 - ((icons.length - 1) * iconSpacing) / 2
-  icons.forEach((icon, i) => {
-    ctx.fillText(icon, iconStart + i * iconSpacing, 870)
-  })
+  // Character image — objectFit: contain, centered in imgArea
+  const natW = animalImage.naturalWidth  || animalImage.width
+  const natH = animalImage.naturalHeight || animalImage.height
+  const maxW  = imgAreaW * 0.82
+  const maxH  = imgAreaH * 0.82
+  const scl   = Math.min(maxW / natW, maxH / natH)
+  const dW = natW * scl, dH = natH * scl
+  const dX = imgAreaX + imgAreaW / 2 - dW / 2
+  const dY = imgAreaY + imgAreaH / 2 - dH / 2
 
-  // Play count tier badge (translated)
-  ctx.fillStyle = 'rgba(139, 92, 246, 0.2)'
-  roundRect(ctx, SIZE / 2 - 200, 910, 400, 70, 20)
-  ctx.fill()
-  ctx.fillStyle = '#c4b5fd'
-  ctx.font = '500 32px system-ui, sans-serif'
-  ctx.fillText(
-    `${tierLabel}  ${PLAY_COUNT_STARS[profile.playCount]}`,
-    SIZE / 2, 955
-  )
+  // Drop shadow (matches: drop-shadow(0 12px 24px ${accent}66))
+  ctx.shadowColor   = hexToRgba(accent, 0.4)
+  ctx.shadowBlur    = 42
+  ctx.shadowOffsetY = 21
+  ctx.drawImage(animalImage, dX, dY, dW, dH)
+  ctx.shadowColor   = 'transparent'
+  ctx.shadowBlur    = 0
+  ctx.shadowOffsetY = 0
 
-  // Watermark
-  ctx.globalAlpha = 0.22
-  ctx.drawImage(brandLogo, SIZE / 2 - 26, SIZE - 68, 52, 52)
+  // Bottom info section (bottom-aligned inside card)
+  const barsBottom  = fy + CH - FP
+  const barsTop     = barsBottom - 7
+  const nickBaseline = barsTop - 18          // gap 10px + font descent ~8px
+  const tagBaseline  = nickBaseline - 52     // 42px nickname + small gap
+
+  // Tagline (small, muted, letterSpacing)
+  ctx.font = '500 19px system-ui, sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillStyle = 'rgba(100,116,139,0.9)'
+  ctx.fillText(tagline, fx + FP, tagBaseline)
+
+  // Nickname (large, bold, heavy weight)
+  ctx.font = '900 42px system-ui, sans-serif'
+  ctx.fillStyle = '#f8fafc'
+  ctx.fillText(profile.nickname, fx + FP, nickBaseline)
+
+  // Segment bars (5 bars, filled up to filledBars)
+  const totalBarW = CW - FP * 2
+  const singleBarW = (totalBarW - 4 * 6) / 5  // 6px gap between 5 bars
+  for (let i = 0; i < 5; i++) {
+    const bx = fx + FP + i * (singleBarW + 6)
+    ctx.fillStyle = i < filledBars ? accent : 'rgba(255,255,255,0.1)'
+    roundRect(ctx, bx, barsTop, singleBarW, 7, 3)
+    ctx.fill()
+  }
+
+  // ── BACK CARD ──────────────────────────────────────────────────
+  const bx = PAD + CW + GAP, by = PAD
+  const bCX = bx + CW / 2
+
+  ctx.save()
+  roundRect(ctx, bx, by, CW, CH, R)
+  ctx.clip()
+  ctx.fillStyle = '#13131a'
+  ctx.fillRect(bx, by, CW, CH)
+  ctx.restore()
+
+  // Back card border
+  ctx.save()
+  roundRect(ctx, bx, by, CW, CH, R)
+  ctx.strokeStyle = hexToRgba(accent, 0.22)
+  ctx.lineWidth = 2
+  ctx.stroke()
+  ctx.restore()
+
+  const BP  = 32  // back card inner padding
+  const BIX = bx + BP
+  const BRX = bx + CW - BP
+  const BIW = CW - BP * 2
+  const MUTED = '#94a3b8'
+  const TEXTC = '#f8fafc'
+
+  // Header: PROFILE (left) + CharName型 (right)
+  const headerY = by + BP + 18
+  ctx.font = '500 17px monospace'
+  ctx.textAlign = 'left'
+  ctx.fillStyle = MUTED
+  ctx.fillText('PROFILE', BIX, headerY)
+  ctx.textAlign = 'right'
+  ctx.font = 'bold 17px system-ui, sans-serif'
+  ctx.fillStyle = accent
+  ctx.fillText(`${charName}형`, BRX, headerY)
+
+  // Stat bars
+  const fearPct   = ({ brave: 90, calm: 55, cautious: 20 } as const)[profile.fearLevel as 'brave' | 'calm' | 'cautious'] ?? 50
+  const fearLabel = ({ brave: '용감함', calm: '침착함', cautious: '신중함' } as const)[profile.fearLevel as 'brave' | 'calm' | 'cautious'] ?? ''
+  const puzzlePct   = ({ puzzle: 90, balanced: 50, device: 20 } as const)[profile.puzzleStyle as 'puzzle' | 'balanced' | 'device'] ?? 50
+  const puzzleLabel = ({ puzzle: '퍼즐형', balanced: '밸런스형', device: '장치형' } as const)[profile.puzzleStyle as 'puzzle' | 'balanced' | 'device'] ?? ''
+  const expPct = profile.playCountTier.stars * 25
+
+  const bars = [
+    { label: '공포 내성', pct: fearPct,   value: fearLabel   },
+    { label: '탐색 방식', pct: puzzlePct, value: puzzleLabel },
+    { label: '경험치',    pct: expPct,    value: tierLabel   },
+  ]
+
+  let curY = headerY + 26
+  const BAR_H = 8, ROW_H = 56
+
+  for (const bar of bars) {
+    const labelRow = curY + 16
+    const barRow   = labelRow + 13
+
+    ctx.font = '15px system-ui, sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillStyle = MUTED
+    ctx.fillText(bar.label, BIX, labelRow)
+
+    ctx.textAlign = 'right'
+    ctx.font = '600 15px system-ui, sans-serif'
+    ctx.fillStyle = TEXTC
+    ctx.fillText(bar.value, BRX, labelRow)
+
+    // Track
+    ctx.fillStyle = '#16161f'
+    roundRect(ctx, BIX, barRow, BIW, BAR_H, 4)
+    ctx.fill()
+
+    // Fill
+    const fw = Math.max(0, Math.round(BIW * bar.pct / 100))
+    if (fw > 0) {
+      const fillGrad = ctx.createLinearGradient(BIX, 0, BIX + fw, 0)
+      fillGrad.addColorStop(0, '#14b8a6')
+      fillGrad.addColorStop(1, accent)
+      ctx.fillStyle = fillGrad
+      roundRect(ctx, BIX, barRow, fw, BAR_H, 4)
+      ctx.fill()
+    }
+
+    curY += ROW_H
+  }
+
+  // Genres
+  if (profile.genres.length > 0) {
+    curY += 18
+    ctx.font = '500 13px monospace'
+    ctx.textAlign = 'left'
+    ctx.fillStyle = MUTED
+    ctx.fillText('GENRES', BIX, curY + 13)
+    curY += 28
+
+    let tx = BIX
+    ctx.font = '14px system-ui, sans-serif'
+    for (const g of profile.genres) {
+      const lbl  = GENRE_LABELS[g] ?? g
+      const tw   = ctx.measureText(lbl).width + 22
+      ctx.fillStyle = hexToRgba(accent, 0.14)
+      roundRect(ctx, tx, curY - 16, tw, 28, 14)
+      ctx.fill()
+      ctx.strokeStyle = hexToRgba(accent, 0.28)
+      ctx.lineWidth = 1
+      ctx.stroke()
+      ctx.fillStyle = accent
+      ctx.textAlign = 'center'
+      ctx.fillText(lbl, tx + tw / 2, curY + 4)
+      tx += tw + 8
+    }
+    curY += 32
+  }
+
+  // Play style tags
+  if (profile.playStyle.length > 0) {
+    curY += 12
+    ctx.font = '500 13px monospace'
+    ctx.textAlign = 'left'
+    ctx.fillStyle = MUTED
+    ctx.fillText('STYLE', BIX, curY + 13)
+    curY += 28
+
+    let tx = BIX
+    ctx.font = '14px system-ui, sans-serif'
+    for (const s of profile.playStyle) {
+      const lbl = CANVAS_STYLE_LABELS[s] ?? s
+      const tw  = ctx.measureText(lbl).width + 22
+      ctx.fillStyle = '#16161f'
+      roundRect(ctx, tx, curY - 16, tw, 28, 14)
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+      ctx.fillStyle = TEXTC
+      ctx.textAlign = 'center'
+      ctx.fillText(lbl, tx + tw / 2, curY + 4)
+      tx += tw + 8
+    }
+  }
+
+  // Back watermark logo (bottom center)
+  ctx.globalAlpha = 0.2
+  ctx.drawImage(brandLogo, bCX - 15, by + CH - 44, 30, 30)
   ctx.globalAlpha = 1
 
   return new Promise(resolve => {
@@ -643,32 +813,6 @@ function loadCanvasImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
-const GENRE_COLORS: Record<string, string> = {
-  Horror: '#3b1021',
-  MysteryThriller: '#173467',
-  FantasyAdventure: '#23644e',
-  Emotional: '#d94f8a',
-  Comic: '#c24b16',
-  Crime: '#5f2933',
-  SF: '#1c5f7a',
-}
-
-function getGenreStops(genres: string[]): string[] {
-  const stops = genres
-    .map(genre => GENRE_COLORS[genre])
-    .filter((color): color is string => Boolean(color))
-
-  if (stops.length === 0) return ['#171725', '#09090f']
-  if (stops.length === 1) return [lightenColor(stops[0], 0.16), darkenColor(stops[0], 0.22)]
-  return stops.map(color => darkenColor(color, 0.08))
-}
-
-
-function getGenreBorder(genres: string[]): string {
-  const first = genres.find(genre => GENRE_COLORS[genre])
-  return first ? lightenColor(GENRE_COLORS[first], 0.32) : '#3f3f46'
-}
-
 function hexToRgba(hex: string, alpha: number): string {
   const normalized = hex.replace('#', '')
   const value = normalized.length === 3
@@ -681,24 +825,4 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
-function lightenColor(hex: string, amount: number): string {
-  return adjustColor(hex, amount)
-}
 
-function darkenColor(hex: string, amount: number): string {
-  return adjustColor(hex, -amount)
-}
-
-function adjustColor(hex: string, amount: number): string {
-  const normalized = hex.replace('#', '')
-  const value = normalized.length === 3
-    ? normalized.split('').map(char => char + char).join('')
-    : normalized
-  const num = Number.parseInt(value, 16)
-  const clamp = (channel: number) => Math.max(0, Math.min(255, channel))
-  const offset = Math.round(255 * amount)
-  const r = clamp(((num >> 16) & 255) + offset)
-  const g = clamp(((num >> 8) & 255) + offset)
-  const b = clamp((num & 255) + offset)
-  return `#${[r, g, b].map(channel => channel.toString(16).padStart(2, '0')).join('')}`
-}
