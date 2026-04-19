@@ -6,6 +6,9 @@ import { getRatingDef, pathRatingToScore10, score10ToPathRating } from './rating
 
 const METRICS: MetricKey[] = ['difficulty', 'fear', 'activity', 'story', 'interior', 'aging']
 
+// 길 척도 6단계(흙길 3.0 ~ 인생테마 9.7)의 산술 평균 = (3+5+6.3+7.4+8.6+9.7)/6 ≈ 6.67
+const COMMUNITY_NEUTRAL = (3 + 5 + 6.3 + 7.4 + 8.6 + 9.7) / 6
+
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
   MysteryThriller: '미스터리/스릴러',
@@ -161,7 +164,7 @@ export function buildPersonalRecommendationModel(
 
     const communityRating = communityRatings[room.id]
     if (communityRating && communityRating.count >= 3) {
-      const communityAdj = clamp((communityRating.score10 - 5) * 0.3, -1.5, 1.5)
+      const communityAdj = clamp((communityRating.score10 - COMMUNITY_NEUTRAL) * 0.3, -1.5, 1.5)
       score += communityAdj
       if (communityRating.score10 >= 7.5) reasons.push(`유저 평균 ${formatScore(communityRating.score10)}/10으로 평가가 좋아요`)
       else if (communityRating.score10 <= 4) reasons.push('유저 평가가 낮은 편이에요')
