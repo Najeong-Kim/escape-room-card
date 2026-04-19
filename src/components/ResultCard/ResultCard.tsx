@@ -15,6 +15,29 @@ import {
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { BrandLogo } from '../BrandLogo'
 
+// ─── Character accent colours & stats ─────────────────────────
+
+const CHARACTER_ACCENTS: Record<string, string> = {
+  brave_puzzle:    '#FBBF24',
+  brave_device:    '#F97316',
+  brave_balanced:  '#A78BFA',
+  neutral_puzzle:  '#FB923C',
+  neutral_device:  '#06B6D4',
+  neutral_balanced:'#10B981',
+  scared_any:      '#EC4899',
+}
+
+const CHARACTER_NAMES: Record<string, string> = {
+  brave_puzzle:    '사자',
+  brave_device:    '호랑이',
+  brave_balanced:  '늑대',
+  neutral_puzzle:  '여우',
+  neutral_device:  '고양이',
+  neutral_balanced:'독수리',
+  scared_any:      '토끼',
+}
+
+
 interface Props {
   profile: QuizProfile
   onReset: () => void
@@ -35,11 +58,9 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
   }, [profile])
 
   const tagline = t(`tagline_${profile.characterId}`)
-  const fearLabel = t(`fear_${profile.fearLevel}`)
-  const styleLabel = t(`style_${profile.puzzleStyle}`)
   const tierLabel = t(`tier_${profile.playCountTier.label}`)
-  const genreBackground = getGenreBackground(profile.genres)
-  const genreBorder = getGenreBorder(profile.genres)
+  const accent = CHARACTER_ACCENTS[profile.characterId] ?? '#14b8a6'
+  const filledBars = profile.playCountTier.stars  // 0–4
 
   // Re-compose share image when card mounts or language changes
   useEffect(() => {
@@ -49,9 +70,6 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
   }, [profile, i18n.language, tagline, tierLabel])
 
   const displayImg = getCharacterImage(profile.characterId, profile.playCount)
-  const fearIcon = FEAR_ICONS[profile.fearLevel]
-  const puzzleIcon = PUZZLE_ICONS[profile.puzzleStyle]
-  const stars = PLAY_COUNT_STARS[profile.playCount]
 
   return (
     <motion.div
@@ -66,43 +84,42 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
         <h1 className="text-3xl font-black text-white">{tagline}</h1>
       </div>
 
-      {/* Card with flip */}
+      {/* Card with flip — same size as landing page sample card (320×460) */}
       <div
-        className="card-scene w-full"
-        style={{ height: '420px' }}
+        className="card-scene"
+        style={{ width: 320, height: 460, cursor: 'pointer' }}
         onClick={() => setFlipped(f => !f)}
       >
         <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
           {/* Front */}
           <div
-            className="card-face rounded-3xl overflow-hidden border shadow-2xl"
-            style={{ background: genreBackground, borderColor: genreBorder }}
+            className="card-face card-noise rounded-3xl overflow-hidden"
+            style={{
+              background: `linear-gradient(160deg, color-mix(in srgb, ${accent} 24%, var(--color-surface)) 0%, var(--color-surface) 70%)`,
+              border: `1px solid color-mix(in srgb, ${accent} 30%, var(--color-border))`,
+              boxShadow: `0 24px 60px -12px rgba(0,0,0,.18), 0 0 40px -12px ${accent}55`,
+            }}
           >
             <CardFront
               profile={profile}
               displayImg={displayImg}
-              fearIcon={fearIcon}
-              puzzleIcon={puzzleIcon}
-              stars={stars}
               tagline={tagline}
-              tierLabel={tierLabel}
-              fearLabel={fearLabel}
-              styleLabel={styleLabel}
+              accent={accent}
+              filledBars={filledBars}
             />
           </div>
 
           {/* Back */}
           <div
-            className="card-face card-face-back rounded-3xl overflow-hidden border shadow-2xl"
-            style={{ background: genreBackground, borderColor: genreBorder }}
+            className="card-face card-face-back rounded-3xl overflow-hidden"
+            style={{
+              background: 'var(--color-surface)',
+              border: `1px solid color-mix(in srgb, ${accent} 20%, var(--color-border))`,
+            }}
           >
             <CardBack
               profile={profile}
-              fearIcon={fearIcon}
-              puzzleIcon={puzzleIcon}
-              fearLabel={fearLabel}
-              styleLabel={styleLabel}
-              tierLabel={tierLabel}
+              accent={accent}
             />
           </div>
         </div>
@@ -146,120 +163,163 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
 // ─── Card faces ───────────────────────────────────────────────────
 
 function CardFront({
-  profile, displayImg, fearIcon, puzzleIcon, stars, tagline, tierLabel, fearLabel, styleLabel,
+  profile, displayImg, tagline, accent, filledBars,
 }: {
   profile: QuizProfile
   displayImg: string
-  fearIcon: string
-  puzzleIcon: string
-  stars: string
   tagline: string
-  tierLabel: string
-  fearLabel: string
-  styleLabel: string
+  accent: string
+  filledBars: number
 }) {
   return (
-    <div className="h-full flex flex-col">
-      {/* Character image */}
-      <div className="flex-1 flex items-center justify-center p-6">
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 16, position: 'relative', zIndex: 2 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--color-text-muted)', letterSpacing: '.1em' }}>
+          BANGTANG · 001
+        </div>
+        <BrandLogo className="h-[22px] w-[22px]" />
+      </div>
+
+      {/* Character image — contained, not cropped */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <img
           src={displayImg}
           alt={profile.characterId}
-          className="w-40 h-40 rounded-full object-cover ring-4 ring-teal-500/30"
+          style={{
+            width: '82%', height: '82%', objectFit: 'contain',
+            filter: `drop-shadow(0 12px 24px ${accent}66)`,
+          }}
           onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3' }}
         />
       </div>
 
-      {/* Name + tagline */}
-      <div className="px-6 pb-4 text-center">
-        <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">{profile.nickname}</p>
-        <h2 className="text-white text-xl font-black">{tagline}</h2>
-      </div>
-
-      {/* Trait icons row */}
-      <div className="px-6 pb-4 flex justify-center gap-6">
-        <TraitBadge icon={fearIcon} label={fearLabel} />
-        <TraitBadge icon={puzzleIcon} label={styleLabel} />
-        {profile.playStyle[0] && (
-          <TraitBadge icon="🎯" label={profile.playStyle[0]} />
-        )}
-      </div>
-
-      {/* Play count badge */}
-      <div className="mx-6 mb-5 bg-teal-900/30 border border-teal-700/40 rounded-xl px-4 py-2
-                      flex items-center justify-between">
-        <span className="text-teal-300 text-xs font-semibold uppercase tracking-wider">
-          {tierLabel}
-        </span>
-        <span className="text-yellow-400 text-sm tracking-tight">{stars}</span>
+      {/* Bottom info */}
+      <div>
+        <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 2, letterSpacing: '.05em' }}>
+          {tagline}
+        </div>
+        <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--color-text)' }}>
+          {profile.nickname}
+        </div>
+        {/* Segment bars representing play count tier */}
+        <div style={{ display: 'flex', gap: 4, marginTop: 10 }}>
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1, height: 4, borderRadius: 2,
+                background: i < filledBars ? accent : 'var(--color-border)',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
 function CardBack({
-  profile, fearIcon, puzzleIcon, fearLabel, styleLabel, tierLabel,
+  profile, accent,
 }: {
   profile: QuizProfile
-  fearIcon: string
-  puzzleIcon: string
-  fearLabel: string
-  styleLabel: string
-  tierLabel: string
+  accent: string
 }) {
   const { t } = useTranslation()
-  const genresLabel = profile.genres.length > 0
-    ? profile.genres.map(genre => t(`opt_${genre}`)).join(', ')
-    : '—'
-  const playStyleLabel = profile.playStyle.length > 0
-    ? profile.playStyle.map(style => t(`opt_${style}`)).join(', ')
-    : '—'
+  const charName = CHARACTER_NAMES[profile.characterId] ?? ''
+
+  const fearPct   = ({ brave: 90, calm: 55, cautious: 20 } as const)[profile.fearLevel] ?? 50
+  const fearLabel = ({ brave: '용감함', calm: '침착함', cautious: '신중함' } as const)[profile.fearLevel] ?? ''
+  const puzzlePct   = ({ puzzle: 90, balanced: 50, device: 20 } as const)[profile.puzzleStyle] ?? 50
+  const puzzleLabel = ({ puzzle: '퍼즐형', balanced: '밸런스형', device: '장치형' } as const)[profile.puzzleStyle] ?? ''
+  const expPct   = profile.playCountTier.stars * 25
+  const expLabel = t(`tier_${profile.playCountTier.label}`)
+
+  const bars = [
+    { label: '공포 내성', pct: fearPct,   value: fearLabel },
+    { label: '탐색 방식', pct: puzzlePct, value: puzzleLabel },
+    { label: '경험치',    pct: expPct,    value: expLabel },
+  ]
 
   return (
-    <div className="h-full flex flex-col p-6 gap-4">
-      <div className="text-center mb-2">
-        <p className="text-gray-500 text-xs uppercase tracking-widest">{t('card_details')}</p>
-        <h3 className="text-white font-black text-lg mt-1">{profile.nickname}</h3>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 18, position: 'relative', zIndex: 2 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11 }}>
+        <span style={{ fontFamily: 'monospace', color: 'var(--color-text-muted)', letterSpacing: '.08em' }}>PROFILE</span>
+        <span style={{ color: accent, fontWeight: 700 }}>{charName}형</span>
       </div>
 
-      <div className="flex flex-col gap-3 flex-1">
-        <BackRow label={t('label_fear')} value={`${fearIcon} ${fearLabel}`} />
-        <BackRow label={t('label_style')} value={`${puzzleIcon} ${styleLabel}`} />
-        <BackRow
-          label={t('label_genres')}
-          value={genresLabel}
-        />
-        <BackRow
-          label={t('label_play_style')}
-          value={playStyleLabel}
-        />
-        <BackRow
-          label={t('label_experience')}
-          value={`${tierLabel} (${t('rooms_count', { count: profile.playCount })})`}
-        />
+      {/* Stat bars — actual user data */}
+      <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+        {bars.map(({ label, pct, value }) => (
+          <div key={label}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5 }}>
+              <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
+              <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{value}</span>
+            </div>
+            <div style={{ height: 5, background: 'var(--color-surface-raised)', borderRadius: 99 }}>
+              <div style={{
+                height: '100%', width: `${pct}%`,
+                background: `linear-gradient(90deg, var(--color-brand-primary), ${accent})`,
+                borderRadius: 99,
+              }} />
+            </div>
+          </div>
+        ))}
       </div>
 
-      <p className="text-center text-gray-700 text-xs mt-auto">
+      {/* Genre tags */}
+      {profile.genres.length > 0 && (
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginBottom: 6, fontFamily: 'monospace', letterSpacing: '.06em' }}>
+            GENRES
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {profile.genres.map(g => (
+              <span
+                key={g}
+                style={{
+                  fontSize: 11, padding: '3px 8px', borderRadius: 99,
+                  background: `color-mix(in srgb, ${accent} 14%, var(--color-surface-raised))`,
+                  color: accent,
+                  border: `1px solid color-mix(in srgb, ${accent} 28%, transparent)`,
+                }}
+              >
+                {GENRE_LABELS[g] ?? g}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Play style tags */}
+      {profile.playStyle.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginBottom: 6, fontFamily: 'monospace', letterSpacing: '.06em' }}>
+            STYLE
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {profile.playStyle.map(s => (
+              <span
+                key={s}
+                style={{
+                  fontSize: 11, padding: '3px 8px', borderRadius: 99,
+                  background: 'var(--color-surface-raised)',
+                  color: 'var(--color-text)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                {t(`opt_${s}`) || s}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Footer logo */}
+      <div style={{ marginTop: 'auto', textAlign: 'center', paddingTop: 8 }}>
         <BrandLogo className="mx-auto h-7 w-7 opacity-45" />
-      </p>
-    </div>
-  )
-}
-
-function TraitBadge({ icon, label }: { icon: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <span className="text-2xl">{icon}</span>
-      <span className="text-gray-500 text-xs">{label}</span>
-    </div>
-  )
-}
-
-function BackRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-2 border-b border-gray-800">
-      <span className="text-gray-500 text-sm shrink-0">{label}</span>
-      <span className="text-white text-sm text-right">{value}</span>
+      </div>
     </div>
   )
 }
