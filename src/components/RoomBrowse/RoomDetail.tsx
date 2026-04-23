@@ -15,6 +15,7 @@ import { GlobalNav } from '../GlobalNav'
 import type { Room } from '../../lib/recommend'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { usePageMeta } from '../../lib/seo'
+import { safeExternalUrl } from '../../lib/safeExternalUrl'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -108,10 +109,13 @@ function DifficultyDots({ value }: { value: number }) {
 }
 
 function naverMapUrl(room: Room) {
-  if (room.naver_place_url) return room.naver_place_url
-  if (room.naver_place_id) return `https://map.naver.com/p/entry/place/${room.naver_place_id}`
+  const verifiedPlaceUrl = safeExternalUrl(room.naver_place_url)
+  if (verifiedPlaceUrl) return verifiedPlaceUrl
+  if (room.naver_place_id) {
+    return safeExternalUrl(`https://map.naver.com/p/entry/place/${room.naver_place_id}`)
+  }
 
-  return `https://map.naver.com/p/search/${encodeURIComponent(`${room.brand} ${room.location} 방탈출`)}`
+  return safeExternalUrl(`https://map.naver.com/p/search/${encodeURIComponent(`${room.brand} ${room.location} 방탈출`)}`)
 }
 
 export default function RoomDetail() {
@@ -174,6 +178,8 @@ export default function RoomDetail() {
       .map(item => item.room)
   }, [logs, room, rooms])
   const visibleReviewLinks = reviewLinks.slice(0, 4)
+  const safeBookingUrl = room ? safeExternalUrl(room.website_url) : null
+  const safeMapUrl = room ? naverMapUrl(room) : null
   const reviewCountByType = reviewLinks.reduce<Record<string, number>>((counts, review) => {
     counts[review.source_type] = (counts[review.source_type] ?? 0) + 1
     return counts
@@ -326,9 +332,9 @@ export default function RoomDetail() {
                     >
                       기록하기
                     </button>
-                    {room.website_url && (
+                    {safeBookingUrl && (
                       <a
-                        href={room.website_url}
+                        href={safeBookingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
@@ -347,14 +353,16 @@ export default function RoomDetail() {
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
               <p className="text-xs text-gray-500">위치</p>
               <p className="text-sm text-gray-200 mt-1">{room.address ?? room.location}</p>
-              <a
-                href={naverMapUrl(room)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex mt-2 text-xs text-green-400 hover:text-green-300"
-              >
-                네이버 지도에서 보기 →
-              </a>
+              {safeMapUrl && (
+                <a
+                  href={safeMapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex mt-2 text-xs text-green-400 hover:text-green-300"
+                >
+                  네이버 지도에서 보기 →
+                </a>
+              )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-3">
@@ -508,9 +516,9 @@ export default function RoomDetail() {
                 기록하기
               </button>
             )}
-            {room.website_url && (
+            {safeBookingUrl && (
               <a
-                href={room.website_url}
+                href={safeBookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="app-secondary-action flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
@@ -532,40 +540,45 @@ export default function RoomDetail() {
                 <p className="text-xs text-gray-600 mt-1">외부 후기는 원문 출처로 이동합니다.</p>
               </div>
               <div className="grid grid-cols-1 gap-3">
-                {visibleReviewLinks.map(review => (
-                  <a
-                    key={review.id}
-                    href={review.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="review-link-card rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-teal-500/40 hover:bg-[#16161f]"
-                  >
-                    <div className="flex gap-3">
-                      {review.thumbnail_url && (
-                        <img
-                          src={review.thumbnail_url}
-                          alt=""
-                          className="w-16 h-16 rounded-lg object-cover bg-[#0e0e16] flex-shrink-0"
-                          onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }}
-                        />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="review-source-badge rounded-full px-2 py-0.5 text-[11px] font-semibold">
-                            {REVIEW_SOURCE_LABEL[review.source_type]}
-                          </span>
-                          {review.published_at && (
-                            <span className="text-[11px] text-gray-600">{review.published_at}</span>
+                {visibleReviewLinks.map(review => {
+                  const safeReviewUrl = safeExternalUrl(review.url)
+                  if (!safeReviewUrl) return null
+
+                  return (
+                    <a
+                      key={review.id}
+                      href={safeReviewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="review-link-card rounded-xl bg-[#13131a] border border-white/8 px-4 py-3 transition-colors hover:border-teal-500/40 hover:bg-[#16161f]"
+                    >
+                      <div className="flex gap-3">
+                        {review.thumbnail_url && (
+                          <img
+                            src={review.thumbnail_url}
+                            alt=""
+                            className="w-16 h-16 rounded-lg object-cover bg-[#0e0e16] flex-shrink-0"
+                            onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }}
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="review-source-badge rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                              {REVIEW_SOURCE_LABEL[review.source_type]}
+                            </span>
+                            {review.published_at && (
+                              <span className="text-[11px] text-gray-600">{review.published_at}</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-white font-semibold leading-snug">{review.title}</p>
+                          {review.author && (
+                            <p className="text-xs text-gray-500 mt-1">{review.author}</p>
                           )}
                         </div>
-                        <p className="text-sm text-white font-semibold leading-snug">{review.title}</p>
-                        {review.author && (
-                          <p className="text-xs text-gray-500 mt-1">{review.author}</p>
-                        )}
                       </div>
-                    </div>
-                  </a>
-                ))}
+                    </a>
+                  )
+                })}
               </div>
               {reviewLinks.length > visibleReviewLinks.length && (
                 <p className="text-xs text-gray-500">후기 {reviewLinks.length - visibleReviewLinks.length}개가 더 있습니다.</p>
