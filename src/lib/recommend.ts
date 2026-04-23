@@ -53,11 +53,26 @@ export interface ThemeTag {
   category: string
 }
 
+export interface RecommendedRoom {
+  room: Room
+  reasons: string[]
+}
+
 // Map profile fearLevel to numeric fear score (1-5 scale)
 const FEAR_SCORE: Record<string, number> = {
   brave: 5,
   calm: 3,
   cautious: 1,
+}
+
+const GENRE_LABEL: Record<string, string> = {
+  Horror: '공포',
+  MysteryThriller: '미스터리/스릴러',
+  FantasyAdventure: '판타지/모험',
+  Emotional: '감성/드라마',
+  Comic: '코믹',
+  Crime: '범죄/잠입',
+  SF: 'SF',
 }
 
 
@@ -68,7 +83,47 @@ function matches(room: Room, profile: QuizProfile, fearTolerance: number): boole
   return fearOk && genreOk
 }
 
-export async function getRecommendations(profile: QuizProfile, count = 3): Promise<Room[]> {
+function explainRecommendation(room: Room, profile: QuizProfile): string[] {
+  const reasons: string[] = []
+  const profileFear = FEAR_SCORE[profile.fearLevel] ?? 3
+  const fearDistance = Math.abs(room.fear_level - profileFear)
+  const matchedGenres = room.genres.filter(genre => profile.genres.includes(genre))
+
+  if (matchedGenres.length > 0) {
+    const [firstGenre] = matchedGenres
+    reasons.push(`선호한 ${GENRE_LABEL[firstGenre] ?? firstGenre} 장르와 잘 맞아요`)
+  }
+
+  if (fearDistance === 0) {
+    reasons.push('공포도 취향이 거의 딱 맞아요')
+  } else if (fearDistance === 1) {
+    reasons.push('부담 없는 공포도로 즐기기 좋아요')
+  }
+
+  if (profile.puzzleStyle === 'puzzle' && room.difficulty >= 3.5) {
+    reasons.push('퍼즐 푸는 재미를 기대할 수 있어요')
+  } else if (profile.puzzleStyle === 'device' && room.activity_level >= 3) {
+    reasons.push('장치와 체험 요소를 즐기기 좋아요')
+  } else if (profile.puzzleStyle === 'balanced') {
+    reasons.push('퍼즐과 체험 밸런스가 무난해 보여요')
+  }
+
+  if (room.interior_score >= 4.2) {
+    reasons.push('공식 기준 인테리어 평가가 좋은 편이에요')
+  }
+
+  if (room.max_players >= 4 && profile.playStyle.includes('Cooperative')) {
+    reasons.push('함께 협업하면서 플레이하기 좋아요')
+  }
+
+  if (room.duration_minutes >= 70) {
+    reasons.push('볼륨감 있는 플레이를 기대할 수 있어요')
+  }
+
+  return reasons.filter((reason, index, all) => all.indexOf(reason) === index).slice(0, 2)
+}
+
+export async function getRecommendations(profile: QuizProfile, count = 3): Promise<RecommendedRoom[]> {
   const query = new URLSearchParams({
     select: [
       'id',
@@ -131,4 +186,8 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
   return candidates
     .sort((a, b) => b.rating_avg - a.rating_avg)
     .slice(0, count)
+    .map(room => ({
+      room,
+      reasons: explainRecommendation(room, profile),
+    }))
 }

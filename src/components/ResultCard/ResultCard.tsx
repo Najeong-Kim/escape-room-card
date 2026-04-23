@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import {
   getCharacterImage,
 } from './characterAssets'
-import { getRecommendations, type Room } from '../../lib/recommend'
+import { getRecommendations, type RecommendedRoom } from '../../lib/recommend'
 import {
   fetchSimilarProfileFavoriteThemes,
   type SimilarProfileFavoriteTheme,
@@ -49,7 +49,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { t, i18n } = useTranslation()
 
-  const [recommendations, setRecommendations] = useState<Room[]>([])
+  const [recommendations, setRecommendations] = useState<RecommendedRoom[]>([])
   const [similarFavorites, setSimilarFavorites] = useState<SimilarProfileFavoriteTheme[]>([])
   useEffect(() => {
     getRecommendations(profile).then(setRecommendations).catch(() => {})
@@ -446,7 +446,7 @@ const GENRE_LABELS: Record<string, string> = {
 function RecommendedRooms({
   rooms, t,
 }: {
-  rooms: Room[]
+  rooms: RecommendedRoom[]
   t: (key: string) => string
 }) {
   if (rooms.length === 0) return null
@@ -458,15 +458,23 @@ function RecommendedRooms({
         <h2 className="text-white font-bold text-lg">{t('rec_title')}</h2>
       </div>
       <div className="flex flex-col gap-3">
-        {rooms.map(room => (
-          <RoomCard key={room.id} room={room} t={t} />
+        {rooms.map(item => (
+          <RoomCard key={item.room.id} recommendation={item} t={t} />
         ))}
       </div>
     </div>
   )
 }
 
-function RoomCard({ room, t }: { room: Room; t: (key: string) => string }) {
+function RoomCard({
+  recommendation,
+  t,
+}: {
+  recommendation: RecommendedRoom
+  t: (key: string) => string
+}) {
+  const { room, reasons } = recommendation
+
   return (
     <div
       className="bg-gray-900/60 border border-gray-800 rounded-2xl px-4 py-3 flex flex-col gap-1"
@@ -498,6 +506,11 @@ function RoomCard({ room, t }: { room: Room; t: (key: string) => string }) {
           ))}
         </div>
       </div>
+      {reasons[0] && (
+        <p className="text-xs leading-relaxed text-teal-200/90">
+          왜 추천했냐면, {reasons[0]}
+        </p>
+      )}
     </div>
   )
 }
@@ -824,5 +837,4 @@ function hexToRgba(hex: string, alpha: number): string {
   const b = num & 255
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
-
 
