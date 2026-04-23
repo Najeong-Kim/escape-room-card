@@ -740,20 +740,29 @@ function StatsAndReviews() {
 
 function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProfile | null }) {
   const [dynamicRooms, setDynamicRooms] = useState<RecommendedRoom[]>([])
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
 
   useEffect(() => {
     if (!card) {
       setDynamicRooms([])
+      setIsLoadingRecommendations(false)
       return
     }
 
     let cancelled = false
+    setIsLoadingRecommendations(true)
     getRecommendations(card, 3)
       .then(result => {
-        if (!cancelled) setDynamicRooms(result)
+        if (!cancelled) {
+          setDynamicRooms(result)
+          setIsLoadingRecommendations(false)
+        }
       })
       .catch(() => {
-        if (!cancelled) setDynamicRooms([])
+        if (!cancelled) {
+          setDynamicRooms([])
+          setIsLoadingRecommendations(false)
+        }
       })
 
     return () => {
@@ -763,11 +772,12 @@ function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProf
 
   const previewRooms = card && dynamicRooms.length > 0
     ? dynamicRooms.map((item, index) => ({
+        id: item.room.id,
         brand: item.room.brand,
         name: item.room.name,
         genre: item.room.genres[0] ? (GENRE_LABEL[item.room.genres[0]] ?? item.room.genres[0]) : '추천 테마',
         diff: item.room.official_scores?.difficulty ?? Math.round(item.room.difficulty * 2 * 10) / 10,
-        match: Math.max(88, 97 - index * 3),
+        match: item.matchPercent,
         hue: [195, 260, 42][index] ?? 195,
         img: item.room.image_url ?? '',
       }))
@@ -776,6 +786,8 @@ function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProf
   const subcopy = card
     ? `카드를 받으면 전국 715개 테마 중 내 성향과 잘 맞는 방을 골라드려요. 아래는 '${CARD_LABEL[card.characterId] ?? '내 카드'}' 기준 추천 예시예요.`
     : "카드를 받으면 전국 715개 테마 중 내 성향과 93% 이상 맞는 방을 골라드려요. 아래는 '늑대 🐺' 카드 기준 예시."
+
+  const navigate = useNavigate()
 
   return (
     <section id="rooms" style={{ padding: '100px 0' }}>
@@ -786,41 +798,74 @@ function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProf
           sub={subcopy}
         />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginTop: 48 }}>
-          {previewRooms.map((r, i) => (
-            <div key={i}
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden', transition: 'transform .2s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
-            >
-              <div style={{
-                aspectRatio: '4 / 3',
-                background: `linear-gradient(135deg, hsl(${r.hue}, 50%, 35%), hsl(${r.hue + 40}, 40%, 20%))`,
-                position: 'relative', overflow: 'hidden',
-              }}>
-                <img
-                  src={r.img}
-                  alt={r.name}
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-                  onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          {card && isLoadingRecommendations ? (
+            Array.from({ length: 3 }, (_, i) => (
+              <div
+                key={`room-skeleton-${i}`}
+                className="animate-pulse"
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden' }}
+              >
+                <div
+                  style={{
+                    aspectRatio: '4 / 3',
+                    background: 'linear-gradient(135deg, color-mix(in srgb, var(--brand) 25%, var(--surface)), color-mix(in srgb, var(--accent) 18%, var(--surface)))',
+                    opacity: 0.45,
+                  }}
                 />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 50%)' }} />
-                <div style={{ position: 'absolute', top: 14, right: 14, padding: '6px 10px', borderRadius: 999, background: 'var(--accent)', color: '#1a1405', fontSize: 12, fontWeight: 900 }}>
-                  {r.match}% match
-                </div>
-              </div>
-              <div style={{ padding: 18 }}>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.brand}</div>
-                <div style={{ fontSize: 19, fontWeight: 900, marginTop: 2 }}>{r.name}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <span className="lp-sticker">{r.genre}</span>
-                    <span className="lp-sticker" style={{ background: 'color-mix(in srgb, var(--accent) 16%, transparent)', color: 'var(--accent)', borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}>난이도 {r.diff}</span>
+                <div style={{ padding: 18 }}>
+                  <div style={{ width: '38%', height: 12, borderRadius: 999, background: 'var(--border)' }} />
+                  <div style={{ width: '68%', height: 22, borderRadius: 999, background: 'var(--border)', marginTop: 10 }} />
+                  <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                    <div style={{ width: 72, height: 28, borderRadius: 999, background: 'var(--border)' }} />
+                    <div style={{ width: 88, height: 28, borderRadius: 999, background: 'var(--border)' }} />
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--brand)' }}>→</div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            previewRooms.map((r, i) => (
+              <div key={i}
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden', transition: 'transform .2s ease', cursor: 'pointer' }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+                onClick={() => {
+                  if ('id' in r && typeof r.id === 'number') {
+                    navigate(`/rooms/${r.id}`)
+                    return
+                  }
+                  onBrowse()
+                }}
+              >
+                <div style={{
+                  aspectRatio: '4 / 3',
+                  background: `linear-gradient(135deg, hsl(${r.hue}, 50%, 35%), hsl(${r.hue + 40}, 40%, 20%))`,
+                  position: 'relative', overflow: 'hidden',
+                }}>
+                  <img
+                    src={r.img}
+                    alt={r.name}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                  />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 50%)' }} />
+                  <div style={{ position: 'absolute', top: 14, right: 14, padding: '6px 10px', borderRadius: 999, background: 'var(--accent)', color: '#1a1405', fontSize: 12, fontWeight: 900 }}>
+                    {r.match}% match
+                  </div>
+                </div>
+                <div style={{ padding: 18 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.brand}</div>
+                  <div style={{ fontSize: 19, fontWeight: 900, marginTop: 2 }}>{r.name}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <span className="lp-sticker">{r.genre}</span>
+                      <span className="lp-sticker" style={{ background: 'color-mix(in srgb, var(--accent) 16%, transparent)', color: 'var(--accent)', borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}>난이도 {r.diff}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--brand)' }}>→</div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
         <div style={{ textAlign: 'center', marginTop: 32 }}>
           <button style={btnGhost()} onClick={onBrowse}>전체 방 둘러보기 →</button>

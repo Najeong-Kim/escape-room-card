@@ -56,6 +56,7 @@ export interface ThemeTag {
 export interface RecommendedRoom {
   room: Room
   reasons: string[]
+  matchPercent: number
 }
 
 // Map profile fearLevel to numeric fear score (1-5 scale)
@@ -121,6 +122,38 @@ function explainRecommendation(room: Room, profile: QuizProfile): string[] {
   }
 
   return reasons.filter((reason, index, all) => all.indexOf(reason) === index).slice(0, 2)
+}
+
+function calculateRecommendationMatch(room: Room, profile: QuizProfile): number {
+  const profileFear = FEAR_SCORE[profile.fearLevel] ?? 3
+  const fearDistance = Math.abs(room.fear_level - profileFear)
+  const matchedGenres = room.genres.filter(genre => profile.genres.includes(genre))
+
+  let score = 70
+
+  if (profile.genres.length > 0) {
+    const genreRatio = matchedGenres.length / profile.genres.length
+    score += genreRatio * 16
+  } else {
+    score += 6
+  }
+
+  if (fearDistance === 0) score += 8
+  else if (fearDistance === 1) score += 4
+  else if (fearDistance >= 3) score -= 6
+
+  if (profile.puzzleStyle === 'puzzle' && room.difficulty >= 3.5) score += 4
+  if (profile.puzzleStyle === 'device' && room.activity_level >= 3) score += 4
+  if (profile.puzzleStyle === 'balanced' && room.difficulty >= 2.5 && room.activity_level >= 2.5) score += 3
+
+  if (profile.playStyle.includes('Cooperative') && room.max_players >= 4) score += 3
+  if (profile.playStyle.includes('Speed runner') && room.duration_minutes <= 65) score += 2
+  if (profile.playStyle.includes('No-hint player') && room.difficulty >= 4) score += 2
+
+  if (room.interior_score >= 4.2) score += 2
+  if (room.duration_minutes >= 70) score += 1
+
+  return Math.max(78, Math.min(99, Math.round(score)))
 }
 
 export async function getRecommendations(profile: QuizProfile, count = 3): Promise<RecommendedRoom[]> {
@@ -189,5 +222,6 @@ export async function getRecommendations(profile: QuizProfile, count = 3): Promi
     .map(room => ({
       room,
       reasons: explainRecommendation(room, profile),
+      matchPercent: calculateRecommendationMatch(room, profile),
     }))
 }
