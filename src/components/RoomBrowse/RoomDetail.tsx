@@ -13,6 +13,7 @@ import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
 import { GlobalNav } from '../GlobalNav'
 import type { Room } from '../../lib/recommend'
+import type { RoomLog } from '../../lib/roomLog'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { usePageMeta } from '../../lib/seo'
 import { safeExternalUrl } from '../../lib/safeExternalUrl'
@@ -76,6 +77,16 @@ const METRICS: { key: MetricKey; label: string }[] = [
 
 function formatScore(score: number) {
   return score.toFixed(1)
+}
+
+function logMetricValue(log: RoomLog, key: MetricKey) {
+  if (key === 'difficulty') return log.difficulty_score ?? null
+  if (key === 'fear') return log.fear_score ?? null
+  if (key === 'activity') return log.activity_score ?? null
+  if (key === 'story') return log.story_score ?? null
+  if (key === 'interior') return log.interior_score ?? null
+  if (key === 'aging') return log.aging_score ?? null
+  return null
 }
 
 
@@ -289,7 +300,7 @@ export default function RoomDetail() {
             )}
           </div>
 
-          {personalPrediction && (
+          {personalPrediction && !logged && (
             <div className="personal-score rounded-2xl border border-teal-300/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015)),radial-gradient(circle_at_top_left,rgba(45,212,191,0.09),transparent_42%)] px-4 py-4 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -315,9 +326,13 @@ export default function RoomDetail() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-widest text-amber-300/90">Quick Actions</p>
-                <h3 className="mt-1 text-lg font-bold text-white">바로 예약하고 위치 보기</h3>
+                <h3 className="mt-1 text-lg font-bold text-white">
+                  {logged ? '다시 예약하거나 위치 확인하기' : '바로 예약하고 위치 보기'}
+                </h3>
                 <p className="mt-1 text-sm leading-relaxed text-gray-300">
-                  이 테마가 마음에 들면 예약 페이지로 바로 이동하거나, 지도에서 매장 위치를 먼저 확인해보세요.
+                  {logged
+                    ? '다시 플레이할 예정이라면 예약 페이지로 이동하거나, 지도에서 매장 위치를 다시 확인해보세요.'
+                    : '이 테마가 마음에 들면 예약 페이지로 바로 이동하거나, 지도에서 매장 위치를 먼저 확인해보세요.'}
                 </p>
               </div>
               <div className="hidden sm:flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-xl">
@@ -364,24 +379,41 @@ export default function RoomDetail() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-widest text-teal-300/90">Your Log</p>
-                <h3 className="mt-1 text-lg font-bold text-white">이미 플레이하셨다면 기록해보세요</h3>
+                <h3 className="mt-1 text-lg font-bold text-white">
+                  {logged ? '이 테마에서 남긴 기록이에요' : '이미 플레이하셨다면 기록해보세요'}
+                </h3>
                 {logged && myLog ? (
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    <span className={`text-sm font-semibold ${myLog.cleared ? 'text-green-400' : 'text-red-400'}`}>
-                      {myLog.cleared ? '탈출 성공' : '탈출 실패'}
-                    </span>
-                    {myLog.rating !== null && myLog.rating !== undefined && (() => {
-                      const def = getRatingDef(myLog.rating!)
-                      return def ? (
-                        <>
-                          <span className="text-gray-600">·</span>
-                          <RatingIcon value={def.value} size={16} />
-                          <span className="text-sm font-semibold" style={{ color: def.color }}>{def.label}</span>
-                        </>
-                      ) : null
-                    })()}
-                    <span className="text-gray-600">·</span>
-                    <span className="text-xs text-gray-500">{myLog.played_at}</span>
+                  <div className="mt-1.5 space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-sm font-semibold ${myLog.cleared ? 'text-green-400' : 'text-red-400'}`}>
+                        {myLog.cleared ? '탈출 성공' : '탈출 실패'}
+                      </span>
+                      {myLog.rating !== null && myLog.rating !== undefined && (() => {
+                        const def = getRatingDef(myLog.rating!)
+                        return def ? (
+                          <>
+                            <span className="text-gray-600">·</span>
+                            <RatingIcon value={def.value} size={16} />
+                            <span className="text-sm font-semibold" style={{ color: def.color }}>{def.label}</span>
+                          </>
+                        ) : null
+                      })()}
+                      <span className="text-gray-600">·</span>
+                      <span className="text-xs text-gray-500">{myLog.played_at}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400">
+                      {myLog.cleared && myLog.hints_used !== null && myLog.hints_used !== undefined && (
+                        <span>힌트 {myLog.hints_used}개</span>
+                      )}
+                      {myLog.cleared && myLog.remaining_minutes !== null && myLog.remaining_minutes !== undefined && (
+                        <span>남은 시간 {myLog.remaining_minutes}분</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-300">
+                      {myLog.memo
+                        ? `한마디: ${myLog.memo}`
+                        : '이 테마에서 남긴 감상이 아직 없어요.'}
+                    </p>
                   </div>
                 ) : (
                   <p className="text-sm text-gray-300 mt-1">
@@ -390,14 +422,7 @@ export default function RoomDetail() {
                 )}
               </div>
               <div className="flex gap-2">
-                {logged ? (
-                  <button
-                    onClick={() => navigate('/my-rooms')}
-                    className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
-                  >
-                    내 기록 보기
-                  </button>
-                ) : (
+                {!logged && (
                   <>
                     <button
                       onClick={() => setShowLog(true)}
@@ -461,16 +486,28 @@ export default function RoomDetail() {
             <h3 className="font-semibold">유저 평균 평가</h3>
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
               {communityRating && ratingDef ? (
-                <div className="flex items-center gap-2 mb-4">
-                  <RatingIcon value={ratingDef.value} size={22} />
-                  <span className="font-semibold text-sm" style={{ color: ratingDef.color }}>{ratingDef.label}</span>
-                  <span className="text-lg font-black text-white ml-1">
-                    {formatScore(communityRating.score10)}
-                    <span className="text-sm font-normal text-gray-500">/10</span>
-                  </span>
-                  {SHOW_COMMUNITY_RATING_COUNTS && (
-                    <span className="text-xs text-gray-600 ml-auto">· {communityRating.count}명</span>
-                  )}
+                <div className="mb-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <RatingIcon value={ratingDef.value} size={22} />
+                    <span className="font-semibold text-sm" style={{ color: ratingDef.color }}>{ratingDef.label}</span>
+                    <span className="text-lg font-black text-white ml-1">
+                      {formatScore(communityRating.score10)}
+                      <span className="text-sm font-normal text-gray-500">/10</span>
+                    </span>
+                    {SHOW_COMMUNITY_RATING_COUNTS && (
+                      <span className="text-xs text-gray-600 ml-auto">· {communityRating.count}명</span>
+                    )}
+                  </div>
+                  {logged && myLog?.rating !== null && myLog?.rating !== undefined && (() => {
+                    const myRatingDef = getRatingDef(myLog.rating)
+                    return myRatingDef ? (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-xs uppercase tracking-widest text-amber-300/90">내 평가</span>
+                        <RatingIcon value={myRatingDef.value} size={18} />
+                        <span className="font-semibold" style={{ color: myRatingDef.color }}>{myRatingDef.label}</span>
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 mb-4">아직 유저 평가가 없습니다.</p>
@@ -479,20 +516,40 @@ export default function RoomDetail() {
               <div className="space-y-3">
                 {METRICS.map(metric => {
                   const community = communityMetricStats[metric.key]
+                  const myMetric = myLog ? logMetricValue(myLog, metric.key) : null
                   return (
-                    <div key={metric.key} className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-14 shrink-0">{metric.label}</span>
-                      <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
-                        {community && (
-                          <div
-                            className="h-full rounded-full bg-teal-400"
-                            style={{ width: `${community.score10 * 10}%` }}
-                          />
+                    <div key={metric.key} className="flex items-start gap-3">
+                      <span className="text-xs text-gray-500 w-14 shrink-0 pt-1">{metric.label}</span>
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-12 shrink-0 text-[11px] text-teal-300">유저 평균</span>
+                          <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                            {community && (
+                              <div
+                                className="h-full rounded-full bg-teal-400"
+                                style={{ width: `${community.score10 * 10}%` }}
+                              />
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-400 w-8 text-right shrink-0">
+                            {community ? formatScore(community.score10) : '—'}
+                          </span>
+                        </div>
+                        {myMetric !== null && myMetric !== undefined && (
+                          <div className="flex items-center gap-2">
+                            <span className="w-12 shrink-0 text-[11px] text-amber-300">내 평가</span>
+                            <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-amber-400"
+                                style={{ width: `${myMetric * 10}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-300 w-8 text-right shrink-0">
+                              {formatScore(myMetric)}
+                            </span>
+                          </div>
                         )}
                       </div>
-                      <span className="text-xs text-gray-400 w-6 text-right shrink-0">
-                        {community ? formatScore(community.score10) : '—'}
-                      </span>
                     </div>
                   )
                 })}
@@ -549,12 +606,9 @@ export default function RoomDetail() {
 
           <div className="flex gap-3 sticky bottom-4 z-20">
             {logged ? (
-              <button
-                onClick={() => navigate('/my-rooms')}
-                className="flex-1 text-center py-3 rounded-xl border border-teal-300/35 bg-white/8 hover:bg-teal-400/14 text-teal-100 text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] backdrop-blur-md transition-colors"
-              >
-                내 기록 보기
-              </button>
+              <span className="flex-1 text-center py-3 rounded-xl border border-teal-300/25 bg-white/8 text-teal-100 text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] backdrop-blur-md">
+                기록 완료
+              </span>
             ) : (
               <button
                 onClick={() => setShowLog(true)}
