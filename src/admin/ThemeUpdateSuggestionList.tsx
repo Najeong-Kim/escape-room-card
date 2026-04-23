@@ -3,6 +3,7 @@ import Button from '@mui/material/Button'
 import { useNotify } from 'react-admin'
 import { supabase } from '../lib/supabaseClient'
 import { adminUpdate } from './adminClient'
+import { sanitizeExternalUrlInput } from '../lib/safeExternalUrl'
 
 interface SuggestionTheme {
   id: number
@@ -119,8 +120,12 @@ export function ThemeUpdateSuggestionList() {
 
   async function approve(item: ThemeUpdateSuggestion) {
     setProcessingId(item.id)
+    const urlFields = new Set(['image_url', 'image_source_url', 'booking_url', 'source_url'])
     const patch = Object.fromEntries(
-      Object.entries(item.suggested_changes).map(([field, change]) => [field, change.to]),
+      Object.entries(item.suggested_changes).map(([field, change]) => [
+        field,
+        urlFields.has(field) ? sanitizeExternalUrlInput(change.to as string | null | undefined) : change.to,
+      ]),
     )
 
     try {

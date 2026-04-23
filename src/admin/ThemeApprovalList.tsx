@@ -4,6 +4,7 @@ import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
 import { supabase } from '../lib/supabaseClient'
 import { adminUpdate, adminInsert, adminDelete, adminRpc } from './adminClient'
+import { sanitizeExternalUrlInput } from '../lib/safeExternalUrl'
 
 interface ApprovalCafe {
   id: number
@@ -310,12 +311,12 @@ export function ThemeApprovalList() {
       max_players: form.max_players,
       price_text: emptyToNull(form.price_text),
       price_per_person: form.price_per_person,
-      image_url: emptyToNull(form.image_url),
-      image_source_url: emptyToNull(form.image_source_url),
+      image_url: sanitizeExternalUrlInput(form.image_url),
+      image_source_url: sanitizeExternalUrlInput(form.image_source_url),
       image_source_name: emptyToNull(form.image_source_name),
       image_status: form.image_status,
-      booking_url: emptyToNull(form.booking_url),
-      source_url: emptyToNull(form.source_url),
+      booking_url: sanitizeExternalUrlInput(form.booking_url),
+      source_url: sanitizeExternalUrlInput(form.source_url),
       difficulty_label: emptyToNull(form.difficulty_label),
       difficulty_score: form.difficulty_score,
       fear_label: emptyToNull(form.fear_label),

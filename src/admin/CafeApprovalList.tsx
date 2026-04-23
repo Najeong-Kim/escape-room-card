@@ -4,6 +4,7 @@ import { useNotify } from 'react-admin'
 import { useCatalogOptions } from './catalogOptions'
 import { supabase } from '../lib/supabaseClient'
 import { adminUpdate, adminRpc } from './adminClient'
+import { sanitizeExternalUrlInput } from '../lib/safeExternalUrl'
 
 interface ApprovalCafe {
   id: number
@@ -218,11 +219,11 @@ export function CafeApprovalList() {
       branch_name: emptyToNull(form.branch_name),
       address: emptyToNull(form.address),
       phone: emptyToNull(form.phone),
-      website_url: emptyToNull(form.website_url),
-      booking_url: emptyToNull(form.booking_url),
-      source_url: emptyToNull(form.source_url),
+      website_url: sanitizeExternalUrlInput(form.website_url),
+      booking_url: sanitizeExternalUrlInput(form.booking_url),
+      source_url: sanitizeExternalUrlInput(form.source_url),
       naver_place_id: emptyToNull(form.naver_place_id),
-      naver_place_url: emptyToNull(form.naver_place_url),
+      naver_place_url: sanitizeExternalUrlInput(form.naver_place_url),
       naver_place_name: emptyToNull(form.naver_place_name),
       naver_place_address: emptyToNull(form.naver_place_address),
       naver_place_checked_at: emptyToNull(form.naver_place_checked_at),
@@ -321,7 +322,7 @@ export function CafeApprovalList() {
     const payload = {
       address: address || cafe.address,
       phone: candidate.telephone || cafe.phone,
-      website_url: isUsefulWebsite(candidate.link) ? candidate.link : cafe.website_url,
+      website_url: isUsefulWebsite(candidate.link) ? sanitizeExternalUrlInput(candidate.link) : cafe.website_url,
       naver_place_name: candidate.title,
       naver_place_address: address || null,
       naver_place_checked_at: new Date().toISOString(),

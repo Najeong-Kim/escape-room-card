@@ -10,3 +10,9 @@ export function safeExternalUrl(value: string | null | undefined): string | null
     return null
   }
 }
+
+export function sanitizeExternalUrlInput(value: string | null | undefined): string | null {
+  const trimmed = value?.trim()
+  if (!trimmed) return null
+  return safeExternalUrl(trimmed)
+}
