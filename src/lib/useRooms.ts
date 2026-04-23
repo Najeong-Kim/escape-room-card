@@ -13,6 +13,60 @@ export interface Theme {
   filter: (room: Room) => boolean
 }
 
+export interface TagFilter {
+  id: string
+  label: string
+  emoji: string
+  match: (room: Room) => boolean
+}
+
+function hasThemeTag(room: Room, codes: string[], names: string[] = []) {
+  const tags = room.theme_tags ?? []
+  return tags.some(tag =>
+    codes.includes(tag.code) ||
+    names.includes(tag.name) ||
+    codes.some(code => tag.code.includes(code)) ||
+    names.some(name => tag.name.includes(name)),
+  )
+}
+
+function normalized(value: string | undefined) {
+  return (value ?? '').toLowerCase().replace(/\s+/g, '')
+}
+
+export const TAG_FILTERS: TagFilter[] = [
+  {
+    id: 'crime-scene',
+    label: '크라임씬',
+    emoji: '🕵️',
+    match: room =>
+      hasThemeTag(room, ['crime_scene', 'crime-scene'], ['크라임씬']) ||
+      normalized(room.name).includes('크라임씬') ||
+      normalized(room.brand).includes('크라임씬카페'),
+  },
+  {
+    id: 'outdoor',
+    label: '야외테마',
+    emoji: '🌿',
+    match: room =>
+      hasThemeTag(room, ['outdoor'], ['야외']) ||
+      normalized(room.name).includes('야외'),
+  },
+  {
+    id: 'horror-theme',
+    label: '공포테마',
+    emoji: '👻',
+    match: room =>
+      hasThemeTag(room, ['strong_horror', 'horror_theme'], ['공포', '공포 강함']) ||
+      room.genres.includes('Horror') ||
+      room.fear_level >= 4,
+  },
+]
+
+export function getMatchingTagFilters(room: Room): TagFilter[] {
+  return TAG_FILTERS.filter(tag => tag.match(room))
+}
+
 export const THEMES: Theme[] = [
   { id: 'solo',    label: '혼방 가능',    emoji: '🧍', filter: r => r.min_players <= 2 },
   { id: 'large',   label: '6인+ 가능',    emoji: '👥', filter: r => r.max_players >= 6 },
@@ -27,6 +81,7 @@ export interface RoomFilters {
   themeId: string | null
   location: string | null
   genre: string | null
+  tagIds: string[]
   players: number | null
   fearMax: number | null
   onlyUnlogged: boolean
@@ -41,6 +96,7 @@ export const INITIAL_FILTERS: RoomFilters = {
   themeId: null,
   location: null,
   genre: null,
+  tagIds: [],
   players: null,
   fearMax: null,
   onlyUnlogged: false,
@@ -48,11 +104,15 @@ export const INITIAL_FILTERS: RoomFilters = {
 
 export function filterRooms(rooms: Room[], filters: RoomFilters, loggedRoomIds = new Set<number>()): Room[] {
   const theme = filters.themeId ? THEMES.find(t => t.id === filters.themeId) : null
+  const selectedTagFilters = filters.tagIds
+    .map(id => TAG_FILTERS.find(tag => tag.id === id))
+    .filter((tag): tag is TagFilter => Boolean(tag))
 
   return rooms.filter(room => {
     if (theme && !theme.filter(room)) return false
     if (filters.location && room.location !== filters.location) return false
     if (filters.genre && !room.genres.includes(filters.genre)) return false
+    if (selectedTagFilters.length > 0 && !selectedTagFilters.every(tag => tag.match(room))) return false
     if (filters.players !== null && room.max_players < filters.players) return false
     if (filters.fearMax !== null && room.fear_level > filters.fearMax) return false
     if (filters.onlyUnlogged && loggedRoomIds.has(room.id)) return false

@@ -13,6 +13,7 @@ import {
 } from '../../lib/userCardProfile'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { BrandLogo } from '../BrandLogo'
+import { getMatchingTagFilters } from '../../lib/useRooms'
 
 // ─── Character accent colours & stats ─────────────────────────
 
@@ -474,6 +475,7 @@ function RoomCard({
   t: (key: string) => string
 }) {
   const { room, reasons } = recommendation
+  const matchingTagFilters = getMatchingTagFilters(room)
 
   return (
     <div
@@ -506,6 +508,19 @@ function RoomCard({
           ))}
         </div>
       </div>
+      {matchingTagFilters.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {matchingTagFilters.slice(0, 3).map(tag => (
+            <span
+              key={tag.id}
+              className="inline-flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-100"
+            >
+              <span>{tag.emoji}</span>
+              <span>{tag.label}</span>
+            </span>
+          ))}
+        </div>
+      )}
       {reasons[0] && (
         <p className="text-xs leading-relaxed text-teal-200/90">
           왜 추천했냐면, {reasons[0]}

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useRooms, useRoomFilterOptions, THEMES, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
+import { useRooms, useRoomFilterOptions, THEMES, TAG_FILTERS, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
 import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
@@ -94,6 +94,15 @@ export default function RoomBrowse() {
     setFilters(f => ({ ...f, genre }))
   }
 
+  function toggleTag(tagId: string) {
+    setFilters(f => ({
+      ...f,
+      tagIds: f.tagIds.includes(tagId)
+        ? f.tagIds.filter(id => id !== tagId)
+        : [...f.tagIds, tagId],
+    }))
+  }
+
   function toggleOnlyUnlogged() {
     setFilters(f => ({ ...f, onlyUnlogged: !f.onlyUnlogged }))
   }
@@ -104,7 +113,7 @@ export default function RoomBrowse() {
   }
 
   const hasActiveFilters =
-    filters.themeId || filters.location || filters.genre || filters.players || filters.fearMax || filters.onlyUnlogged || searchTerm.trim()
+    filters.themeId || filters.location || filters.genre || filters.tagIds.length > 0 || filters.players || filters.fearMax || filters.onlyUnlogged || searchTerm.trim()
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
@@ -168,6 +177,27 @@ export default function RoomBrowse() {
               >
                 <span>{theme.emoji}</span>
                 <span>{theme.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <p className="text-xs text-gray-500 mb-2">태그 필터</p>
+          <div className="flex flex-wrap gap-2">
+            {TAG_FILTERS.map(tag => (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggleTag(tag.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150
+                  ${filters.tagIds.includes(tag.id)
+                    ? 'bg-amber-400 border-amber-300 text-[#241804]'
+                    : 'bg-white/5 border-white/10 text-gray-300 hover:border-amber-300/50 hover:text-white'
+                  }`}
+              >
+                <span>{tag.emoji}</span>
+                <span>{tag.label}</span>
               </button>
             ))}
           </div>
