@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabaseClient'
 import { loadSavedCard, SAVED_CARD_CHANGED } from '../../lib/savedCard'
 import type { QuizProfile } from '../../lib/traitMap'
+import { getRecommendations, type RecommendedRoom } from '../../lib/recommend'
 import { AppThemeToggle } from '../AppThemeToggle'
 import './LandingPage.css'
 
@@ -85,6 +86,26 @@ const ROOMS = [
   { brand: '제로월드',  name: '제로',                 genre: '호러/공포', diff: 8.0, match: 94, hue: 0,   img: 'https://cdn.zamfit.co.kr/EscapeRoom/a162d45f-31aa-41ae-af32-a2eca4f5a5b8.jpg' },
   { brand: '상상의문',  name: 'DKDK컴퍼니',           genre: '판타지',    diff: 8.0, match: 91, hue: 260, img: 'https://ayquitjpjqkzhhmxnhge.supabase.co/storage/v1/object/public/theme-posters/176/poster.jpg' },
 ]
+
+const CARD_LABEL: Record<string, string> = {
+  brave_puzzle: '사자 🦁',
+  brave_device: '호랑이 🐯',
+  brave_balanced: '늑대 🐺',
+  neutral_puzzle: '여우 🦊',
+  neutral_device: '고양이 🐱',
+  neutral_balanced: '독수리 🦅',
+  scared_any: '토끼 🐰',
+}
+
+const GENRE_LABEL: Record<string, string> = {
+  Horror: '공포',
+  MysteryThriller: '미스터리/스릴러',
+  FantasyAdventure: '판타지/모험',
+  Emotional: '감성/드라마',
+  Comic: '코믹',
+  Crime: '범죄/잠입',
+  SF: 'SF',
+}
 
 const FAQ = [
   { q: '방탕이 뭐예요?', a: '방탈출로 탕진하자의 줄임말이에요 😄 방탈출에 진심인 사람들을 위한 성향 카드 서비스예요. 12문항에 답하면 사자·호랑이·늑대 등 7가지 동물 중 나한테 딱 맞는 캐릭터가 나와요.' },
@@ -717,17 +738,55 @@ function StatsAndReviews() {
 
 // ─── Room Preview ────────────────────────────────────────────
 
-function RoomPreview({ onBrowse }: { onBrowse: () => void }) {
+function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProfile | null }) {
+  const [dynamicRooms, setDynamicRooms] = useState<RecommendedRoom[]>([])
+
+  useEffect(() => {
+    if (!card) {
+      setDynamicRooms([])
+      return
+    }
+
+    let cancelled = false
+    getRecommendations(card, 3)
+      .then(result => {
+        if (!cancelled) setDynamicRooms(result)
+      })
+      .catch(() => {
+        if (!cancelled) setDynamicRooms([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [card])
+
+  const previewRooms = card && dynamicRooms.length > 0
+    ? dynamicRooms.map((item, index) => ({
+        brand: item.room.brand,
+        name: item.room.name,
+        genre: item.room.genres[0] ? (GENRE_LABEL[item.room.genres[0]] ?? item.room.genres[0]) : '추천 테마',
+        diff: item.room.official_scores?.difficulty ?? Math.round(item.room.difficulty * 2 * 10) / 10,
+        match: Math.max(88, 97 - index * 3),
+        hue: [195, 260, 42][index] ?? 195,
+        img: item.room.image_url ?? '',
+      }))
+    : ROOMS
+
+  const subcopy = card
+    ? `카드를 받으면 전국 715개 테마 중 내 성향과 잘 맞는 방을 골라드려요. 아래는 '${CARD_LABEL[card.characterId] ?? '내 카드'}' 기준 추천 예시예요.`
+    : "카드를 받으면 전국 715개 테마 중 내 성향과 93% 이상 맞는 방을 골라드려요. 아래는 '늑대 🐺' 카드 기준 예시."
+
   return (
     <section id="rooms" style={{ padding: '100px 0' }}>
       <div className="lp-container">
         <SectionHeader
           eyebrow="ROOM RECOMMENDATIONS"
           title={<>내 취향이면, 이런 <span style={{ color: 'var(--accent)' }}>방</span></>}
-          sub="카드를 받으면 전국 715개 테마 중 내 성향과 93% 이상 맞는 방을 골라드려요. 아래는 '늑대 🐺' 카드 기준 예시."
+          sub={subcopy}
         />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginTop: 48 }}>
-          {ROOMS.map((r, i) => (
+          {previewRooms.map((r, i) => (
             <div key={i}
               style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden', transition: 'transform .2s ease' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)' }}
@@ -940,7 +999,7 @@ function ReturnUserPage({ card, onBrowse, onRedo }: { card: QuizProfile; onBrows
       </section>
 
       {/* 방 탐색 유도 */}
-      <RoomPreview onBrowse={onBrowse} />
+      <RoomPreview onBrowse={onBrowse} card={card} />
 
       <LpFooter />
     </div>
