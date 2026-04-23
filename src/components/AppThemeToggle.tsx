@@ -42,6 +42,47 @@ export function AppThemeToggle({ className = '', floating = true }: { className?
   )
 }
 
+export function AppThemeMenuButton({ className = '' }: { className?: string }) {
+  const [theme, setTheme] = useState<AppTheme>(initialTheme)
+
+  useEffect(() => {
+    applyTheme(theme)
+    window.localStorage.setItem(STORAGE_KEY, theme)
+  }, [theme])
+
+  const nextTheme = theme === 'dark' ? 'light' : 'dark'
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(nextTheme)}
+      className={[
+        'flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-[13px] font-semibold transition-colors',
+        className,
+      ].join(' ')}
+      style={{
+        borderColor: 'var(--color-border)',
+        background: 'var(--color-surface-raised)',
+        color: 'var(--color-text)',
+      }}
+      aria-label={theme === 'dark' ? '라이트 모드로 변경' : '다크 모드로 변경'}
+      title={theme === 'dark' ? '라이트 모드로 변경' : '다크 모드로 변경'}
+    >
+      <span className="truncate">{theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+      <span
+        className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border"
+        style={{
+          borderColor: 'var(--color-border)',
+          background: 'var(--color-surface)',
+          color: 'var(--color-text)',
+        }}
+      >
+        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      </span>
+    </button>
+  )
+}
+
 function SunIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">

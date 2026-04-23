@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { createPortal } from 'react-dom'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabaseClient'
 import { syncLocalRoomLogsToUser } from '../lib/userRoomLogs'
@@ -12,7 +13,15 @@ function authRedirectUrl() {
   return configuredUrl?.replace(/\/$/, '') || window.location.origin
 }
 
-export function UserAuthButton({ className = 'top-24', floating = true }: { className?: string; floating?: boolean }) {
+export function UserAuthButton({
+  className = 'top-24',
+  floating = true,
+  menuStyle = false,
+}: {
+  className?: string
+  floating?: boolean
+  menuStyle?: boolean
+}) {
   const [session, setSession] = useState<Session | null>(null)
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
@@ -76,18 +85,41 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
         type="button"
         onClick={() => setOpen(true)}
         className={[
-          'app-auth-button app-icon-button rounded-full',
+          menuStyle
+            ? 'app-auth-button flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-[13px] font-semibold'
+            : 'app-auth-button app-icon-button rounded-full',
           floating ? 'fixed right-4 z-50' : '',
           'border transition-colors backdrop-blur-sm',
           className,
         ].join(' ')}
+        style={menuStyle ? {
+          borderColor: 'var(--color-border)',
+          background: 'var(--color-surface-raised)',
+          color: 'var(--color-text)',
+        } : undefined}
         aria-label={session ? '계정 보기' : '로그인'}
         title={session ? '계정 보기' : '로그인'}
       >
-        <UserIcon signedIn={Boolean(session)} />
+        {menuStyle ? (
+          <>
+            <span className="truncate">{session ? '계정 보기' : '로그인'}</span>
+            <span
+              className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border"
+              style={{
+                borderColor: 'var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text)',
+              }}
+            >
+              <UserIcon signedIn={Boolean(session)} />
+            </span>
+          </>
+        ) : (
+          <UserIcon signedIn={Boolean(session)} />
+        )}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
           onClick={event => { if (event.target === event.currentTarget) setOpen(false) }}
@@ -159,7 +191,8 @@ export function UserAuthButton({ className = 'top-24', floating = true }: { clas
               </form>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )

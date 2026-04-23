@@ -75,7 +75,7 @@ export default function App() {
     <div className="min-h-dvh bg-[#0a0a0f]">
       <GlobalNav languageLabel={t('lang_toggle')} onLanguageToggle={toggleLang} />
 
-      <section className="max-w-md mx-auto px-6 pt-6">
+      <section className="max-w-md mx-auto px-4 sm:px-6 pt-6">
         <p className="text-xs uppercase tracking-widest text-teal-300/80">My Card</p>
         <h1 className="mt-1 text-2xl font-bold text-white">{pageTitle}</h1>
         <p className="mt-2 text-sm leading-relaxed text-gray-400">{pageSubtitle}</p>
@@ -150,10 +150,10 @@ function SavedCardHome({
   const recentLogs = logs.slice(0, 2)
 
   return (
-    <div className="min-h-dvh max-w-md mx-auto px-5 pt-6 pb-14 flex flex-col gap-5">
+    <div className="min-h-dvh max-w-md mx-auto px-4 sm:px-5 pt-6 pb-14 flex flex-col gap-5">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131a]">
         <div className="relative px-5 pt-6 pb-5 bg-[linear-gradient(135deg,rgba(20,184,166,0.22),rgba(124,58,237,0.16),rgba(245,158,11,0.14))]">
-          <div className="relative z-10 flex items-start justify-between gap-4">
+          <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <BrandLogo className="mb-2 h-9 w-9 drop-shadow-[0_0_18px_rgba(20,184,166,0.38)]" />
               <h1 className="text-white text-3xl font-black leading-tight break-keep">
@@ -163,7 +163,7 @@ function SavedCardHome({
                 방탈출로 탕진하기 좋은 {fearLabel} · {styleLabel} 취향이에요.
               </p>
             </div>
-            <div className="w-28 h-28 flex-shrink-0 rounded-2xl bg-white/8 border border-white/10 flex items-end justify-center overflow-hidden">
+            <div className="mx-auto h-24 w-24 flex-shrink-0 rounded-2xl bg-white/8 border border-white/10 flex items-end justify-center overflow-hidden sm:mx-0 sm:h-28 sm:w-28">
               <img
                 src={characterImage}
                 alt=""
@@ -189,7 +189,7 @@ function SavedCardHome({
 
       {personalModel?.lifeTheme && (
         <section className="personal-score rounded-2xl border border-teal-500/30 bg-[#101b1b] px-5 py-5">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="text-teal-300 text-xs font-semibold uppercase tracking-widest mb-2">
                 나의 인생테마 후보
@@ -199,8 +199,8 @@ function SavedCardHome({
               </h2>
               <p className="text-gray-400 text-sm mt-1">{personalModel.lifeTheme.room.brand}</p>
             </div>
-            <div className="text-right flex-shrink-0">
-              <div className="flex items-center justify-end gap-1 text-teal-200 text-lg font-black">
+            <div className="flex-shrink-0 sm:text-right">
+              <div className="flex items-center gap-1 text-teal-200 text-lg font-black sm:justify-end">
                 <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />
                 {predictionPathLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
               </div>
@@ -219,7 +219,7 @@ function SavedCardHome({
       )}
 
       <section className="rounded-2xl border border-white/10 bg-[#13131a] px-5 py-5">
-        <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-amber-300 text-xs uppercase tracking-widest mb-1">개인 통계</p>
             <h2 className="text-white text-lg font-bold">
@@ -236,7 +236,7 @@ function SavedCardHome({
 
         {totalLogs > 0 ? (
           <div className="grid gap-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <MiniStat
                 label="평균 길"
                 value={averagePathDef?.label ?? '평가 대기'}
@@ -300,7 +300,7 @@ function ProfileStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-[#0e0e16] border border-white/8 px-4 py-3">
       <p className="text-gray-500 text-xs mb-1">{label}</p>
-      <p className="text-white text-sm font-semibold break-keep">{value}</p>
+      <p className="text-white text-sm font-semibold break-words">{value}</p>
     </div>
   )
 }
@@ -320,7 +320,7 @@ function MiniStat({ label, value, icon }: { label: string; value: string; icon?:
       <p className="text-gray-500 text-xs mb-2">{label}</p>
       <div className="flex items-center gap-2 min-h-6">
         {icon}
-        <p className="text-white text-sm font-bold break-keep">{value}</p>
+        <p className="text-white text-sm font-bold break-words">{value}</p>
       </div>
     </div>
   )

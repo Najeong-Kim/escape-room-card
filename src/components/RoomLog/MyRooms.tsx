@@ -43,7 +43,7 @@ export default function MyRooms() {
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <GlobalNav />
       <div className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
-        <section className="flex items-end justify-between gap-4">
+        <section className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end sm:gap-4">
           <div>
             <p className="text-xs uppercase tracking-widest text-teal-300/80">My Logs</p>
             <h1 className="mt-1 text-2xl font-bold text-white">내 방탈출 기록</h1>
@@ -58,7 +58,7 @@ export default function MyRooms() {
 
         {/* Stats */}
         {total > 0 && (
-          <div className="flex gap-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <div className="flex-1 bg-[#13131a] border border-white/8 rounded-2xl p-4 text-center">
               <p className="text-3xl font-bold text-teal-400">{total}</p>
               <p className="text-xs text-gray-500 mt-1">총 플레이</p>
@@ -114,7 +114,7 @@ export default function MyRooms() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 text-sm">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                 <span className="text-gray-500">{log.played_at}</span>
                 <RatingDisplay rating={log.rating} />
               </div>
@@ -125,9 +125,9 @@ export default function MyRooms() {
                 </p>
               )}
 
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
                 {deletingId === log.id ? (
-                  <div className="flex gap-2">
+                  <div className="flex w-full flex-wrap justify-end gap-2">
                     <button
                       onClick={() => setDeletingId(null)}
                       className="text-xs text-gray-500 hover:text-gray-300 px-3 py-1.5 rounded-lg border border-white/10 transition-colors"

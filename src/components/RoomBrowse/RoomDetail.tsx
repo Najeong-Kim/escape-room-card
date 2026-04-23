@@ -291,7 +291,7 @@ export default function RoomDetail() {
 
           {personalPrediction && (
             <div className="personal-score rounded-2xl border border-teal-300/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015)),radial-gradient(circle_at_top_left,rgba(45,212,191,0.09),transparent_42%)] px-4 py-4 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-sm">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-widest text-teal-300/90">내 기록 기반 예상 길</p>
                   <h3 className="mt-1 text-lg font-bold text-white">
@@ -303,7 +303,7 @@ export default function RoomDetail() {
                       : '내 기록과 유저 평가를 바탕으로 계산했어요.'}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
+                <div className="flex items-center gap-1.5 text-white text-2xl font-black sm:justify-end">
                   <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
                   {predictionPathLabel(personalPrediction).replace('예상 ', '')}
                 </div>

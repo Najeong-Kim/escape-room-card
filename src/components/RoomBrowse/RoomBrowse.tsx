@@ -110,12 +110,12 @@ export default function RoomBrowse() {
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <GlobalNav />
       <div className="px-4 pt-5 pb-24 max-w-2xl mx-auto space-y-5">
-        <section className="flex items-end justify-between gap-4">
+        <section className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end sm:gap-4">
           <div>
             <p className="text-xs uppercase tracking-widest text-teal-300/80">Room Explorer</p>
             <h1 className="mt-1 text-2xl font-bold text-white">방 둘러보기</h1>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <p className="text-xs text-gray-500">방탈출 테마</p>
             <p className="text-lg font-semibold text-white">{loading ? '…' : filtered.length.toLocaleString()}개</p>
           </div>
@@ -125,7 +125,7 @@ export default function RoomBrowse() {
         {personalModel?.lifeTheme && (
           <section className="personal-score rounded-2xl border border-teal-500/30 bg-teal-950/20 px-4 py-4">
             <p className="text-xs text-teal-300 font-semibold mb-1">나의 인생테마 후보</p>
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h2 className="text-white font-bold text-lg truncate">{personalModel.lifeTheme.room.name}</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{personalModel.lifeTheme.room.brand}</p>
@@ -136,7 +136,7 @@ export default function RoomBrowse() {
                   {personalModel.lifeTheme.prediction.reasons[0] ?? '내 기록과 가장 가까운 테마예요.'}
                 </p>
               </div>
-              <div className="text-right flex-shrink-0">
+              <div className="flex-shrink-0 sm:text-right">
                 <div className="flex items-center gap-1 text-teal-300 text-xl font-black">
                   <RatingIcon value={predictionPathRating(personalModel.lifeTheme.prediction)} size={20} />
                   {predictionPathLabel(personalModel.lifeTheme.prediction).replace('예상 ', '')}
@@ -182,12 +182,12 @@ export default function RoomBrowse() {
             placeholder="테마명, 매장명, 지역, 태그 검색"
             className="w-full rounded-xl border border-white/10 bg-[#13131a] px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-teal-500/60"
           />
-          <div className="flex flex-wrap gap-2 items-center">
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
           {/* Location */}
           <select
             value={filters.location ?? ''}
             onChange={e => setLocation(e.target.value || null)}
-            className="bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5
+            className="w-full sm:w-auto bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2
                        focus:outline-none focus:border-teal-500/50 cursor-pointer"
           >
             <option value="">전체 지역</option>
@@ -200,7 +200,7 @@ export default function RoomBrowse() {
           <select
             value={filters.genre ?? ''}
             onChange={e => setGenre(e.target.value || null)}
-            className="bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5
+            className="w-full sm:w-auto bg-[#13131a] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2
                        focus:outline-none focus:border-teal-500/50 cursor-pointer"
           >
             <option value="">전체 장르</option>
@@ -213,7 +213,7 @@ export default function RoomBrowse() {
             type="button"
             onClick={toggleOnlyUnlogged}
             className={[
-              'rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
+              'w-full sm:w-auto rounded-lg border px-3 py-2 text-sm font-medium transition-all',
               filters.onlyUnlogged
                 ? 'border-teal-500 bg-teal-600 text-white'
                 : 'border-white/10 bg-[#13131a] text-gray-300 hover:border-teal-500/50 hover:text-white',
@@ -225,7 +225,7 @@ export default function RoomBrowse() {
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="text-xs text-teal-400 hover:text-teal-300 px-2 py-1.5 transition-colors"
+              className="text-xs text-teal-400 hover:text-teal-300 px-2 py-2 text-left transition-colors"
             >
               필터 초기화
             </button>
