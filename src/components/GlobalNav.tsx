@@ -40,7 +40,7 @@ export function GlobalNav({ languageLabel, onLanguageToggle }: GlobalNavProps) {
           style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'inherit' }}
         >
           <img
-            src="/brand-logo.svg"
+            src="/brand-logo.png"
             alt="방탕"
             width={28}
             height={28}

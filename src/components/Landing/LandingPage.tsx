@@ -132,7 +132,7 @@ function btnGhost(small = false): CSSProperties {
 function LpLogo({ size = 32 }: { size?: number }) {
   return (
     <img
-      src="/brand-logo.svg"
+      src="/brand-logo.png"
       alt="방탕"
       width={size}
       height={size}
