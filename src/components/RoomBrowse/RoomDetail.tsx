@@ -6,7 +6,7 @@ import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, Metri
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { useRooms } from '../../lib/useRooms'
-import { buildPersonalRecommendationModel, predictionConfidenceLabel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
+import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { fetchThemeReviewLinks, REVIEW_SOURCE_LABEL, type ThemeReviewLink } from '../../lib/themeReviewLinks'
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
@@ -289,12 +289,82 @@ export default function RoomDetail() {
             )}
           </div>
 
-          <div className="rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-4">
+          {personalPrediction && (
+            <div className="personal-score rounded-2xl border border-teal-300/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015)),radial-gradient(circle_at_top_left,rgba(45,212,191,0.09),transparent_42%)] px-4 py-4 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-teal-300/90">내 기록 기반 예상 길</p>
+                  <h3 className="mt-1 text-lg font-bold text-white">
+                    {predictionPathLabel(personalPrediction).replace('예상 ', '')}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-300 leading-relaxed">
+                    {personalPrediction.reasons.length
+                      ? personalPrediction.reasons.join(' · ')
+                      : '내 기록과 유저 평가를 바탕으로 계산했어요.'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
+                  <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
+                  {predictionPathLabel(personalPrediction).replace('예상 ', '')}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-2xl border border-amber-200/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.008)),radial-gradient(circle_at_top_right,rgba(251,191,36,0.06),transparent_38%)] px-4 py-4 shadow-[0_10px_24px_rgba(0,0,0,0.1)] backdrop-blur-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-amber-300/90">Quick Actions</p>
+                <h3 className="mt-1 text-lg font-bold text-white">바로 예약하고 위치 보기</h3>
+                <p className="mt-1 text-sm leading-relaxed text-gray-300">
+                  이 테마가 마음에 들면 예약 페이지로 바로 이동하거나, 지도에서 매장 위치를 먼저 확인해보세요.
+                </p>
+              </div>
+              <div className="hidden sm:flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-xl">
+                📍
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {safeBookingUrl ? (
+                <a
+                  href={safeBookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-3 text-sm font-bold text-[#241804] transition-colors hover:bg-amber-300"
+                >
+                  <span aria-hidden="true">↗</span>
+                  예약하기
+                </a>
+              ) : (
+                <span className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-gray-500">
+                  예약 링크 준비중
+                </span>
+              )}
+
+              {safeMapUrl ? (
+                <a
+                  href={safeMapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-teal-400/30 bg-teal-500/10 px-4 py-3 text-sm font-semibold text-teal-300 transition-colors hover:bg-teal-500/15"
+                >
+                  <span aria-hidden="true">📍</span>
+                  지도 보기
+                </a>
+              ) : (
+                <span className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-gray-500">
+                  지도 링크 준비중
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-sky-200/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.008)),radial-gradient(circle_at_top_left,rgba(56,189,248,0.055),transparent_36%)] px-4 py-4 shadow-[0_10px_24px_rgba(0,0,0,0.1)] backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <p className="text-xs text-teal-300 font-semibold">
-                  {logged ? '이미 기록한 테마예요' : personalPrediction ? predictionConfidenceLabel(personalPrediction) : '이 테마가 궁금하신가요?'}
-                </p>
+                <p className="text-xs uppercase tracking-widest text-teal-300/90">Your Log</p>
+                <h3 className="mt-1 text-lg font-bold text-white">이미 플레이하셨다면 기록해보세요</h3>
                 {logged && myLog ? (
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span className={`text-sm font-semibold ${myLog.cleared ? 'text-green-400' : 'text-red-400'}`}>
@@ -315,9 +385,7 @@ export default function RoomDetail() {
                   </div>
                 ) : (
                   <p className="text-sm text-gray-300 mt-1">
-                    {personalPrediction
-                      ? `${predictionPathLabel(personalPrediction).replace('예상 ', '')} · ${personalPrediction.reasons[0] ?? '내 기록을 바탕으로 계산했어요.'}`
-                      : '플레이 후 길 평가를 남기면 추천이 더 정확해집니다.'}
+                    플레이 후 길 평가와 감상을 남기면 다음 추천이 더 정확해져요.
                   </p>
                 )}
               </div>
@@ -333,20 +401,10 @@ export default function RoomDetail() {
                   <>
                     <button
                       onClick={() => setShowLog(true)}
-                      className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
+                      className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#041311] text-sm font-bold transition-colors"
                     >
                       기록하기
                     </button>
-                    {safeBookingUrl && (
-                      <a
-                        href={safeBookingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="app-secondary-action min-w-28 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
-                      >
-                        예약하기
-                      </a>
-                    )}
                   </>
                 )}
               </div>
@@ -442,25 +500,6 @@ export default function RoomDetail() {
             </div>
           </div>
 
-          {personalPrediction && !logged && (
-            <div className="personal-score rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs text-teal-300 font-semibold">{predictionConfidenceLabel(personalPrediction)}</p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {personalPrediction.reasons.length
-                      ? personalPrediction.reasons.join(' · ')
-                      : '내 기록과 유저 평가를 바탕으로 계산했어요.'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5 text-white text-2xl font-black">
-                  <RatingIcon value={predictionPathRating(personalPrediction)} size={24} />
-                  {predictionPathLabel(personalPrediction).replace('예상 ', '')}
-                </div>
-              </div>
-            </div>
-          )}
-
           {escapeStats && escapeStats.totalCount >= 1 && (
             <div className="rounded-xl bg-[#13131a] border border-white/8 px-4 py-4">
               <p className="text-xs text-gray-500 mb-3">유저 탈출 통계</p>
@@ -510,13 +549,16 @@ export default function RoomDetail() {
 
           <div className="flex gap-3 sticky bottom-4 z-20">
             {logged ? (
-              <span className="flex-1 text-center py-3 rounded-xl bg-green-900/80 border border-green-500/30 text-green-200 text-sm font-medium backdrop-blur">
-                기록됨
-              </span>
+              <button
+                onClick={() => navigate('/my-rooms')}
+                className="flex-1 text-center py-3 rounded-xl border border-teal-300/35 bg-white/8 hover:bg-teal-400/14 text-teal-100 text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] backdrop-blur-md transition-colors"
+              >
+                내 기록 보기
+              </button>
             ) : (
               <button
                 onClick={() => setShowLog(true)}
-                className="app-primary-action flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
+                className="app-primary-action flex-1 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#041311] text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-colors"
               >
                 기록하기
               </button>
@@ -526,9 +568,9 @@ export default function RoomDetail() {
                 href={safeBookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="app-secondary-action flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-100 text-sm font-semibold text-center transition-colors"
+                className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#241804] text-sm font-bold text-center shadow-[0_10px_24px_rgba(0,0,0,0.2)] transition-colors"
               >
-                예약 페이지
+                예약하기
               </a>
             )}
           </div>
