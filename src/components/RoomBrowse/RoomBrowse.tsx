@@ -109,21 +109,18 @@ export default function RoomBrowse() {
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <GlobalNav />
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3 min-w-0">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-white transition-colors p-1"
-          aria-label="뒤로"
-        >
-          ←
-        </button>
-        <h1 className="font-semibold text-base truncate">방 둘러보기</h1>
-        <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
-          {loading ? '로딩 중…' : `${filtered.length}개`}
-        </span>
-      </div>
-
       <div className="px-4 pt-5 pb-24 max-w-2xl mx-auto space-y-5">
+        <section className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-teal-300/80">Room Explorer</p>
+            <h1 className="mt-1 text-2xl font-bold text-white">방 둘러보기</h1>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">방탈출 테마</p>
+            <p className="text-lg font-semibold text-white">{loading ? '…' : filtered.length.toLocaleString()}개</p>
+          </div>
+        </section>
+
         {/* Theme chips */}
         {personalModel?.lifeTheme && (
           <section className="personal-score rounded-2xl border border-teal-500/30 bg-teal-950/20 px-4 py-4">

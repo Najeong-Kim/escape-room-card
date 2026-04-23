@@ -42,18 +42,20 @@ export default function MyRooms() {
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <GlobalNav />
-      {/* Top bar */}
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-white transition-colors p-1"
-        >
-          ←
-        </button>
-        <h1 className="font-semibold text-base">내 방탈출 기록</h1>
-      </div>
-
       <div className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
+        <section className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-teal-300/80">My Logs</p>
+            <h1 className="mt-1 text-2xl font-bold text-white">내 방탈출 기록</h1>
+          </div>
+          <button
+            onClick={() => navigate('/rooms')}
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            방 둘러보기 →
+          </button>
+        </section>
+
         {/* Stats */}
         {total > 0 && (
           <div className="flex gap-3">

@@ -66,9 +66,20 @@ export default function App() {
     setMode('quiz')
   }
 
+  const pageTitle = mode === 'quiz' ? '내 카드 만들기' : '내 카드'
+  const pageSubtitle = mode === 'quiz'
+    ? '취향 몇 가지만 고르면 방탕 카드가 바로 완성돼요.'
+    : '내 방탈출 성향과 추천, 기록 흐름을 한곳에서 볼 수 있어요.'
+
   return (
     <div className="min-h-dvh bg-[#0a0a0f]">
       <GlobalNav languageLabel={t('lang_toggle')} onLanguageToggle={toggleLang} />
+
+      <section className="max-w-md mx-auto px-6 pt-6">
+        <p className="text-xs uppercase tracking-widest text-teal-300/80">My Card</p>
+        <h1 className="mt-1 text-2xl font-bold text-white">{pageTitle}</h1>
+        <p className="mt-2 text-sm leading-relaxed text-gray-400">{pageSubtitle}</p>
+      </section>
 
       <AnimatePresence mode="wait">
         {mode === 'home' && savedProfile && (
@@ -139,7 +150,7 @@ function SavedCardHome({
   const recentLogs = logs.slice(0, 2)
 
   return (
-    <div className="min-h-dvh max-w-md mx-auto px-5 py-24 flex flex-col gap-5">
+    <div className="min-h-dvh max-w-md mx-auto px-5 pt-6 pb-14 flex flex-col gap-5">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131a]">
         <div className="relative px-5 pt-6 pb-5 bg-[linear-gradient(135deg,rgba(20,184,166,0.22),rgba(124,58,237,0.16),rgba(245,158,11,0.14))]">
           <div className="relative z-10 flex items-start justify-between gap-4">

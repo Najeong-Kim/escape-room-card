@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchAllCommunityEscapeStats, fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
 import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
@@ -120,6 +120,7 @@ function naverMapUrl(room: Room) {
 
 export default function RoomDetail() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams()
   const roomId = Number(id)
   const { rooms, loading, error } = useRooms()
@@ -180,6 +181,7 @@ export default function RoomDetail() {
   const visibleReviewLinks = reviewLinks.slice(0, 4)
   const safeBookingUrl = room ? safeExternalUrl(room.website_url) : null
   const safeMapUrl = room ? naverMapUrl(room) : null
+  const shouldUseHistoryBack = location.state && typeof location.state === 'object' && 'from' in location.state && location.state.from === '/'
   const reviewCountByType = reviewLinks.reduce<Record<string, number>>((counts, review) => {
     counts[review.source_type] = (counts[review.source_type] ?? 0) + 1
     return counts
@@ -210,11 +212,14 @@ export default function RoomDetail() {
     return (
       <div className="min-h-dvh bg-[#0a0a0f] text-white">
         <GlobalNav />
-        <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3">
-          <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white">← 뒤로</button>
-        </div>
         <div className="px-4 py-20 text-center text-gray-500">
           <p>방 정보를 불러오지 못했습니다.</p>
+          <button
+            onClick={() => shouldUseHistoryBack ? navigate(-1) : navigate('/rooms')}
+            className="mt-4 text-sm text-teal-400 hover:text-teal-300"
+          >
+            방 둘러보기로 돌아가기 →
+          </button>
         </div>
       </div>
     )
@@ -223,17 +228,6 @@ export default function RoomDetail() {
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">
       <GlobalNav />
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center gap-3 min-w-0">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-white transition-colors p-1"
-          aria-label="뒤로"
-        >
-          ←
-        </button>
-        <h1 className="font-semibold text-base truncate">방 상세</h1>
-      </div>
-
       <main className="max-w-2xl mx-auto pb-24">
         {room.image_url ? (
           <img
@@ -249,6 +243,17 @@ export default function RoomDetail() {
         )}
 
         <section className="px-4 pt-6 space-y-6">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              onClick={() => shouldUseHistoryBack ? navigate(-1) : navigate('/rooms')}
+              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              <span aria-hidden="true">←</span>
+              <span>방 둘러보기로</span>
+            </button>
+            <span className="text-xs uppercase tracking-widest text-gray-500">Theme Detail</span>
+          </div>
+
           <div>
             <p className="text-sm text-gray-500">{room.brand}</p>
             <h2 className="text-2xl font-bold leading-tight mt-1">{room.name}</h2>

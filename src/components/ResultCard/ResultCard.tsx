@@ -75,7 +75,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="flex flex-col items-center min-h-dvh max-w-md mx-auto px-6 py-8 gap-6"
+      className="flex flex-col items-center min-h-dvh max-w-md mx-auto px-6 pt-5 pb-8 gap-6"
     >
       <div className="text-center">
         <BrandLogo className="mx-auto mb-2 h-10 w-10 drop-shadow-[0_0_18px_rgba(20,184,166,0.38)]" />
@@ -837,4 +837,3 @@ function hexToRgba(hex: string, alpha: number): string {
   const b = num & 255
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
-

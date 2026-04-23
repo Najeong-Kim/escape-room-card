@@ -830,7 +830,7 @@ function RoomPreview({ onBrowse, card }: { onBrowse: () => void; card?: QuizProf
                 onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
                 onClick={() => {
                   if ('id' in r && typeof r.id === 'number') {
-                    navigate(`/rooms/${r.id}`)
+                    navigate(`/rooms/${r.id}`, { state: { from: '/' } })
                     return
                   }
                   onBrowse()
