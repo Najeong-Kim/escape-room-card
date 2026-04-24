@@ -78,7 +78,7 @@ const en = {
   watermark: '🔒 Bangtang',
 
   // Recommendations
-  rec_title: 'Top 3 Picks For You',
+  rec_title: 'Top {{count}} Picks For You',
   rec_subtitle: 'Matched to your taste',
   rec_location: 'Location',
 

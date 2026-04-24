@@ -78,7 +78,7 @@ const ko = {
   watermark: '🔒 방탕',
 
   // Recommendations
-  rec_title: '추천 방 3개',
+  rec_title: '추천 방 {{count}}개',
   rec_subtitle: '내 취향에 맞는 테마',
   rec_location: '위치',
 

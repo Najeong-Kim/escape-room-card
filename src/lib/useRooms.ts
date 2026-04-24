@@ -17,6 +17,7 @@ export interface TagFilter {
   id: string
   label: string
   emoji: string
+  tone?: 'amber' | 'emerald' | 'sky' | 'rose'
   match: (room: Room) => boolean
 }
 
@@ -39,6 +40,7 @@ export const TAG_FILTERS: TagFilter[] = [
     id: 'crime-scene',
     label: '크라임씬',
     emoji: '🕵️',
+    tone: 'sky',
     match: room =>
       hasThemeTag(room, ['crime_scene', 'crime-scene'], ['크라임씬']) ||
       normalized(room.name).includes('크라임씬') ||
@@ -48,6 +50,7 @@ export const TAG_FILTERS: TagFilter[] = [
     id: 'outdoor',
     label: '야외테마',
     emoji: '🌿',
+    tone: 'emerald',
     match: room =>
       hasThemeTag(room, ['outdoor'], ['야외']) ||
       normalized(room.name).includes('야외'),
@@ -56,6 +59,7 @@ export const TAG_FILTERS: TagFilter[] = [
     id: 'horror-theme',
     label: '공포테마',
     emoji: '👻',
+    tone: 'rose',
     match: room =>
       hasThemeTag(room, ['strong_horror', 'horror_theme'], ['공포', '공포 강함']) ||
       room.genres.includes('Horror') ||
@@ -65,6 +69,27 @@ export const TAG_FILTERS: TagFilter[] = [
 
 export function getMatchingTagFilters(room: Room): TagFilter[] {
   return TAG_FILTERS.filter(tag => tag.match(room))
+}
+
+export function tagFilterButtonClass(tag: TagFilter, selected: boolean) {
+  if (selected) {
+    if (tag.tone === 'rose') return 'bg-rose-400 border-rose-300 text-[#2b0d16]'
+    if (tag.tone === 'emerald') return 'bg-emerald-400 border-emerald-300 text-[#0d261d]'
+    if (tag.tone === 'sky') return 'bg-sky-400 border-sky-300 text-[#0d2230]'
+    return 'bg-amber-400 border-amber-300 text-[#241804]'
+  }
+
+  if (tag.tone === 'rose') return 'bg-white/5 border-white/10 text-rose-200 hover:border-rose-300/50 hover:text-rose-100'
+  if (tag.tone === 'emerald') return 'bg-white/5 border-white/10 text-emerald-200 hover:border-emerald-300/50 hover:text-emerald-100'
+  if (tag.tone === 'sky') return 'bg-white/5 border-white/10 text-sky-200 hover:border-sky-300/50 hover:text-sky-100'
+  return 'bg-white/5 border-white/10 text-gray-300 hover:border-amber-300/50 hover:text-white'
+}
+
+export function tagFilterPillClass(tag: TagFilter) {
+  if (tag.tone === 'rose') return 'border-rose-200/40 bg-rose-500/28 text-rose-50'
+  if (tag.tone === 'emerald') return 'border-emerald-300/30 bg-emerald-400/14 text-emerald-100'
+  if (tag.tone === 'sky') return 'border-sky-300/30 bg-sky-400/14 text-sky-100'
+  return 'border-amber-300/25 bg-amber-400/10 text-amber-100'
 }
 
 export const THEMES: Theme[] = [

@@ -5,7 +5,7 @@ import { fetchAllCommunityEscapeStats, fetchAllCommunityMetricStats, fetchAllCom
 import type { CommunityEscapeStats, CommunityMetricStats, CommunityRating, MetricKey } from '../../lib/communityRatings'
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import { useRoomLogs } from '../../lib/useRoomLogs'
-import { getMatchingTagFilters, useRooms } from '../../lib/useRooms'
+import { getMatchingTagFilters, tagFilterPillClass, useRooms } from '../../lib/useRooms'
 import { buildPersonalRecommendationModel, predictionPathLabel, predictionPathRating } from '../../lib/personalRecommendations'
 import { fetchThemeReviewLinks, REVIEW_SOURCE_LABEL, type ThemeReviewLink } from '../../lib/themeReviewLinks'
 import { ReportModal } from '../ReportModal'
@@ -317,7 +317,7 @@ export default function RoomDetail() {
                 {matchingTagFilters.map(tag => (
                   <span
                     key={tag.id}
-                    className="inline-flex items-center gap-1 rounded-full border border-amber-300/25 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100"
+                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${tagFilterPillClass(tag)}`}
                   >
                     <span>{tag.emoji}</span>
                     <span>{tag.label}</span>

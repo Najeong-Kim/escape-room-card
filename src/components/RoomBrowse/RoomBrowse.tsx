@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useRooms, useRoomFilterOptions, THEMES, TAG_FILTERS, filterRooms, INITIAL_FILTERS } from '../../lib/useRooms'
+import { useRooms, useRoomFilterOptions, THEMES, TAG_FILTERS, filterRooms, INITIAL_FILTERS, tagFilterButtonClass } from '../../lib/useRooms'
 import type { RoomFilters } from '../../lib/useRooms'
 import { RoomCard } from './RoomCard'
 import { fetchAllCommunityMetricStats, fetchAllCommunityRatings } from '../../lib/communityRatings'
@@ -191,10 +191,7 @@ export default function RoomBrowse() {
                 type="button"
                 onClick={() => toggleTag(tag.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150
-                  ${filters.tagIds.includes(tag.id)
-                    ? 'bg-amber-400 border-amber-300 text-[#241804]'
-                    : 'bg-white/5 border-white/10 text-gray-300 hover:border-amber-300/50 hover:text-white'
-                  }`}
+                  ${tagFilterButtonClass(tag, filters.tagIds.includes(tag.id))}`}
               >
                 <span>{tag.emoji}</span>
                 <span>{tag.label}</span>

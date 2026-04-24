@@ -12,8 +12,9 @@ import {
   type SimilarProfileFavoriteTheme,
 } from '../../lib/userCardProfile'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
+import { getRatingDef, RatingIcon, type PathRating } from '../../lib/ratings'
 import { BrandLogo } from '../BrandLogo'
-import { getMatchingTagFilters } from '../../lib/useRooms'
+import { getMatchingTagFilters, tagFilterPillClass } from '../../lib/useRooms'
 
 // ─── Character accent colours & stats ─────────────────────────
 
@@ -76,7 +77,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="flex flex-col items-center min-h-dvh max-w-md mx-auto px-6 pt-5 pb-8 gap-6"
+      className="flex flex-col items-center max-w-md mx-auto px-6 pt-5 pb-8 gap-6"
     >
       <div className="text-center">
         <BrandLogo className="mx-auto mb-2 h-10 w-10 drop-shadow-[0_0_18px_rgba(20,184,166,0.38)]" />
@@ -451,12 +452,13 @@ function RecommendedRooms({
   t: (key: string) => string
 }) {
   if (rooms.length === 0) return null
+  const title = `추천 방 ${rooms.length}개`
 
   return (
     <div className="w-full">
       <div className="mb-3">
         <p className="text-gray-500 text-xs uppercase tracking-widest">{t('rec_subtitle')}</p>
-        <h2 className="text-white font-bold text-lg">{t('rec_title')}</h2>
+        <h2 className="text-white font-bold text-lg">{title}</h2>
       </div>
       <div className="flex flex-col gap-3">
         {rooms.map(item => (
@@ -474,8 +476,10 @@ function RoomCard({
   recommendation: RecommendedRoom
   t: (key: string) => string
 }) {
-  const { room, reasons } = recommendation
+  const { room, reasons, matchPercent } = recommendation
   const matchingTagFilters = getMatchingTagFilters(room)
+  const predictedPath = matchPercentToPathRating(matchPercent)
+  const predictedPathDef = getRatingDef(predictedPath)
 
   return (
     <div
@@ -490,10 +494,17 @@ function RoomCard({
           <p className="text-white font-semibold text-sm truncate">{room.name}</p>
           <p className="text-gray-500 text-xs">{room.brand}</p>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="text-yellow-400 text-xs">★</span>
-          <span className="text-gray-300 text-xs">{room.rating_avg.toFixed(1)}</span>
-        </div>
+        {predictedPathDef && (
+          <div className="shrink-0 text-right">
+            <div className="flex items-center justify-end gap-1">
+              <RatingIcon value={predictedPathDef.value} size={18} />
+              <span className="text-xs font-semibold" style={{ color: predictedPathDef.color }}>
+                {predictedPathDef.label}
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-500">예상 길</p>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-gray-500 text-xs">{t('rec_location')}: {room.location}</span>
@@ -513,7 +524,7 @@ function RoomCard({
           {matchingTagFilters.slice(0, 3).map(tag => (
             <span
               key={tag.id}
-              className="inline-flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-100"
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${tagFilterPillClass(tag)}`}
             >
               <span>{tag.emoji}</span>
               <span>{tag.label}</span>
@@ -528,6 +539,15 @@ function RoomCard({
       )}
     </div>
   )
+}
+
+function matchPercentToPathRating(matchPercent: number): PathRating {
+  if (matchPercent >= 97) return 5
+  if (matchPercent >= 93) return 4
+  if (matchPercent >= 89) return 3
+  if (matchPercent >= 85) return 2
+  if (matchPercent >= 81) return 1
+  return 0
 }
 
 // ─── Canvas composition (front + back side-by-side) ───────────────

@@ -72,7 +72,7 @@ export default function App() {
     : '내 방탈출 성향과 추천, 기록 흐름을 한곳에서 볼 수 있어요.'
 
   return (
-    <div className="min-h-dvh bg-[#0a0a0f]">
+    <div className="flex min-h-dvh flex-col bg-[#0a0a0f]">
       <GlobalNav languageLabel={t('lang_toggle')} onLanguageToggle={toggleLang} />
 
       <section className="max-w-md mx-auto px-4 sm:px-6 pt-6">
@@ -108,7 +108,7 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-      <Footer />
+      {mode !== 'quiz' && <Footer />}
     </div>
   )
 }
@@ -150,7 +150,7 @@ function SavedCardHome({
   const recentLogs = logs.slice(0, 2)
 
   return (
-    <div className="min-h-dvh max-w-md mx-auto px-4 sm:px-5 pt-6 pb-14 flex flex-col gap-5">
+    <div className="max-w-md mx-auto w-full px-4 sm:px-5 pt-6 pb-14 flex flex-col gap-5">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#13131a]">
         <div className="relative px-5 pt-6 pb-5 bg-[linear-gradient(135deg,rgba(20,184,166,0.22),rgba(124,58,237,0.16),rgba(245,158,11,0.14))]">
           <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

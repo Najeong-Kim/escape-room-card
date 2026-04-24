@@ -37,7 +37,7 @@ export function QuizFlow({ onComplete }: Props) {
   const fraction = progressFraction(state)
 
   return (
-    <div className="flex flex-col min-h-dvh max-w-md mx-auto">
+    <div className="flex w-full max-w-md flex-col mx-auto">
       <ProgressBar fraction={fraction} step={stepIndex + 1} total={8} />
 
       {/* Back button */}
