@@ -21,6 +21,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@clerk/react": "^6.4.3",
     "@dicebear/collection": "^9.4.2",
     "@dicebear/core": "^9.4.2",
     "@supabase/supabase-js": "^2.103.0",

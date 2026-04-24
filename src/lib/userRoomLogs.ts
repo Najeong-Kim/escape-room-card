@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient'
 import { getLogs, replaceLogs } from './roomLog'
 import type { RoomLog } from './roomLog'
+import { getCurrentUserId } from './auth'
 
 interface UserRoomLogRow {
   local_id: string
@@ -73,8 +74,7 @@ function sortLogs(logs: RoomLog[]) {
 }
 
 async function currentUserId() {
-  const { data } = await supabase.auth.getUser()
-  return data.user?.id ?? null
+  return getCurrentUserId()
 }
 
 export async function fetchUserRoomLogs(): Promise<RoomLog[]> {

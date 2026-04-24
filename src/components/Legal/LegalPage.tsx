@@ -54,7 +54,7 @@ function PrivacyContent() {
         <h3 className="font-semibold">수집하는 정보</h3>
         <p className="text-sm text-gray-400 leading-relaxed">
           방탕은 서비스 이용에 필요한 범위에서 닉네임, 방탕 카드 결과, 플레이 기록, 테마 평가, 제보 내용을 저장할 수 있습니다.
-          로그인하지 않은 상태의 카드와 기록은 브라우저 localStorage에 저장됩니다.
+          로그인하지 않은 상태의 카드 결과는 브라우저 localStorage에 저장될 수 있으며, 플레이 기록은 로그인한 계정에 저장됩니다.
         </p>
       </section>
 

@@ -2,8 +2,10 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Room } from '../../lib/recommend'
+import { useAppAuth } from '../../lib/auth'
 import { useRoomLogs } from '../../lib/useRoomLogs'
 import { LogModal } from '../RoomLog/LogModal'
+import { SignInRequiredModal } from '../SignInRequiredModal'
 import { getRatingDef, RatingIcon, score10ToPathRating } from '../../lib/ratings'
 import type { CommunityMetricStats, CommunityRating } from '../../lib/communityRatings'
 import type { PersonalPrediction } from '../../lib/personalRecommendations'
@@ -102,8 +104,22 @@ interface RoomCardProps {
 
 export function RoomCard({ room, communityRating, communityMetricStats, personalPrediction, onRated }: RoomCardProps) {
   const [showLog, setShowLog] = useState(false)
+  const [showSignInGate, setShowSignInGate] = useState(false)
+  const auth = useAppAuth()
   const [logs] = useRoomLogs()
   const logged = logs.some(log => log.room_id === room.id)
+
+  function openLog(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (!auth.isSignedIn) {
+      setShowSignInGate(true)
+      return
+    }
+
+    setShowLog(true)
+  }
 
   const ratingLevel = communityRating
     ? score10ToPathRating(communityRating.score10)
@@ -278,7 +294,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
             <span className="text-xs text-green-500 font-medium">✓ 기록됨</span>
           ) : (
             <button
-              onClick={e => { e.preventDefault(); e.stopPropagation(); setShowLog(true) }}
+              onClick={openLog}
               className="text-xs text-teal-400 hover:text-teal-300 border border-teal-500/30
                          hover:bg-teal-900/20 px-3 py-1 rounded-lg transition-all"
             >
@@ -302,6 +318,7 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           onSaved={() => { setShowLog(false); onRated?.() }}
         />
       )}
+      <SignInRequiredModal open={showSignInGate} onClose={() => setShowSignInGate(false)} />
     </>
   )
 

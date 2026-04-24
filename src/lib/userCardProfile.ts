@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient'
 import { loadSavedCard, saveCard } from './savedCard'
 import type { QuizProfile } from './traitMap'
+import { getCurrentUserId } from './auth'
 
 export interface SimilarProfileFavoriteTheme {
   theme_id: number
@@ -19,8 +20,7 @@ interface UserCardProfileRow {
 }
 
 async function currentUserId() {
-  const { data } = await supabase.auth.getUser()
-  return data.user?.id ?? null
+  return getCurrentUserId()
 }
 
 function profilePayload(profile: QuizProfile, userId: string) {

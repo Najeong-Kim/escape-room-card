@@ -9,6 +9,7 @@ import { getRatingDef, RatingIcon } from '../../lib/ratings'
 import { Footer } from '../Footer'
 import { GlobalNav } from '../GlobalNav'
 import { EditLogModal } from './EditLogModal'
+import { useAppAuth } from '../../lib/auth'
 
 function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
   if (rating === null || rating === undefined) {
@@ -26,6 +27,7 @@ function RatingDisplay({ rating }: { rating: RoomLog['rating'] }) {
 
 export default function MyRooms() {
   const navigate = useNavigate()
+  const auth = useAppAuth()
   const [logs] = useRoomLogs()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingLog, setEditingLog] = useState<RoomLog | null>(null)
@@ -38,6 +40,54 @@ export default function MyRooms() {
 
   const total = logs.length
   const cleared = logs.filter(l => l.cleared).length
+
+  if (!auth.isSignedIn) {
+    return (
+      <div className="min-h-dvh bg-[#0a0a0f] text-white">
+        <GlobalNav />
+        <div className="mx-auto flex max-w-md flex-col gap-4 px-4 py-6">
+          <section className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end sm:gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-teal-300/80">My Logs</p>
+              <h1 className="mt-1 text-2xl font-bold text-white">내 방탈출 기록</h1>
+              <p className="mt-2 text-sm leading-relaxed text-gray-400">
+                기록은 로그인 후 내 계정에 저장돼요. 로그인하면 플레이 기록과 평가를 계속 이어서 볼 수 있어요.
+              </p>
+            </div>
+          </section>
+
+          <div className="rounded-3xl border border-white/8 bg-[#13131a] px-5 py-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-500/10 text-2xl">
+              🔐
+            </div>
+            <h2 className="mt-4 text-xl font-bold text-white">로그인하면 기록이 쌓여요</h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-400">
+              플레이한 테마를 기록하고, 내 평가와 유저 평균을 비교하고, 취향 추천까지 이어서 받아보세요.
+            </p>
+            <div className="mt-5 grid gap-2 text-left text-xs text-gray-300">
+              <div className="rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3">플레이 기록을 계정에 안전하게 저장</div>
+              <div className="rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3">내 평가와 유저 평균 비교</div>
+              <div className="rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3">기록이 쌓일수록 추천 정교화</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => auth.openSignIn()}
+              className="mt-5 w-full rounded-xl bg-teal-500 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-teal-400"
+            >
+              로그인하고 기록 시작하기
+            </button>
+            <button
+              onClick={() => navigate('/rooms')}
+              className="mt-3 text-sm text-gray-400 transition-colors hover:text-white"
+            >
+              먼저 방 둘러보기 →
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-dvh bg-[#0a0a0f] text-white">

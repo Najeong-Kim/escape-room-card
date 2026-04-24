@@ -11,12 +11,14 @@ import { fetchThemeReviewLinks, REVIEW_SOURCE_LABEL, type ThemeReviewLink } from
 import { ReportModal } from '../ReportModal'
 import { Footer } from '../Footer'
 import { LogModal } from '../RoomLog/LogModal'
+import { SignInRequiredModal } from '../SignInRequiredModal'
 import { GlobalNav } from '../GlobalNav'
 import type { Room } from '../../lib/recommend'
 import type { RoomLog } from '../../lib/roomLog'
 import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { usePageMeta } from '../../lib/seo'
 import { safeExternalUrl } from '../../lib/safeExternalUrl'
+import { useAppAuth } from '../../lib/auth'
 
 const GENRE_LABEL: Record<string, string> = {
   Horror: '공포',
@@ -141,7 +143,9 @@ export default function RoomDetail() {
   const [escapeStats, setEscapeStats] = useState<CommunityEscapeStats | undefined>()
   const [reviewLinks, setReviewLinks] = useState<ThemeReviewLink[]>([])
   const [showLog, setShowLog] = useState(false)
+  const [showSignInGate, setShowSignInGate] = useState(false)
   const [showReport, setShowReport] = useState(false)
+  const auth = useAppAuth()
   const [logs] = useRoomLogs()
   const logged = useMemo(() => logs.some(log => log.room_id === roomId), [logs, roomId])
   const myLog = useMemo(() => logs.find(log => log.room_id === roomId), [logs, roomId])
@@ -198,6 +202,15 @@ export default function RoomDetail() {
     counts[review.source_type] = (counts[review.source_type] ?? 0) + 1
     return counts
   }, {})
+
+  function requestLog() {
+    if (!auth.isSignedIn) {
+      setShowSignInGate(true)
+      return
+    }
+
+    setShowLog(true)
+  }
 
   usePageMeta({
     title: room ? `${room.name} - ${room.brand}` : '방 상세',
@@ -439,7 +452,7 @@ export default function RoomDetail() {
                 {!logged && (
                   <>
                     <button
-                      onClick={() => setShowLog(true)}
+                      onClick={requestLog}
                       className="app-primary-action min-w-28 px-4 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#041311] text-sm font-bold transition-colors"
                     >
                       기록하기
@@ -625,7 +638,7 @@ export default function RoomDetail() {
               </span>
             ) : (
               <button
-                onClick={() => setShowLog(true)}
+                onClick={requestLog}
                 className="app-primary-action flex-1 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#041311] text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-colors"
               >
                 기록하기
@@ -742,6 +755,11 @@ export default function RoomDetail() {
           }}
         />
       )}
+      <SignInRequiredModal
+        open={showSignInGate}
+        onClose={() => setShowSignInGate(false)}
+        description="플레이 기록은 로그인 후 계정에 저장돼요. 로그인하면 내 기록, 내 평가 비교, 취향 추천을 계속 이어서 볼 수 있어요."
+      />
       {showReport && (
         <ReportModal
           themeId={room.id}

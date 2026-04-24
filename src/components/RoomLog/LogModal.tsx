@@ -8,6 +8,7 @@ import type { PathRating } from '../../lib/ratings'
 import { submitCommunityEscapeStats, submitCommunityMetricRatings, submitCommunityRating } from '../../lib/communityRatings'
 import type { MetricKey, MetricScores } from '../../lib/communityRatings'
 import { saveUserRoomLog } from '../../lib/userRoomLogs'
+import { useAppAuth } from '../../lib/auth'
 
 const METRICS: { key: MetricKey; label: string; low: string; high: string }[] = [
   { key: 'difficulty', label: '난이도', low: '쉬움', high: '어려움' },
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function LogModal({ room, onClose, onSaved }: Props) {
+  const auth = useAppAuth()
   const today = new Date().toISOString().slice(0, 10)
   const [playedAt, setPlayedAt] = useState(today)
   const [cleared, setCleared] = useState(true)
@@ -38,6 +40,11 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const ratingSectionRef = useRef<HTMLDivElement>(null)
 
   async function save() {
+    if (!auth.isSignedIn) {
+      auth.openSignIn()
+      return
+    }
+
     if (rating === null) {
       setRatingTouched(true)
       ratingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -100,6 +107,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
             <div>
               <p className="text-xs text-gray-500">{room.brand}</p>
               <h2 className="text-white font-bold text-lg leading-snug">{room.name}</h2>
+              <p className="mt-1 text-xs text-teal-300">플레이 기록은 로그인한 계정에 저장돼요.</p>
             </div>
             <button
               onClick={onClose}
