@@ -1,4 +1,5 @@
 import type { Room } from './recommend'
+import { safeImageUrl } from './safeImageUrl'
 
 interface ThemeCafe {
   name: string
@@ -140,7 +141,7 @@ export function themeToRoom(theme: ThemeCatalogRow): Room {
       aging: theme.aging_label,
     },
     website_url: theme.booking_url ?? cafe?.booking_url ?? cafe?.website_url ?? undefined,
-    image_url: theme.image_status === 'rejected' ? undefined : theme.image_url ?? undefined,
+    image_url: theme.image_status === 'rejected' ? undefined : safeImageUrl(theme.image_url),
     naver_place_id: cafe?.naver_place_id ?? undefined,
     naver_place_url: cafe?.naver_place_url ?? undefined,
   }

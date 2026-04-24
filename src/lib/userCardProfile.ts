@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient'
 import { loadSavedCard, saveCard } from './savedCard'
 import type { QuizProfile } from './traitMap'
 import { getCurrentUserId } from './auth'
+import { safeImageUrl } from './safeImageUrl'
 
 export interface SimilarProfileFavoriteTheme {
   theme_id: number
@@ -99,6 +100,7 @@ export async function fetchSimilarProfileFavoriteThemes(
 
   return ((data ?? []) as unknown as SimilarProfileFavoriteTheme[]).map(theme => ({
     ...theme,
+    image_url: safeImageUrl(theme.image_url) ?? null,
     score_10: Number(theme.score_10),
   }))
 }
