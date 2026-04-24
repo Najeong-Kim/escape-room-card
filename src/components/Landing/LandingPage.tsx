@@ -1,7 +1,7 @@
 import { useState, useEffect, type CSSProperties } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabaseClient'
+import { useAppAuth } from '../../lib/auth'
 import { loadSavedCard, SAVED_CARD_CHANGED } from '../../lib/savedCard'
 import type { QuizProfile } from '../../lib/traitMap'
 import { getRecommendations, type RecommendedRoom } from '../../lib/recommend'
@@ -177,7 +177,7 @@ function Nav({ onCta }: { onCta: () => void }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <LpLogo size={32} />
           <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-0.02em' }}>방탕</span>
-          <span className="lp-mono" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '2px 6px', border: '1px solid var(--border)', borderRadius: 4, marginLeft: 4 }}>v2.0</span>
+          <span className="lp-mono" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '2px 6px', border: '1px solid var(--border)', borderRadius: 4, marginLeft: 4 }}>v0.1</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 14, fontWeight: 500 }}>
           <a href="#characters" style={{ color: 'var(--text-muted)', textDecoration: 'none' }} className="lp-hide-sm">캐릭터</a>
@@ -1140,16 +1140,9 @@ function MyCardDisplay({ char, card }: { char: typeof CHARACTERS[number]; card: 
 export function LandingPage() {
   const navigate = useNavigate()
   const [card, setCard] = useState<QuizProfile | null>(loadSavedCard)
-  const [session, setSession] = useState<Session | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [heroCount, setHeroCount] = useState<string>('수천 명')
-
-  // auth
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    const { data: listener } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
-    return () => listener.subscription.unsubscribe()
-  }, [])
+  const { isSignedIn } = useAppAuth()
 
   // dynamic card count
   useEffect(() => {
@@ -1191,7 +1184,7 @@ export function LandingPage() {
   return (
     <div className="lp-root">
       <Nav onCta={onCta} />
-      <HeroBalanced parallaxY={scrollY} onCta={onCta} onBrowse={onBrowse} loggedIn={Boolean(session)} heroCount={heroCount} />
+      <HeroBalanced parallaxY={scrollY} onCta={onCta} onBrowse={onBrowse} loggedIn={isSignedIn} heroCount={heroCount} />
       <CharacterShowcase />
       <CardSamplePreview />
       <Features />
