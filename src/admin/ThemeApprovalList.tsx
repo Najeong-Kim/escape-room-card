@@ -359,9 +359,9 @@ export function ThemeApprovalList() {
 
     setProcessingId(theme.id)
 
-    if (status === 'closed') {
+    if (status === 'closed' || status === 'rejected') {
       try {
-        await adminUpdate('themes', { status: 'closed', needs_review: false }, { column: 'id', value: theme.id })
+        await adminUpdate('themes', { status, needs_review: false }, { column: 'id', value: theme.id })
       } catch (err) {
         setProcessingId(null)
         notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
