@@ -350,7 +350,7 @@ export function ThemeApprovalList() {
     await loadThemes()
   }
 
-  async function reviewTheme(theme: ApprovalTheme, status: 'active' | 'rejected') {
+  async function reviewTheme(theme: ApprovalTheme, status: 'active' | 'rejected' | 'closed') {
     if (status === 'active' && (!theme.cafes || theme.cafes.needs_review || theme.cafes.status !== 'active')) {
       notify('매장 검수를 먼저 승인해야 테마를 승인할 수 있습니다.', { type: 'warning' })
       return
@@ -358,32 +358,48 @@ export function ThemeApprovalList() {
 
     setProcessingId(theme.id)
 
-    let rpcResult: { data: { theme_status?: string; theme_needs_review?: boolean }[] }
-    try {
-      rpcResult = await adminRpc('review_theme_for_review', { p_theme_id: theme.id, p_status: status })
-    } catch (err) {
-      setProcessingId(null)
-      notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
-      return
-    }
+    if (status === 'closed') {
+      try {
+        await adminUpdate('themes', { status: 'closed', needs_review: false }, { column: 'id', value: theme.id })
+      } catch (err) {
+        setProcessingId(null)
+        notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
+        return
+      }
+    } else {
+      let rpcResult: { data: { theme_status?: string; theme_needs_review?: boolean }[] }
+      try {
+        rpcResult = await adminRpc('review_theme_for_review', { p_theme_id: theme.id, p_status: status })
+      } catch (err) {
+        setProcessingId(null)
+        notify(`처리에 실패했습니다: ${err instanceof Error ? err.message : String(err)}`, { type: 'error' })
+        return
+      }
 
-    const data = rpcResult.data
-    if (!data || data.length === 0) {
-      setProcessingId(null)
-      notify('처리에 실패했습니다: DB에서 변경된 테마가 없습니다.', { type: 'error' })
-      return
-    }
+      const data = rpcResult.data
+      if (!data || data.length === 0) {
+        setProcessingId(null)
+        notify('처리에 실패했습니다: DB에서 변경된 테마가 없습니다.', { type: 'error' })
+        return
+      }
 
-    const reviewed = data[0]
-    if (reviewed.theme_status !== status || reviewed.theme_needs_review !== false) {
-      setProcessingId(null)
-      notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
-      return
+      const reviewed = data[0]
+      if (reviewed.theme_status !== status || reviewed.theme_needs_review !== false) {
+        setProcessingId(null)
+        notify('처리 결과가 DB에 정상 반영되지 않았습니다.', { type: 'error' })
+        return
+      }
     }
 
     setProcessingId(null)
     setThemes(current => current.filter(item => item.id !== theme.id))
-    notify(status === 'active' ? '테마를 승인했습니다.' : '테마를 거절했습니다.', { type: 'success' })
+    if (status === 'active') {
+      notify('테마를 승인했습니다.', { type: 'success' })
+    } else if (status === 'closed') {
+      notify('테마를 사라짐/종료 처리했습니다.', { type: 'success' })
+    } else {
+      notify('테마를 거절했습니다.', { type: 'success' })
+    }
   }
 
   return (
@@ -430,6 +446,7 @@ export function ThemeApprovalList() {
                     ) : (
                       <>
                         <Button variant="contained" disabled={processingId === theme.id || !cafeApproved} onClick={() => reviewTheme(theme, 'active')}>승인</Button>
+                        <Button color="warning" disabled={processingId === theme.id} onClick={() => reviewTheme(theme, 'closed')}>사라짐</Button>
                         <Button color="error" disabled={processingId === theme.id} onClick={() => reviewTheme(theme, 'rejected')}>거절</Button>
                         <Button disabled={processingId === theme.id} onClick={() => startEdit(theme)}>수정</Button>
                       </>

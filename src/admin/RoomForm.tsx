@@ -9,6 +9,7 @@ import {
 
 const STATUS_CHOICES = [
   { id: 'active', name: '활성' },
+  { id: 'closed', name: '사라짐/종료' },
   { id: 'inactive', name: '비활성' },
   { id: 'rejected', name: '거절' },
 ]

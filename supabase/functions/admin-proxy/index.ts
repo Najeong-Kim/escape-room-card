@@ -8,6 +8,8 @@ const VERCEL_URL = Deno.env.get('VERCEL_URL') ? `https://${Deno.env.get('VERCEL_
 const ALLOWED_ORIGINS = new Set([
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'https://bang-tang.com',
+  'https://www.bang-tang.com',
   SITE_URL,
   VERCEL_URL,
 ].filter(Boolean) as string[])
