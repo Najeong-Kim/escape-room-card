@@ -1,4 +1,4 @@
-import { Datagrid, DateField, Edit, Create, FunctionField, List, NumberField, SimpleForm, TextField } from 'react-admin'
+import { Datagrid, DateField, Edit, Create, FunctionField, List, NumberField, SelectInput, SimpleForm, TextField, TextInput } from 'react-admin'
 import { REVIEW_SOURCE_LABEL, type ReviewSourceType } from '../lib/themeReviewLinks'
 import { ReviewLinkFormFields } from './ReviewLinkForm'
 
@@ -50,6 +50,21 @@ export const ReviewLinkList = () => (
     perPage={50}
     sort={{ field: 'created_at', order: 'DESC' }}
     queryOptions={{ meta: { select: '*,themes(name,cafes(name,branch_name))' } }}
+    filters={[
+      <TextInput key="title" source="title" label="제목 검색" alwaysOn />,
+      <TextInput key="theme_id" source="theme_id" label="테마 ID" />,
+      <SelectInput
+        key="status"
+        source="status"
+        label="상태"
+        choices={[
+          { id: 'active', name: '노출' },
+          { id: 'pending', name: '검수 대기' },
+          { id: 'hidden', name: '숨김' },
+          { id: 'rejected', name: '거절' },
+        ]}
+      />,
+    ]}
   >
     <Datagrid rowClick="edit">
       <NumberField source="theme_id" label="테마 ID" />

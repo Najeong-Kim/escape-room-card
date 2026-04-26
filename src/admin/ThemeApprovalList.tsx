@@ -125,6 +125,10 @@ const inputStyle = {
   font: 'inherit',
 }
 
+function normalizedSearch(value: string | null | undefined) {
+  return (value ?? '').toLowerCase().replace(/\s+/g, '')
+}
+
 function formatPlayers(theme: ApprovalTheme) {
   if (theme.min_players === null || theme.max_players === null) return '인원 미확인'
   return `${theme.min_players}-${theme.max_players}명`
@@ -201,6 +205,7 @@ export function ThemeApprovalList() {
   const [processingId, setProcessingId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState<ThemeForm | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const loadThemes = useCallback(async () => {
     setLoading(true)
@@ -277,6 +282,21 @@ export function ThemeApprovalList() {
   useEffect(() => {
     loadThemes()
   }, [loadThemes])
+
+  const filteredThemes = themes.filter(theme => {
+    const query = normalizedSearch(searchTerm)
+    if (!query) return true
+    const cafe = theme.cafes
+    const haystack = normalizedSearch([
+      theme.name,
+      cafe?.name,
+      cafe?.branch_name,
+      cafe?.district,
+      cafe?.area_label,
+      theme.genre_labels.join(' '),
+    ].filter(Boolean).join(' '))
+    return haystack.includes(query)
+  })
 
   function startEdit(theme: ApprovalTheme) {
     setEditingId(theme.id)
@@ -415,15 +435,24 @@ export function ThemeApprovalList() {
         <Button onClick={loadThemes} disabled={loading}>새로고침</Button>
       </div>
 
+      <div style={{ ...cardStyle, marginBottom: 16 }}>
+        <input
+          style={inputStyle}
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="테마명, 매장명, 지점명, 지역, 장르로 검색"
+        />
+      </div>
+
       {loading ? (
         <p style={mutedStyle}>불러오는 중...</p>
-      ) : themes.length === 0 ? (
+      ) : filteredThemes.length === 0 ? (
         <div style={cardStyle}>
-          <p style={{ margin: 0 }}>검수 대기 중인 테마가 없습니다.</p>
+          <p style={{ margin: 0 }}>{searchTerm ? '검색 결과가 없습니다.' : '검수 대기 중인 테마가 없습니다.'}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 12 }}>
-          {themes.map(theme => {
+          {filteredThemes.map(theme => {
             const cafe = theme.cafes
             const cafeName = cafe
               ? `${cafe.name}${cafe.branch_name ? ` ${cafe.branch_name}` : ''}`

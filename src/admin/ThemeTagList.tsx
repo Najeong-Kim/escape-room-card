@@ -1,8 +1,16 @@
-import { BooleanField, Create, Datagrid, Edit, List, NumberField, SelectField, SimpleForm, TextField } from 'react-admin'
+import { BooleanField, Create, Datagrid, Edit, List, NumberField, SelectField, SelectInput, SimpleForm, TextField, TextInput } from 'react-admin'
 import { TAG_CATEGORY_CHOICES, ThemeTagFormFields } from './ThemeTagForm'
 
 export const ThemeTagList = () => (
-  <List perPage={50} sort={{ field: 'sort_order', order: 'ASC' }}>
+  <List
+    perPage={50}
+    sort={{ field: 'sort_order', order: 'ASC' }}
+    filters={[
+      <TextInput key="name" source="name" label="태그명 검색" alwaysOn />,
+      <TextInput key="code" source="code" label="코드" />,
+      <SelectInput key="category" source="category" label="카테고리" choices={TAG_CATEGORY_CHOICES} />,
+    ]}
+  >
     <Datagrid rowClick="edit">
       <TextField source="name" label="태그명" />
       <TextField source="code" label="코드" />

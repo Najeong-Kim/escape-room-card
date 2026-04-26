@@ -1,4 +1,4 @@
-import { Create, Datagrid, Edit, FunctionField, List, NumberField, SelectField, SimpleForm, TextField } from 'react-admin'
+import { Create, Datagrid, Edit, FunctionField, List, NumberField, SelectField, SelectInput, SimpleForm, TextField, TextInput } from 'react-admin'
 import { TAGGING_SOURCE_CHOICES, TAGGING_STATUS_CHOICES, ThemeTaggingFormFields } from './ThemeTaggingForm'
 
 const TAG_CATEGORY_LABEL: Record<string, string> = {
@@ -55,6 +55,11 @@ export const ThemeTaggingList = () => (
     perPage={50}
     sort={{ field: 'created_at', order: 'DESC' }}
     queryOptions={{ meta: { select: '*,themes(name,cafes(name,branch_name)),theme_tags(name,category)' } }}
+    filters={[
+      <TextInput key="theme_id" source="theme_id" label="테마 ID" alwaysOn />,
+      <SelectInput key="source_type" source="source_type" label="출처" choices={TAGGING_SOURCE_CHOICES} />,
+      <SelectInput key="status" source="status" label="상태" choices={TAGGING_STATUS_CHOICES} />,
+    ]}
   >
     <Datagrid rowClick="edit">
       <FunctionField label="테마" render={(record: ThemeTaggingRecord) => themeLabel(record)} />

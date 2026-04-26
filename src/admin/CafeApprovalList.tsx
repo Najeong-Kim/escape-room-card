@@ -104,6 +104,10 @@ const candidateBoxStyle = {
   background: 'rgba(25, 118, 210, 0.06)',
 }
 
+function normalizedSearch(value: string | null | undefined) {
+  return (value ?? '').toLowerCase().replace(/\s+/g, '')
+}
+
 function cafeToForm(cafe: ApprovalCafe): CafeForm {
   return {
     name: cafe.name,
@@ -152,6 +156,7 @@ export function CafeApprovalList() {
   const [processingId, setProcessingId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState<CafeForm | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const loadCafes = useCallback(async () => {
     setLoading(true)
@@ -199,6 +204,21 @@ export function CafeApprovalList() {
   useEffect(() => {
     loadCafes()
   }, [loadCafes])
+
+  const filteredCafes = cafes.filter(cafe => {
+    const query = normalizedSearch(searchTerm)
+    if (!query) return true
+    const haystack = normalizedSearch([
+      cafe.name,
+      cafe.branch_name,
+      cafe.district,
+      cafe.area_label,
+      cafe.address,
+      cafe.phone,
+      cafe.naver_place_name,
+    ].filter(Boolean).join(' '))
+    return haystack.includes(query)
+  })
 
   function startEdit(cafe: ApprovalCafe) {
     setEditingId(cafe.id)
@@ -355,11 +375,20 @@ export function CafeApprovalList() {
         <Button onClick={loadCafes} disabled={loading}>새로고침</Button>
       </div>
 
+      <div style={{ ...cardStyle, marginBottom: 16 }}>
+        <input
+          style={inputStyle}
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="매장명, 지점명, 지역, 주소로 검색"
+        />
+      </div>
+
       {loading ? (
         <p style={mutedStyle}>불러오는 중...</p>
-      ) : cafes.length === 0 ? (
+      ) : filteredCafes.length === 0 ? (
         <div style={cardStyle}>
-          <p style={{ margin: 0 }}>검수 대기 중인 매장이 없습니다.</p>
+          <p style={{ margin: 0 }}>{searchTerm ? '검색 결과가 없습니다.' : '검수 대기 중인 매장이 없습니다.'}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 12 }}>
@@ -369,7 +398,7 @@ export function CafeApprovalList() {
               <p style={{ margin: '6px 0 0', ...mutedStyle }}>{candidateLoadError}</p>
             </div>
           )}
-          {cafes.map(cafe => {
+          {filteredCafes.map(cafe => {
             const isEditing = editingId === cafe.id && form
             const verification = candidatesByCafeId[cafe.id]
             const bestCandidate = verification?.best_candidate
