@@ -241,7 +241,7 @@ export function ThemeApprovalList() {
           genre_id
         ),
         created_at,
-        cafes (
+        cafes!inner (
           id,
           name,
           branch_name,
@@ -256,6 +256,7 @@ export function ThemeApprovalList() {
       `)
       .eq('needs_review', true)
       .in('status', ['active', 'unknown'])
+      .in('cafes.status', ['active', 'unknown'])
       .order('created_at', { ascending: false })
 
     setLoading(false)
