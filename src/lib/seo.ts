@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 const DEFAULT_TITLE = '방탈출로 탕진하자: 방탕'
-const DEFAULT_DESCRIPTION = '방탈출로 탕진하기. 내 취향 카드를 만들고, 플레이 기록을 남기고, 다음 테마를 찾아보세요.'
+const DEFAULT_DESCRIPTION = '7문항에 답하면 내 방탈출 성향 카드가 나와요. 전국 715개 테마 중 취향에 딱 맞는 방도 골라드려요.'
 const DEFAULT_IMAGE = '/og-image.png'
 
 function absoluteUrl(path: string) {

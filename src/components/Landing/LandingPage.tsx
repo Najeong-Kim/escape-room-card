@@ -33,7 +33,7 @@ const CHAR_DETAILS: Record<string, { desc: string; stats: string[] }> = {
 const FEATURES = [
   {
     kbd: 'Q1',
-    title: '12문항, 2분이면 끝',
+    title: '7문항, 1분이면 끝',
     desc: '통계데이터학 기반의 진짜 질문. 공포도·장치·스토리 취향까지 잡아내요.',
     icon: (
       <svg viewBox="0 0 40 40" fill="none" style={{ width: 28, height: 28 }}>
@@ -108,10 +108,10 @@ const GENRE_LABEL: Record<string, string> = {
 }
 
 const FAQ = [
-  { q: '방탕이 뭐예요?', a: '방탈출로 탕진하자의 줄임말이에요 😄 방탈출에 진심인 사람들을 위한 성향 카드 서비스예요. 12문항에 답하면 사자·호랑이·늑대 등 7가지 동물 중 나한테 딱 맞는 캐릭터가 나와요.' },
+  { q: '방탕이 뭐예요?', a: '방탈출로 탕진하자의 줄임말이에요 😄 방탈출에 진심인 사람들을 위한 성향 카드 서비스예요. 7문항에 답하면 사자·호랑이·늑대 등 7가지 동물 중 나한테 딱 맞는 캐릭터가 나와요.' },
   { q: '돈 안 내도 되나요?', a: '네, 완전 무료예요! 카드 만들기, 방 추천, 플레이 기록 전부 무료로 쓸 수 있어요.' },
   { q: '내 정보 어디에 쓰여요?', a: '닉네임이랑 플레이 기록만 저장해요. 카드를 공유할 때만 외부에 공개되고, 언제든지 삭제할 수 있어요.' },
-  { q: '방탈출 기록이 없어도 추천받을 수 있나요?', a: '물론이죠! 처음엔 12문항 답변 기반으로 추천해드려요. 기록이 쌓일수록 훨씬 더 취향에 딱 맞는 방이 나와요.' },
+  { q: '방탈출 기록이 없어도 추천받을 수 있나요?', a: '물론이죠! 처음엔 7문항 답변 기반으로 추천해드려요. 기록이 쌓일수록 훨씬 더 취향에 딱 맞는 방이 나와요.' },
   { q: '친구한테 어떻게 공유해요?', a: '카드 이미지로 저장하거나 링크로 공유하면 돼요. 인스타 스토리 사이즈로도 저장되니까 바로 올릴 수 있어요 📲' },
 ]
 
@@ -362,7 +362,7 @@ function HeroBalanced({ parallaxY, onCta, onBrowse, loggedIn = false, heroCount 
                 ? <span className="lp-sticker" style={{ background: 'var(--brand)', color: '#fff', border: 'none' }}>✓ 로그인 됨</span>
                 : <span className="lp-sticker" style={{ background: 'var(--accent)', color: '#1a1405', border: 'none' }}>✦ NEW</span>
               }
-              <span className="lp-sticker">무료 · 2분</span>
+              <span className="lp-sticker">무료 · 1분</span>
             </div>
             <h1 style={{
               fontSize: 'clamp(2.6rem, 5.6vw, 5.2rem)',
@@ -394,8 +394,8 @@ function HeroBalanced({ parallaxY, onCta, onBrowse, loggedIn = false, heroCount 
             </h1>
             <p style={{ fontSize: 16, color: 'var(--text-muted)', maxWidth: 440, marginTop: 28, lineHeight: 1.65 }} className="lp-break-keep">
               {loggedIn
-                ? '12문항에 답하면 7가지 동물 중 내 캐릭터가 결정돼요. 카드를 만들고 취향에 딱 맞는 방을 찾아봐요.'
-                : '12문항만 답하세요. 7가지 동물 중 나의 방탈출 캐릭터가 나오고, 내 취향에 딱 맞는 방까지 골라드려요.'
+                ? '7문항에 답하면 7가지 동물 중 내 캐릭터가 결정돼요. 카드를 만들고 취향에 딱 맞는 방을 찾아봐요.'
+                : '7문항만 답하세요. 7가지 동물 중 나의 방탈출 캐릭터가 나오고, 내 취향에 딱 맞는 방까지 골라드려요.'
               }
             </p>
             <div style={{ display: 'flex', gap: 12, marginTop: 32, flexWrap: 'wrap' }}>
@@ -917,12 +917,12 @@ function BottomCta({ onCta, onBrowse }: { onCta: () => void; onBrowse: () => voi
         }}>
           <div className="lp-halftone" style={{ position: 'absolute', inset: 0, color: 'color-mix(in srgb, var(--text) 6%, transparent)', pointerEvents: 'none' }} />
           <div style={{ position: 'relative' }}>
-            <div className="lp-mono" style={{ fontSize: 12, color: 'var(--brand)', letterSpacing: '.2em', marginBottom: 16 }}>무료 · 2분 · 카드는 영원히</div>
+            <div className="lp-mono" style={{ fontSize: 12, color: 'var(--brand)', letterSpacing: '.2em', marginBottom: 16 }}>무료 · 1분 · 카드는 영원히</div>
             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.6rem)', fontWeight: 900, letterSpacing: '-0.035em', lineHeight: 1, margin: 0, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }} className="lp-break-keep">
               지금 바로 내 방탈출 카드를 받아보세요
             </h2>
             <p style={{ color: 'var(--text-muted)', maxWidth: 520, margin: '18px auto 0', lineHeight: 1.6 }} className="lp-break-keep">
-              12문항이면 충분해요. 카드 받고, 친구랑 비교하고, 이번 주말 방탈출은 방탕이 골라줄게요.
+              7문항이면 충분해요. 카드 받고, 친구랑 비교하고, 이번 주말 방탈출은 방탕이 골라줄게요.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 32, flexWrap: 'wrap' }}>
               <button style={{ ...btnPrimary(), padding: '18px 36px', fontSize: 17 }} onClick={onCta}>카드 만들기 →</button>
