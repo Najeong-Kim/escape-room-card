@@ -416,3 +416,17 @@
 :root[data-app-theme='light'] .global-nav-logo-text {
   color: #111827;
 }
+
+/* Room image attribution overlay */
+.room-image-attribution-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+.room-image-attribution {
+  color: rgba(255,255,255,0.8);
+}
+:root[data-app-theme='light'] .room-image-attribution-overlay {
+  background: linear-gradient(to top, rgba(255,255,255,0.7), transparent);
+}
+:root[data-app-theme='light'] .room-image-attribution {
+  color: rgba(0,0,0,0.6);
+}

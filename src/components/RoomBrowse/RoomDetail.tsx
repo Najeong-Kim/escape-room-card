@@ -255,12 +255,27 @@ export default function RoomDetail() {
       <GlobalNav />
       <main className="max-w-2xl mx-auto pb-24">
         {room.image_url ? (
-          <img
-            src={room.image_url}
-            alt={room.name}
-            className="w-full h-64 object-cover bg-[#13131a]"
-            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-          />
+          <div className="relative">
+            <img
+              src={room.image_url}
+              alt={room.name}
+              className="w-full h-64 object-cover bg-[#13131a]"
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+            />
+            <div className="room-image-attribution-overlay absolute bottom-0 left-0 right-0 h-10" />
+            {safeBookingUrl ? (
+              <a
+                href={safeBookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="room-image-attribution absolute bottom-2 right-3 text-[11px] hover:opacity-100 transition-opacity"
+              >
+                © {room.brand}
+              </a>
+            ) : (
+              <span className="room-image-attribution absolute bottom-2 right-3 text-[11px]">© {room.brand}</span>
+            )}
+          </div>
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-teal-900/30 to-[#0a0a0f] flex items-center justify-center">
             <span className="text-5xl opacity-30">🔐</span>

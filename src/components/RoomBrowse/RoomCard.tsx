@@ -147,12 +147,16 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
                     hover:border-teal-500/40 hover:bg-[#16161f] transition-all duration-200">
       {/* Image */}
       {room.image_url ? (
-        <img
-          src={room.image_url}
-          alt={room.name}
-          className="w-full h-36 object-cover"
-          onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
-        />
+        <div className="relative w-full h-36">
+          <img
+            src={room.image_url}
+            alt={room.name}
+            className="w-full h-36 object-cover"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
+          />
+          <div className="room-image-attribution-overlay absolute bottom-0 left-0 right-0 h-8" />
+          <span className="room-image-attribution absolute bottom-1 right-2 text-[10px]">© {room.brand}</span>
+        </div>
       ) : (
         <div className="w-full h-36 bg-gradient-to-br from-teal-900/30 to-[#0a0a0f] flex items-center justify-center">
           <span className="text-3xl opacity-30">🔐</span>
