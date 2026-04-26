@@ -1,10 +1,13 @@
 import {
+  AutocompleteInput,
   TextInput,
   NumberInput,
   SelectInput,
   BooleanInput,
   ArrayInput,
   SimpleFormIterator,
+  ReferenceInput,
+  required,
 } from 'react-admin'
 
 const STATUS_CHOICES = [
@@ -23,6 +26,19 @@ const IMAGE_STATUS_CHOICES = [
 
 export const RoomFormFields = () => (
   <>
+    <ReferenceInput source="cafe_id" reference="cafes" label="연결 매장">
+      <AutocompleteInput
+        fullWidth
+        label="연결 매장"
+        optionText={(choice?: { name?: string; branch_name?: string | null }) =>
+          choice ? `${choice.name ?? ''}${choice.branch_name ? ` ${choice.branch_name}` : ''}`.trim() : ''
+        }
+        filterToQuery={(searchText: string) => ({ name: searchText })}
+        helperText="매장명이나 지점명으로 검색해서 연결할 매장을 선택하세요."
+        validate={[required()]}
+      />
+    </ReferenceInput>
+
     <TextInput source="name" label="테마명" fullWidth required />
     <SelectInput source="status" label="상태" choices={STATUS_CHOICES} required />
     <BooleanInput source="needs_review" label="검수 필요" />
