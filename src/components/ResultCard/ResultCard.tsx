@@ -15,6 +15,7 @@ import { SHOW_COMMUNITY_RATING_COUNTS } from '../../lib/featureFlags'
 import { getRatingDef, RatingIcon, type PathRating } from '../../lib/ratings'
 import { BrandLogo } from '../BrandLogo'
 import { getMatchingTagFilters, tagFilterPillClass } from '../../lib/useRooms'
+import { logRecClick } from '../../lib/analytics'
 
 // ─── Character accent colours & stats ─────────────────────────
 
@@ -153,7 +154,7 @@ export function ResultCard({ profile, onReset, onHome }: Props) {
 
       {/* Recommended rooms */}
       <SimilarProfileFavorites themes={similarFavorites} />
-      <RecommendedRooms rooms={recommendations} t={t} />
+      <RecommendedRooms rooms={recommendations} characterId={profile.characterId} t={t} />
 
       {/* Hidden canvas for share */}
       <canvas ref={canvasRef} className="hidden" />
@@ -446,9 +447,10 @@ const GENRE_LABELS: Record<string, string> = {
 }
 
 function RecommendedRooms({
-  rooms, t,
+  rooms, characterId, t,
 }: {
   rooms: RecommendedRoom[]
+  characterId: string
   t: (key: string) => string
 }) {
   if (rooms.length === 0) return null
@@ -462,7 +464,7 @@ function RecommendedRooms({
       </div>
       <div className="flex flex-col gap-3">
         {rooms.map(item => (
-          <RoomCard key={item.room.id} recommendation={item} t={t} />
+          <RoomCard key={item.room.id} recommendation={item} characterId={characterId} t={t} />
         ))}
       </div>
     </div>
@@ -471,9 +473,11 @@ function RecommendedRooms({
 
 function RoomCard({
   recommendation,
+  characterId,
   t,
 }: {
   recommendation: RecommendedRoom
+  characterId: string
   t: (key: string) => string
 }) {
   const { room, reasons, matchPercent } = recommendation
@@ -485,8 +489,7 @@ function RoomCard({
     <div
       className="bg-gray-900/60 border border-gray-800 rounded-2xl px-4 py-3 flex flex-col gap-1"
       onClick={() => {
-        // click tracking placeholder — log to console for now
-        console.log('[rec_click]', { room_id: room.id, room_name: room.name })
+        logRecClick({ room_id: room.id, room_name: room.name, character_id: characterId, match_percent: matchPercent, source: 'result_card' })
       }}
     >
       <div className="flex items-start justify-between gap-2">
