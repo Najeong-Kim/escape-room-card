@@ -7387,6 +7387,7 @@
             "스릴러"
           ],
           "genre_codes": [
+            "Crime",
             "MysteryThriller"
           ],
           "duration_minutes": 65,
@@ -7438,13 +7439,13 @@
           "normalized_key": "멸종위기종 탐사대",
           "name": "멸종위기종 탐사대",
           "genre_labels": [
-            "스릴러"
+            "어드벤처/미션"
           ],
           "genre_codes": [
-            "MysteryThriller"
+            "FantasyAdventure"
           ],
           "duration_minutes": 65,
-          "min_players": 3,
+          "min_players": 2,
           "max_players": 6,
           "price_text": "2인 26,000원/인 / 3인 26,000원/인 / 4인 26,000원/인 / 5인 26,000원/인 / 6인 26,000원/인",
           "price_per_person": 26000,
@@ -7468,6 +7469,7 @@
             "미스터리"
           ],
           "genre_codes": [
+            "Crime",
             "MysteryThriller"
           ],
           "duration_minutes": 75,
@@ -7499,7 +7501,7 @@
           ],
           "duration_minutes": 67,
           "min_players": 2,
-          "max_players": 3,
+          "max_players": 6,
           "price_text": null,
           "price_per_person": null,
           "image_url": "https://cdn.zamfit.co.kr/EscapeRoom/1dfb03b5-0711-4775-b2c1-bc648e5c72c7.png",
@@ -7526,7 +7528,7 @@
           ],
           "duration_minutes": 70,
           "min_players": 2,
-          "max_players": 3,
+          "max_players": 6,
           "price_text": null,
           "price_per_person": null,
           "image_url": "https://cdn.zamfit.co.kr/EscapeRoom/e606f630-6456-428b-b9e9-185291bd51ff.png",
@@ -7564,6 +7566,29 @@
           "activity_score": null,
           "needs_review": true,
           "source_name": "잼핏 테마 상세"
+        },
+        {
+          "normalized_key": "alone얼론",
+          "name": "alone(얼론)",
+          "genre_labels": [
+            "드라마",
+            "미스터리"
+          ],
+          "genre_codes": [
+            "Emotional",
+            "MysteryThriller"
+          ],
+          "duration_minutes": 65,
+          "min_players": 2,
+          "max_players": 6,
+          "difficulty_label": "3.5",
+          "difficulty_score": 7,
+          "fear_score": 1.0,
+          "booking_url": "https://www.xn--2e0b040a4xj.com/reservation?branch=4#list",
+          "source_url": "https://www.xn--2e0b040a4xj.com/reservation?branch=4#list",
+          "status": "active",
+          "needs_review": true,
+          "source_name": "카페 공식 사이트 직접 확인"
         }
       ]
     },
