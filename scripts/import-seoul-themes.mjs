@@ -36,9 +36,10 @@ function genreCodesForLabels(labels = []) {
     if (label.includes('공포') || normalized.includes('horror')) codes.add('Horror')
     if (label.includes('스릴러') || label.includes('미스터리') || label.includes('추리')) codes.add('MysteryThriller')
     if (label.includes('감성') || label.includes('드라마')) codes.add('Emotional')
-    if (label.includes('코믹') || label.includes('개그')) codes.add('Comic')
-    if (label.includes('판타지') || label.includes('모험') || label.includes('어드벤처')) codes.add('FantasyAdventure')
-    if (label.includes('범죄') || label.includes('살인') || label.includes('잠입')) codes.add('Crime')
+    if (label.includes('코믹') || label.includes('코미디') || label.includes('개그') || label.includes('B급')) codes.add('Comic')
+    if (label.includes('판타지') || label.includes('모험') || label.includes('어드벤처') || label.includes('야외') || label.includes('역사')) codes.add('FantasyAdventure')
+    if (label.includes('범죄') || label.includes('살인') || label.includes('잠입') || label.includes('액션')) codes.add('Crime')
+    if (label.includes('로맨스') || label.includes('19금')) codes.add('Emotional')
     if (normalized.includes('sf') || label.includes('SF')) codes.add('SF')
   }
 
