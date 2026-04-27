@@ -4689,6 +4689,56 @@
           "activity_score": null,
           "needs_review": true,
           "source_name": "잼핏 테마 상세"
+        },
+        {
+          "normalized_key": "꼬치진다",
+          "name": "꼬치 진다",
+          "genre_labels": [
+            "19금"
+          ],
+          "genre_codes": [
+            "Emotional"
+          ],
+          "duration_minutes": 60,
+          "min_players": 2,
+          "max_players": 6,
+          "price_text": null,
+          "price_per_person": null,
+          "image_url": null,
+          "booking_url": "https://showroom404.com/",
+          "source_url": "https://showroom404.com/themes",
+          "status": "active",
+          "difficulty_label": "4",
+          "fear_label": null,
+          "difficulty_score": 8,
+          "fear_score": null,
+          "needs_review": true,
+          "source_name": "카페 공식 사이트 직접 확인"
+        },
+        {
+          "normalized_key": "한라아파트4동404호",
+          "name": "한라아파트 4동 404호",
+          "genre_labels": [
+            "공포"
+          ],
+          "genre_codes": [
+            "Horror"
+          ],
+          "duration_minutes": 60,
+          "min_players": 2,
+          "max_players": 6,
+          "price_text": null,
+          "price_per_person": null,
+          "image_url": null,
+          "booking_url": "https://showroom404.com/",
+          "source_url": "https://showroom404.com/themes",
+          "status": "active",
+          "difficulty_label": "2",
+          "fear_label": "2",
+          "difficulty_score": 4,
+          "fear_score": 2.0,
+          "needs_review": true,
+          "source_name": "카페 공식 사이트 직접 확인"
         }
       ]
     },
