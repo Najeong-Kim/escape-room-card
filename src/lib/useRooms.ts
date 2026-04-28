@@ -99,10 +99,10 @@ export function tagFilterButtonClass(tag: TagFilter, selected: boolean) {
     return 'bg-amber-400 border-amber-300 text-[#241804]'
   }
 
-  if (tag.tone === 'rose') return 'bg-white/5 border-white/10 text-rose-200 hover:border-rose-300/50 hover:text-rose-100'
-  if (tag.tone === 'emerald') return 'bg-white/5 border-white/10 text-emerald-200 hover:border-emerald-300/50 hover:text-emerald-100'
-  if (tag.tone === 'sky') return 'bg-white/5 border-white/10 text-sky-200 hover:border-sky-300/50 hover:text-sky-100'
-  return 'bg-white/5 border-white/10 text-gray-300 hover:border-amber-300/50 hover:text-white'
+  if (tag.tone === 'rose') return 'tag-filter-tone-rose bg-white/5 border-white/10 text-rose-200 hover:border-rose-300/50 hover:text-rose-100'
+  if (tag.tone === 'emerald') return 'tag-filter-tone-emerald bg-white/5 border-white/10 text-emerald-200 hover:border-emerald-300/50 hover:text-emerald-100'
+  if (tag.tone === 'sky') return 'tag-filter-tone-sky bg-white/5 border-white/10 text-sky-200 hover:border-sky-300/50 hover:text-sky-100'
+  return 'tag-filter-tone-amber bg-white/5 border-white/10 text-gray-300 hover:border-amber-300/50 hover:text-white'
 }
 
 export function tagFilterPillClass(tag: TagFilter) {

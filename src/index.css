@@ -417,6 +417,16 @@
   color: #111827;
 }
 
+/* Tag filter button light mode text colors */
+:root[data-app-theme='light'] .tag-filter-tone-rose { color: #be123c !important; }
+:root[data-app-theme='light'] .tag-filter-tone-rose:hover { color: #9f1239 !important; }
+:root[data-app-theme='light'] .tag-filter-tone-emerald { color: #047857 !important; }
+:root[data-app-theme='light'] .tag-filter-tone-emerald:hover { color: #065f46 !important; }
+:root[data-app-theme='light'] .tag-filter-tone-sky { color: #0369a1 !important; }
+:root[data-app-theme='light'] .tag-filter-tone-sky:hover { color: #0c4a6e !important; }
+:root[data-app-theme='light'] .tag-filter-tone-amber { color: #b45309 !important; }
+:root[data-app-theme='light'] .tag-filter-tone-amber:hover { color: #92400e !important; }
+
 /* Room image attribution overlay */
 .room-image-attribution-overlay {
   background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
