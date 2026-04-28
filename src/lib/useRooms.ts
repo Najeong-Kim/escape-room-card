@@ -18,7 +18,7 @@ export interface TagFilter {
   label: string
   emoji: string
   tone?: 'amber' | 'emerald' | 'sky' | 'rose'
-  match: (room: Room) => boolean
+  match: (room: Room, communityRating?: { score10: number } | null) => boolean
 }
 
 function hasThemeTag(room: Room, codes: string[], names: string[] = []) {
@@ -64,6 +64,26 @@ export const TAG_FILTERS: TagFilter[] = [
       hasThemeTag(room, ['strong_horror', 'horror_theme'], ['공포', '공포 강함']) ||
       room.genres.includes('Horror') ||
       room.fear_level >= 4,
+  },
+  {
+    id: 'commercial',
+    label: '영업용',
+    emoji: '🏪',
+    tone: 'amber',
+    match: room => {
+      const score = room.official_scores?.difficulty
+      if (score !== null && score !== undefined) return score <= 6
+      const label = room.official_labels?.difficulty
+      if (label !== null && label !== undefined && !isNaN(Number(label))) return Number(label) <= 3
+      return false
+    },
+  },
+  {
+    id: 'dirt-road',
+    label: '흙길 탐방',
+    emoji: '🪨',
+    tone: 'rose',
+    match: (_room, communityRating) => communityRating !== null && communityRating !== undefined && communityRating.score10 < 4,
   },
 ]
 
@@ -127,7 +147,12 @@ export const INITIAL_FILTERS: RoomFilters = {
   onlyUnlogged: false,
 }
 
-export function filterRooms(rooms: Room[], filters: RoomFilters, loggedRoomIds = new Set<number>()): Room[] {
+export function filterRooms(
+  rooms: Room[],
+  filters: RoomFilters,
+  loggedRoomIds = new Set<number>(),
+  communityRatings: Record<number, { score10: number }> = {},
+): Room[] {
   const theme = filters.themeId ? THEMES.find(t => t.id === filters.themeId) : null
   const selectedTagFilters = filters.tagIds
     .map(id => TAG_FILTERS.find(tag => tag.id === id))
@@ -137,7 +162,7 @@ export function filterRooms(rooms: Room[], filters: RoomFilters, loggedRoomIds =
     if (theme && !theme.filter(room)) return false
     if (filters.location && room.location !== filters.location) return false
     if (filters.genre && !room.genres.includes(filters.genre)) return false
-    if (selectedTagFilters.length > 0 && !selectedTagFilters.every(tag => tag.match(room))) return false
+    if (selectedTagFilters.length > 0 && !selectedTagFilters.every(tag => tag.match(room, communityRatings[room.id]))) return false
     if (filters.players !== null && room.max_players < filters.players) return false
     if (filters.fearMax !== null && room.fear_level > filters.fearMax) return false
     if (filters.onlyUnlogged && loggedRoomIds.has(room.id)) return false

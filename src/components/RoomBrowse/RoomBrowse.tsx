@@ -63,7 +63,7 @@ export default function RoomBrowse() {
   const loggedRoomIds = useMemo(() => new Set(logs.map(log => log.room_id)), [logs])
 
   const filtered = useMemo(() => {
-    return [...filterRooms(rooms, filters, loggedRoomIds)]
+    return [...filterRooms(rooms, filters, loggedRoomIds, communityRatings)]
       .filter(room => matchesSearch(room, searchTerm))
       .sort((a, b) => {
       const aHasRating = communityRatings[a.id] ? 1 : 0
