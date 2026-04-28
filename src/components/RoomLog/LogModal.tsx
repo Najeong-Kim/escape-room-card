@@ -31,6 +31,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [playedAt, setPlayedAt] = useState(today)
   const [cleared, setCleared] = useState(true)
   const [hintsUsed, setHintsUsed] = useState<number | null>(null)
+  const [partySize, setPartySize] = useState<number | null>(null)
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
   const [rating, setRating] = useState<PathRating | null>(null)
@@ -59,6 +60,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       brand: room.brand,
       played_at: playedAt,
       cleared,
+      party_size: partySize,
       hints_used: cleared ? hintsUsed : null,
       remaining_minutes: cleared ? remainingMinutes : null,
       remaining_seconds: cleared ? remainingSeconds : null,
@@ -131,6 +133,26 @@ export function LogModal({ room, onClose, onSaved }: Props) {
                          text-white text-sm focus:outline-none focus:border-teal-500/60
                          [color-scheme:dark]"
             />
+          </div>
+
+          {/* Party size */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-gray-400">함께한 인원 (선택)</label>
+            <div className="flex items-center gap-2 bg-[#0e0e16] border border-white/10 rounded-xl px-3 py-2.5">
+              <button
+                type="button"
+                onClick={() => setPartySize(v => v !== null && v > 1 ? v - 1 : null)}
+                className="text-gray-400 hover:text-white w-5 text-center leading-none"
+              >−</button>
+              <span className="flex-1 text-center text-white text-sm tabular-nums">
+                {partySize !== null ? `${partySize}명` : '—'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPartySize(v => Math.min(10, (v ?? 0) + 1))}
+                className="text-gray-400 hover:text-white w-5 text-center leading-none"
+              >+</button>
+            </div>
           </div>
 
           {/* Cleared */}

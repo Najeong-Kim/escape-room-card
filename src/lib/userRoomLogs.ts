@@ -10,6 +10,7 @@ interface UserRoomLogRow {
   brand: string
   played_at: string
   cleared: boolean
+  party_size: number | null
   hints_used: number | null
   remaining_minutes: number | null
   remaining_seconds: number | null
@@ -32,6 +33,7 @@ function rowToLog(row: UserRoomLogRow): RoomLog {
     brand: row.brand,
     played_at: row.played_at,
     cleared: row.cleared,
+    party_size: row.party_size,
     hints_used: row.hints_used,
     remaining_minutes: row.remaining_minutes,
     remaining_seconds: row.remaining_seconds,
@@ -55,6 +57,7 @@ function logToPayload(log: RoomLog, userId: string) {
     brand: log.brand,
     played_at: log.played_at,
     cleared: log.cleared,
+    party_size: log.party_size ?? null,
     hints_used: log.hints_used ?? null,
     remaining_minutes: log.remaining_minutes ?? null,
     remaining_seconds: log.remaining_seconds ?? null,
@@ -93,6 +96,7 @@ export async function fetchUserRoomLogs(): Promise<RoomLog[]> {
       'brand',
       'played_at',
       'cleared',
+      'party_size',
       'hints_used',
       'remaining_minutes',
       'remaining_seconds',

@@ -5,6 +5,7 @@ export interface RoomLog {
   brand: string
   played_at: string   // YYYY-MM-DD
   cleared: boolean
+  party_size?: number | null
   hints_used?: number | null
   remaining_minutes?: number | null
   remaining_seconds?: number | null
