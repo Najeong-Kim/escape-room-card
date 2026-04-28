@@ -219,9 +219,9 @@ export function RoomCard({ room, communityRating, communityMetricStats, personal
           )}
         </div>
 
-        {room.theme_tags && room.theme_tags.length > 0 && (
+        {(room.theme_tags?.length ?? 0) > 0 && (
           <div className="flex flex-wrap gap-1">
-            {room.theme_tags.slice(0, 4).map(tag => (
+            {room.theme_tags!.slice(0, 4).map(tag => (
               <span
                 key={tag.code}
                 className={[

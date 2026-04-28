@@ -59,6 +59,7 @@ export interface RecommendedRoom {
   matchPercent: number
 }
 
+
 // Map profile fearLevel to numeric fear score (1-5 scale)
 const FEAR_SCORE: Record<string, number> = {
   brave: 5,
