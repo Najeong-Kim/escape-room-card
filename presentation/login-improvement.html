@@ -308,6 +308,115 @@
     .cross { color: var(--con); }
     .dim  { color: var(--muted); font-size: 13px; }
 
+    /* ═══════════════════════════════════════
+       SLIDE 7 — Architecture diagram
+    ═══════════════════════════════════════ */
+    .s-arch { }
+    .s-arch-inner {
+      width: 100%; max-width: 960px; text-align: center;
+    }
+    .arch-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--s3); margin-bottom: 10px;
+    }
+    .s-arch-inner h2 {
+      font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px;
+    }
+    .arch-sub {
+      font-size: 14px; color: var(--muted); margin-bottom: 36px;
+    }
+
+    /* 3-node flow */
+    .arch-flow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; margin-bottom: 40px;
+    }
+    .arch-node {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 22px 30px; min-width: 172px;
+    }
+    .arch-node.n-clerk    { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.07); }
+    .arch-node.n-supabase { border-color: rgba(59,130,246,0.5);  background: rgba(59,130,246,0.07); }
+    .arch-node-icon  { font-size: 30px; margin-bottom: 2px; }
+    .arch-node-name  { font-size: 16px; font-weight: 800; }
+    .arch-node-role  { font-size: 11px; color: var(--muted); }
+    .arch-node-tag {
+      margin-top: 8px; font-size: 10px; font-weight: 600;
+      padding: 2px 10px; border-radius: 100px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .arch-node.n-clerk    .arch-node-tag { color: var(--s3); background: rgba(124,58,237,0.18); }
+    .arch-node.n-supabase .arch-node-tag { color: var(--s2); background: rgba(59,130,246,0.18); }
+
+    /* Connector (arrow + labels) */
+    .arch-conn {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      padding: 0 18px; min-width: 130px;
+    }
+    .arch-conn-step {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      color: var(--why); text-transform: uppercase;
+    }
+    .arch-conn-arrow {
+      display: flex; align-items: center; width: 100%;
+    }
+    .arch-conn-line {
+      flex: 1; height: 1.5px;
+      background: linear-gradient(to right, var(--muted), rgba(255,255,255,0.3));
+      opacity: 0.45;
+    }
+    .arch-conn-head {
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 8px solid rgba(255,255,255,0.3);
+    }
+    .arch-conn-label {
+      font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4;
+    }
+    .arch-conn-code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 10px; color: var(--accent);
+    }
+
+    /* RLS explanation box */
+    .arch-rls {
+      display: inline-flex; align-items: center; gap: 18px;
+      background: rgba(52,211,153,0.05);
+      border: 1px solid rgba(52,211,153,0.22);
+      border-radius: 14px; padding: 16px 28px;
+    }
+    .arch-rls-icon { font-size: 22px; }
+    .arch-rls-body { text-align: left; }
+    .arch-rls-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--pro); margin-bottom: 6px;
+    }
+    .arch-rls-code {
+      display: block; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px; color: var(--text);
+      background: rgba(255,255,255,0.06);
+      padding: 5px 14px; border-radius: 8px; margin-bottom: 6px;
+    }
+    .arch-rls-desc { font-size: 12px; color: var(--muted); }
+
+    /* Step cards */
+    .arch-steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 24px; text-align: left;
+    }
+    .arch-step {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .arch-step-num {
+      font-size: 11px; font-weight: 700; color: var(--why);
+      letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .arch-step-text { font-size: 13px; color: var(--text); line-height: 1.55; }
+    .arch-step-text em { font-style: normal; color: var(--accent); font-weight: 600; }
+
     /* ── Image modal ── */
     #img-modal {
       display: none;
@@ -664,7 +773,99 @@ export const supabase = createClient(url, anonKey, {
   </div>
 
   <!-- ═══════════════════════════
-       SLIDE 7: Summary
+       SLIDE 7: Architecture Diagram
+  ═══════════════════════════ -->
+  <div class="slide s-arch">
+    <div class="s-arch-inner">
+      <p class="arch-eyebrow">Stage 3 · 인증 흐름</p>
+      <h2>Clerk + Supabase 아키텍처</h2>
+      <p class="arch-sub">인증(Clerk)과 데이터(Supabase)를 분리해 각자 잘하는 일에 집중한다</p>
+
+      <div class="arch-flow">
+        <!-- 사용자 -->
+        <div class="arch-node">
+          <div class="arch-node-icon">👤</div>
+          <div class="arch-node-name">사용자</div>
+          <div class="arch-node-role">브라우저</div>
+        </div>
+
+        <!-- ① 로그인 -->
+        <div class="arch-conn">
+          <div class="arch-conn-step">① 로그인</div>
+          <div class="arch-conn-arrow">
+            <div class="arch-conn-line"></div>
+            <div class="arch-conn-head"></div>
+          </div>
+          <div class="arch-conn-label">소셜 / 이메일</div>
+        </div>
+
+        <!-- Clerk -->
+        <div class="arch-node n-clerk">
+          <div class="arch-node-icon">🔐</div>
+          <div class="arch-node-name">Clerk</div>
+          <div class="arch-node-role">인증 전담</div>
+          <span class="arch-node-tag">JWT 발급</span>
+        </div>
+
+        <!-- ② JWT 전달 -->
+        <div class="arch-conn">
+          <div class="arch-conn-step">② JWT 전달</div>
+          <div class="arch-conn-arrow">
+            <div class="arch-conn-line"></div>
+            <div class="arch-conn-head"></div>
+          </div>
+          <div class="arch-conn-code">getToken()</div>
+          <div class="arch-conn-label">accessToken에 주입</div>
+        </div>
+
+        <!-- Supabase -->
+        <div class="arch-node n-supabase">
+          <div class="arch-node-icon">🗄️</div>
+          <div class="arch-node-name">Supabase</div>
+          <div class="arch-node-role">데이터 전담</div>
+          <span class="arch-node-tag">RLS 검증</span>
+        </div>
+      </div>
+
+      <!-- 단계별 설명 카드 -->
+      <div class="arch-steps">
+        <div class="arch-step">
+          <div class="arch-step-num">① 로그인</div>
+          <div class="arch-step-text">
+            사용자가 Clerk에 로그인하면 <em>JWT 토큰</em>을 발급받는다.
+            "나는 이 사람이다"를 증명하는 디지털 증명서다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">② 토큰 자동 주입</div>
+          <div class="arch-step-text">
+            앱이 Supabase에 요청할 때마다 <em>getToken()</em>으로 JWT를 꺼내
+            <em>accessToken</em> 헤더에 자동으로 첨부한다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">③ RLS로 필터링</div>
+          <div class="arch-step-text">
+            Supabase가 JWT를 열어 <em>사용자 ID</em>를 확인하고,
+            그 ID가 일치하는 행만 돌려준다. 남의 데이터는 볼 수 없다.
+          </div>
+        </div>
+      </div>
+
+      <!-- RLS 설명 -->
+      <div class="arch-rls">
+        <div class="arch-rls-icon">🛡️</div>
+        <div class="arch-rls-body">
+          <div class="arch-rls-label">③ Row Level Security</div>
+          <code class="arch-rls-code">auth.jwt()->>'sub' = user_id</code>
+          <div class="arch-rls-desc">JWT의 sub(사용자 ID)와 DB의 user_id가 일치하는 행만 반환</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       SLIDE 8: Summary
   ═══════════════════════════ -->
   <div class="slide s-summary">
     <div class="s-summary-inner">
@@ -738,8 +939,9 @@ export const supabase = createClient(url, anonKey, {
   <div class="dot" onclick="goto(4)"></div>
   <div class="dot" onclick="goto(5)"></div>
   <div class="dot" onclick="goto(6)"></div>
+  <div class="dot" onclick="goto(7)"></div>
 </div>
-<div class="slide-counter">1 / 7</div>
+<div class="slide-counter">1 / 8</div>
 <div class="nav-hint">← → 방향키로 이동</div>
 
 <script>
@@ -787,7 +989,7 @@ export const supabase = createClient(url, anonKey, {
     tlA1.classList.toggle('active', n === 2)
     tlS2.classList.toggle('active', n === 3)
     tlA2.classList.toggle('active', n === 4)
-    tlS3.classList.toggle('active', n === 5)
+    tlS3.classList.toggle('active', n === 5 || n === 6)
   }
   updateTimeline(0) // init
 
