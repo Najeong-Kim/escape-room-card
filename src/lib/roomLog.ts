@@ -7,6 +7,7 @@ export interface RoomLog {
   cleared: boolean
   hints_used?: number | null
   remaining_minutes?: number | null
+  remaining_seconds?: number | null
   rating: 0 | 1 | 2 | 3 | 4 | 5 | null
   difficulty_score?: number | null
   fear_score?: number | null

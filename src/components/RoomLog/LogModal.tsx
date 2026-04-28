@@ -32,6 +32,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
   const [cleared, setCleared] = useState(true)
   const [hintsUsed, setHintsUsed] = useState<number | null>(null)
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null)
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
   const [rating, setRating] = useState<PathRating | null>(null)
   const [memo, setMemo] = useState('')
   const [metricScores, setMetricScores] = useState<MetricScores>({})
@@ -60,6 +61,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       cleared,
       hints_used: cleared ? hintsUsed : null,
       remaining_minutes: cleared ? remainingMinutes : null,
+      remaining_seconds: cleared ? remainingSeconds : null,
       rating,
       difficulty_score: metricScores.difficulty ?? null,
       fear_score: metricScores.fear ?? null,
@@ -73,7 +75,7 @@ export function LogModal({ room, onClose, onSaved }: Props) {
       saveUserRoomLog(newLog),
       submitCommunityRating(room.id, rating),
       submitCommunityMetricRatings(room.id, metricScores),
-      submitCommunityEscapeStats(room.id, cleared, cleared ? hintsUsed : null, cleared ? remainingMinutes : null),
+      submitCommunityEscapeStats(room.id, cleared, cleared ? hintsUsed : null, cleared ? remainingMinutes : null, cleared ? remainingSeconds : null),
     ])
     setSaving(false)
     onSaved()
@@ -180,24 +182,41 @@ export function LogModal({ room, onClose, onSaved }: Props) {
                 )}
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">남은 시간 (분)</label>
-                <div className="flex items-center gap-2 bg-[#0e0e16] border border-white/10 rounded-xl px-3 py-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setRemainingMinutes(v => Math.max(0, (v ?? 0) - 1))}
-                    className="text-gray-400 hover:text-white w-5 text-center leading-none"
-                  >−</button>
-                  <span className="flex-1 text-center text-white text-sm tabular-nums">
-                    {remainingMinutes !== null ? `${remainingMinutes}분` : '—'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setRemainingMinutes(v => (v ?? -1) + 1)}
-                    className="text-gray-400 hover:text-white w-5 text-center leading-none"
-                  >+</button>
+                <label className="text-xs text-gray-400">남은 시간</label>
+                <div className="flex gap-1.5">
+                  <div className="flex-1 flex items-center gap-1 bg-[#0e0e16] border border-white/10 rounded-xl px-2 py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setRemainingMinutes(v => Math.max(0, (v ?? 0) - 1))}
+                      className="text-gray-400 hover:text-white w-4 text-center leading-none"
+                    >−</button>
+                    <span className="flex-1 text-center text-white text-sm tabular-nums">
+                      {remainingMinutes !== null ? `${remainingMinutes}분` : '—'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setRemainingMinutes(v => (v ?? -1) + 1)}
+                      className="text-gray-400 hover:text-white w-4 text-center leading-none"
+                    >+</button>
+                  </div>
+                  <div className="flex-1 flex items-center gap-1 bg-[#0e0e16] border border-white/10 rounded-xl px-2 py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setRemainingSeconds(v => Math.max(0, (v ?? 0) - 1))}
+                      className="text-gray-400 hover:text-white w-4 text-center leading-none"
+                    >−</button>
+                    <span className="flex-1 text-center text-white text-sm tabular-nums">
+                      {remainingSeconds !== null ? `${remainingSeconds}초` : '—'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setRemainingSeconds(v => Math.min(59, (v ?? -1) + 1))}
+                      className="text-gray-400 hover:text-white w-4 text-center leading-none"
+                    >+</button>
+                  </div>
                 </div>
-                {remainingMinutes !== null && (
-                  <button type="button" onClick={() => setRemainingMinutes(null)} className="text-[11px] text-gray-600 hover:text-gray-400 text-right">초기화</button>
+                {(remainingMinutes !== null || remainingSeconds !== null) && (
+                  <button type="button" onClick={() => { setRemainingMinutes(null); setRemainingSeconds(null) }} className="text-[11px] text-gray-600 hover:text-gray-400 text-right">초기화</button>
                 )}
               </div>
             </div>

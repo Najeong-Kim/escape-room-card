@@ -152,12 +152,13 @@ export async function submitCommunityEscapeStats(
   cleared: boolean,
   hintsUsed: number | null,
   remainingMinutes: number | null,
+  remainingSeconds: number | null = null,
 ): Promise<void> {
   const sessionId = getSessionId()
   const { error } = await supabase
     .from('room_escape_stats')
     .upsert(
-      { room_id: roomId, session_id: sessionId, cleared, hints_used: hintsUsed, remaining_minutes: remainingMinutes },
+      { room_id: roomId, session_id: sessionId, cleared, hints_used: hintsUsed, remaining_minutes: remainingMinutes, remaining_seconds: remainingSeconds },
       { onConflict: 'room_id,session_id' },
     )
   if (error) console.warn('submitCommunityEscapeStats failed', error.message)

@@ -12,6 +12,7 @@ interface UserRoomLogRow {
   cleared: boolean
   hints_used: number | null
   remaining_minutes: number | null
+  remaining_seconds: number | null
   rating: RoomLog['rating']
   difficulty_score: number | null
   fear_score: number | null
@@ -33,6 +34,7 @@ function rowToLog(row: UserRoomLogRow): RoomLog {
     cleared: row.cleared,
     hints_used: row.hints_used,
     remaining_minutes: row.remaining_minutes,
+    remaining_seconds: row.remaining_seconds,
     rating: row.rating,
     difficulty_score: row.difficulty_score,
     fear_score: row.fear_score,
@@ -55,6 +57,7 @@ function logToPayload(log: RoomLog, userId: string) {
     cleared: log.cleared,
     hints_used: log.hints_used ?? null,
     remaining_minutes: log.remaining_minutes ?? null,
+    remaining_seconds: log.remaining_seconds ?? null,
     rating: log.rating,
     difficulty_score: log.difficulty_score ?? null,
     fear_score: log.fear_score ?? null,
@@ -92,6 +95,7 @@ export async function fetchUserRoomLogs(): Promise<RoomLog[]> {
       'cleared',
       'hints_used',
       'remaining_minutes',
+      'remaining_seconds',
       'rating',
       'difficulty_score',
       'fear_score',
