@@ -35,12 +35,46 @@
 
     .presentation { width: 100vw; height: 100vh; position: relative; }
 
+    /* ── Stage timeline ── */
+    .stage-timeline {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      gap: 2px;
+      padding: 14px 0 18px;
+      background: linear-gradient(to bottom, rgba(10,10,15,0.94) 55%, transparent);
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .tl-stage {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: 11px; font-weight: 500;
+      color: rgba(255,255,255,0.2);
+      transition: color 0.4s, font-weight 0.4s;
+    }
+    .tl-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor; flex-shrink: 0;
+      transition: transform 0.4s;
+    }
+    .tl-stage.active           { font-weight: 700; }
+    .tl-stage.active .tl-dot   { transform: scale(1.5); }
+    #tl-s1.active { color: var(--s1); }
+    #tl-s2.active { color: var(--s2); }
+    #tl-s3.active { color: var(--s3); }
+    .tl-sep {
+      font-size: 13px; padding: 0 6px;
+      color: rgba(255,255,255,0.14);
+      transition: color 0.4s;
+    }
+    .tl-sep.active { color: var(--why); }
+
     /* ── Slide base ── */
     .slide {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      padding: 48px 68px;
+      padding: 72px 68px 48px;
       opacity: 0; pointer-events: none;
       transition: opacity 0.35s ease, transform 0.35s ease;
       transform: translateX(48px);
@@ -304,6 +338,14 @@
   </style>
 </head>
 <body>
+<div class="stage-timeline" id="timeline">
+  <div class="tl-stage" id="tl-s1"><span class="tl-dot"></span>Stage 1 · localStorage</div>
+  <div class="tl-sep"   id="tl-a1">→</div>
+  <div class="tl-stage" id="tl-s2"><span class="tl-dot"></span>Stage 2 · Supabase Auth</div>
+  <div class="tl-sep"   id="tl-a2">→</div>
+  <div class="tl-stage" id="tl-s3"><span class="tl-dot"></span>Stage 3 · Clerk + Supabase</div>
+</div>
+
 <div class="presentation">
 
   <!-- ═══════════════════════════
@@ -730,6 +772,25 @@ export const supabase = createClient(url, anonKey, {
   const counter = document.querySelector('.slide-counter')
   let cur = 0
 
+  // Timeline: slide index → which element is active
+  // 0=title, 1=s1, 2=why1→2, 3=s2, 4=why2→3, 5=s3, 6=summary
+  const tlS1 = document.getElementById('tl-s1')
+  const tlS2 = document.getElementById('tl-s2')
+  const tlS3 = document.getElementById('tl-s3')
+  const tlA1 = document.getElementById('tl-a1')
+  const tlA2 = document.getElementById('tl-a2')
+  const tl   = document.getElementById('timeline')
+
+  function updateTimeline(n) {
+    tl.style.opacity = n === 0 ? '0' : '1'
+    tlS1.classList.toggle('active', n === 1)
+    tlA1.classList.toggle('active', n === 2)
+    tlS2.classList.toggle('active', n === 3)
+    tlA2.classList.toggle('active', n === 4)
+    tlS3.classList.toggle('active', n === 5)
+  }
+  updateTimeline(0) // init
+
   function goto(n) {
     if (n === cur || n < 0 || n >= slides.length) return
     const forward = n > cur
@@ -746,6 +807,7 @@ export const supabase = createClient(url, anonKey, {
 
     dots.forEach((d, i) => d.classList.toggle('active', i === cur))
     counter.textContent = `${cur + 1} / ${slides.length}`
+    updateTimeline(cur)
   }
 
   document.addEventListener('keydown', e => {
