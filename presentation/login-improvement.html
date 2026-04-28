@@ -401,6 +401,56 @@
     }
     .arch-rls-desc { font-size: 12px; color: var(--muted); }
 
+    /* Stage 1 arch — browser wrapper */
+    .arch-browser-wrap {
+      border: 1.5px dashed rgba(107,114,128,0.35);
+      border-radius: 18px; padding: 20px 28px;
+      position: relative; margin-bottom: 20px;
+      display: flex; justify-content: center;
+    }
+    .arch-browser-label {
+      position: absolute; top: -9px; left: 20px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--s1);
+      background: var(--bg); padding: 0 8px;
+    }
+    .arch-no-server {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 100px; padding: 6px 18px;
+      margin-bottom: 24px;
+    }
+    .arch-node.n-storage {
+      border-color: rgba(107,114,128,0.4);
+      background: rgba(107,114,128,0.07);
+    }
+    .arch-node.n-storage .arch-node-tag {
+      color: var(--s1); background: rgba(107,114,128,0.2);
+    }
+    .arch-conn-head-left {
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 8px solid rgba(255,255,255,0.3);
+    }
+    /* Stage 2 arch — Supabase group */
+    .arch-supabase-group {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .arch-supabase-group-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--s2);
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.22);
+      border-radius: 100px; padding: 3px 14px;
+    }
+    .arch-supabase-group-nodes {
+      display: flex; align-items: center; gap: 0;
+      border: 1.5px solid rgba(59,130,246,0.22);
+      border-radius: 18px; padding: 12px 16px;
+      background: rgba(59,130,246,0.04);
+    }
+
     /* Step cards */
     .arch-steps {
       display: grid; grid-template-columns: repeat(3, 1fr);
@@ -543,7 +593,71 @@ export function getSessionId(): string {
   </div>
 
   <!-- ═══════════════════════════
-       SLIDE 3: Why 1→2
+       SLIDE 3: Stage 1 Architecture
+  ═══════════════════════════ -->
+  <div class="slide s-arch">
+    <div class="s-arch-inner">
+      <p class="arch-eyebrow">Stage 1 · 데이터 흐름</p>
+      <h2>localStorage 아키텍처</h2>
+      <p class="arch-sub">서버가 없다. 모든 것이 브라우저 안에서 일어난다.</p>
+
+      <div class="arch-browser-wrap">
+        <div class="arch-browser-label">브라우저</div>
+        <div class="arch-flow" style="margin-bottom:0;">
+          <div class="arch-node" style="min-width:150px;">
+            <div class="arch-node-icon">⚛️</div>
+            <div class="arch-node-name">앱</div>
+            <div class="arch-node-role">React</div>
+          </div>
+          <div class="arch-conn">
+            <div class="arch-conn-arrow">
+              <div class="arch-conn-head-left"></div>
+              <div class="arch-conn-line" style="opacity:.6;background:linear-gradient(to right,rgba(255,255,255,.3),rgba(255,255,255,.3));"></div>
+              <div class="arch-conn-head"></div>
+            </div>
+            <div class="arch-conn-label">읽기 / 쓰기</div>
+          </div>
+          <div class="arch-node n-storage" style="min-width:190px;">
+            <div class="arch-node-icon">💾</div>
+            <div class="arch-node-name">localStorage</div>
+            <div class="arch-node-role">브라우저 내부 저장소</div>
+            <span class="arch-node-tag">UUID · 기록 · 프로필</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;">
+        <div class="arch-no-server">⚠️&nbsp; 서버 없음 — 데이터가 이 브라우저 밖으로 나가지 않는다</div>
+      </div>
+
+      <div class="arch-steps">
+        <div class="arch-step">
+          <div class="arch-step-num">① 앱 실행</div>
+          <div class="arch-step-text">
+            localStorage에서 <em>UUID</em>를 불러온다.
+            없으면 <em>crypto.randomUUID()</em>로 새로 만들어 저장한다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">② 데이터 저장</div>
+          <div class="arch-step-text">
+            방탈출 기록·프로필이 모두 <em>localStorage</em>에 저장된다.
+            네트워크 요청이 전혀 없다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">③ 다음 방문</div>
+          <div class="arch-step-text">
+            같은 브라우저라면 UUID가 유지되어 데이터가 남는다.
+            <em>다른 기기·브라우저 초기화 시 데이터가 사라진다.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       SLIDE 4: Why 1→2
   ═══════════════════════════ -->
   <div class="slide s-why">
     <div class="s-why-inner">
@@ -661,7 +775,86 @@ supabase.auth.onAuthStateChange((_event, session) => {
   </div>
 
   <!-- ═══════════════════════════
-       SLIDE 5: Why 2→3
+       SLIDE 6: Stage 2 Architecture
+  ═══════════════════════════ -->
+  <div class="slide s-arch">
+    <div class="s-arch-inner">
+      <p class="arch-eyebrow">Stage 2 · 인증 흐름</p>
+      <h2>Supabase Auth 아키텍처</h2>
+      <p class="arch-sub">Supabase 하나가 인증과 데이터를 모두 담당한다.</p>
+
+      <div class="arch-flow">
+        <div class="arch-node" style="min-width:140px;">
+          <div class="arch-node-icon">👤</div>
+          <div class="arch-node-name">사용자</div>
+          <div class="arch-node-role">브라우저</div>
+        </div>
+
+        <div class="arch-conn">
+          <div class="arch-conn-step">① 이메일 OTP</div>
+          <div class="arch-conn-arrow">
+            <div class="arch-conn-line"></div>
+            <div class="arch-conn-head"></div>
+          </div>
+          <div class="arch-conn-code">signInWithOtp()</div>
+        </div>
+
+        <!-- Supabase Auth + DB as one service -->
+        <div class="arch-supabase-group">
+          <div class="arch-supabase-group-label">Supabase — 단일 서비스</div>
+          <div class="arch-supabase-group-nodes">
+            <div class="arch-node n-supabase" style="min-width:145px;">
+              <div class="arch-node-icon">✉️</div>
+              <div class="arch-node-name">Auth</div>
+              <div class="arch-node-role">인증 · 세션 관리</div>
+              <span class="arch-node-tag">매직링크 발송</span>
+            </div>
+            <div class="arch-conn" style="min-width:90px;">
+              <div class="arch-conn-step">② 세션</div>
+              <div class="arch-conn-arrow">
+                <div class="arch-conn-line"></div>
+                <div class="arch-conn-head"></div>
+              </div>
+              <div class="arch-conn-code">auth.uid()</div>
+            </div>
+            <div class="arch-node n-supabase" style="min-width:145px;">
+              <div class="arch-node-icon">🗄️</div>
+              <div class="arch-node-name">DB</div>
+              <div class="arch-node-role">데이터 저장</div>
+              <span class="arch-node-tag">RLS 검증</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-steps" style="margin-top:20px;">
+        <div class="arch-step">
+          <div class="arch-step-num">① 이메일 입력</div>
+          <div class="arch-step-text">
+            <em>signInWithOtp()</em>를 호출하면 Supabase Auth가
+            <em>매직링크</em>를 이메일로 발송한다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">② 링크 클릭 → 세션</div>
+          <div class="arch-step-text">
+            링크 클릭 시 Supabase가 <em>세션 쿠키</em>를 생성한다.
+            별도 서버 없이 Supabase가 모두 처리한다.
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">③ RLS로 필터링</div>
+          <div class="arch-step-text">
+            DB 요청 시 <em>auth.uid()</em>로 본인을 확인한다.
+            Stage 3과 달리 Supabase 내부 세션만으로 동작한다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════
+       SLIDE 7: Why 2→3
   ═══════════════════════════ -->
   <div class="slide s-why">
     <div class="s-why-inner">
@@ -940,8 +1133,10 @@ export const supabase = createClient(url, anonKey, {
   <div class="dot" onclick="goto(5)"></div>
   <div class="dot" onclick="goto(6)"></div>
   <div class="dot" onclick="goto(7)"></div>
+  <div class="dot" onclick="goto(8)"></div>
+  <div class="dot" onclick="goto(9)"></div>
 </div>
-<div class="slide-counter">1 / 8</div>
+<div class="slide-counter">1 / 10</div>
 <div class="nav-hint">← → 방향키로 이동</div>
 
 <script>
@@ -983,13 +1178,17 @@ export const supabase = createClient(url, anonKey, {
   const tlA2 = document.getElementById('tl-a2')
   const tl   = document.getElementById('timeline')
 
+  // Slide index map (10 slides):
+  // 0=title, 1=s1-code, 2=s1-arch, 3=why1→2,
+  // 4=s2-code, 5=s2-arch, 6=why2→3,
+  // 7=s3-code, 8=s3-arch, 9=summary
   function updateTimeline(n) {
     tl.style.opacity = n === 0 ? '0' : '1'
-    tlS1.classList.toggle('active', n === 1)
-    tlA1.classList.toggle('active', n === 2)
-    tlS2.classList.toggle('active', n === 3)
-    tlA2.classList.toggle('active', n === 4)
-    tlS3.classList.toggle('active', n === 5 || n === 6)
+    tlS1.classList.toggle('active', n === 1 || n === 2)
+    tlA1.classList.toggle('active', n === 3)
+    tlS2.classList.toggle('active', n === 4 || n === 5)
+    tlA2.classList.toggle('active', n === 6)
+    tlS3.classList.toggle('active', n === 7 || n === 8)
   }
   updateTimeline(0) // init
 
