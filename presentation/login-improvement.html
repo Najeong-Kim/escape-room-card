@@ -273,6 +273,34 @@
     .tick { color: var(--pro); font-weight: 700; }
     .cross { color: var(--con); }
     .dim  { color: var(--muted); font-size: 13px; }
+
+    /* ── Image modal ── */
+    #img-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      justify-content: center; align-items: center;
+      cursor: zoom-out;
+    }
+    #img-modal.open { display: flex; }
+    #img-modal img {
+      max-width: min(800px, 90vw); max-height: 90vh;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+      cursor: default;
+      object-fit: contain;
+    }
+    #img-modal-close {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 24px; color: rgba(255,255,255,0.5);
+      cursor: pointer; line-height: 1;
+      transition: color 0.2s;
+    }
+    #img-modal-close:hover { color: #fff; }
+    .img-wrap img { cursor: zoom-in; }
   </style>
 </head>
 <body>
@@ -653,6 +681,12 @@ export const supabase = createClient(url, anonKey, {
 
 </div>
 
+<!-- Image modal -->
+<div id="img-modal" onclick="closeModal()">
+  <span id="img-modal-close" onclick="closeModal()">✕</span>
+  <img id="img-modal-img" src="" alt="">
+</div>
+
 <!-- Nav -->
 <div class="progress">
   <div class="dot active" onclick="goto(0)"></div>
@@ -668,6 +702,28 @@ export const supabase = createClient(url, anonKey, {
 
 <script>
   hljs.highlightAll()
+
+  // Image modal
+  const modal    = document.getElementById('img-modal')
+  const modalImg = document.getElementById('img-modal-img')
+
+  document.querySelectorAll('.img-wrap img').forEach(img => {
+    img.addEventListener('click', e => {
+      e.stopPropagation()
+      modalImg.src = img.src
+      modalImg.alt = img.alt
+      modal.classList.add('open')
+    })
+  })
+
+  function closeModal() { modal.classList.remove('open') }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal()
+  })
+
+  // prevent modal image click from closing modal
+  modalImg.addEventListener('click', e => e.stopPropagation())
 
   const slides  = Array.from(document.querySelectorAll('.slide'))
   const dots    = Array.from(document.querySelectorAll('.dot'))
@@ -693,6 +749,7 @@ export const supabase = createClient(url, anonKey, {
   }
 
   document.addEventListener('keydown', e => {
+    if (modal.classList.contains('open')) return
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goto(cur + 1) }
     if (e.key === 'ArrowLeft')                    { e.preventDefault(); goto(cur - 1) }
     if (e.key === 'Home')                         { e.preventDefault(); goto(0) }
